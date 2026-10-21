@@ -9,7 +9,7 @@
     "dev": "nodemon server.js --delay 2 --verbose",
     "dev:debug": "nodemon --inspect server.js",
     "dev:monitor": "node monitor.js",
-    "seed": "node seeds/debtifyDemoSeed.js",
+    "seed": "node seeds/debtifySeed.js",
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop all",
     "pm2:restart": "pm2 restart all",

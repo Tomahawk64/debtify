@@ -58,7 +58,7 @@ cd server
 npm run seed
 ```
 
-This creates a demo organization, one user per role, and sample leads.
+This creates the organization and the four core accounts (superadmin, admin, agent1, agent2) defined in `server/seeds/debtifySeed.js`. Edit that file to change the names/emails/passwords before running it — credentials aren't documented here since they're real login credentials, not demo ones.
 
 ### 4. Start Development Servers
 
@@ -75,15 +75,6 @@ npm run client
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:5000/api
-
-## Demo Login Credentials
-
-After running `npm run seed` (password `Demo@1234` for all):
-
-- `superadmin@debtify.com`
-- `admin@debtify.com`
-- `agent1@debtify.com`
-- `agent2@debtify.com`
 
 ## User Roles
 
