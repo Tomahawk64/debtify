@@ -303,7 +303,7 @@ const Layout = ({ onDashboardRefresh }) => {
         
         {/* Sidebar header */}
         <div className="flex items-center justify-between h-16 px-6 bg-primary-600">
-          <h1 className="text-xl font-bold text-white">LMS</h1>
+          <h1 className="text-xl font-bold text-white tracking-tight">Debtify</h1>
           <button
             onClick={() => setSidebarOpen(false)}
             className="text-white md:hidden"

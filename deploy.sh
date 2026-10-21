@@ -1,81 +1,63 @@
 #!/bin/bash
 set -e
 
-cd /root/Olivialms
+# ─────────────────────────────────────────────────────────────────────────
+# Debtify — deployment script
+#
+# This VPS hosts multiple other projects, so this app does NOT use
+# `--network host`. It binds to two specific host ports instead, chosen to
+# be unlikely to collide with anything else already running.
+#
+# BEFORE FIRST RUN:
+#   1. Verify these two ports are actually free on this VPS:
+#        ss -tlnp | grep -E ':7860|:7861'
+#      If either is taken, change BACKEND_PORT / FRONTEND_PORT below.
+#   2. Set PUBLIC_HOST below to this VPS's public IP (or domain, once you
+#      have one) so the frontend build knows where to reach the API.
+#   3. Make sure server/.env exists on the VPS with a working MONGODB_URI
+#      (not committed to git — copy it there separately).
+# ─────────────────────────────────────────────────────────────────────────
+
+BACKEND_PORT=7860
+FRONTEND_PORT=7861
+PUBLIC_HOST="CHANGE_ME"   # e.g. http://123.45.67.89  or  https://debtify.example.com
+
+cd /root/debtify
 
 echo ">> Code already pulled by CI — skipping git pull"
 
-echo ">> Building LMS backend..."
-docker build -t olivialms-backend ./server
+echo ">> Building backend..."
+docker build -t debtify-backend ./server
 
-echo ">> Building LMS frontend..."
+echo ">> Building frontend (API at ${PUBLIC_HOST}:${BACKEND_PORT})..."
 docker build \
-  --build-arg REACT_APP_API_URL=https://olivialms.cloud \
-  --build-arg REACT_APP_SOCKET_URL=https://olivialms.cloud \
-  --build-arg REACT_APP_CHAT_URL=https://rgstaffhub.reddingtonglobal.com \
-  --build-arg REACT_APP_DOMESTIC_URL=https://olivialms.cloud/domestic \
-  -t olivialms-frontend ./client
-
-echo ">> Building Domestic LMS backend..."
-docker build -t domestic-backend ./domestic-server
-
-echo ">> Building Domestic LMS frontend..."
-docker build \
-  --build-arg REACT_APP_DOM_API_URL=https://olivialms.cloud \
-  --build-arg REACT_APP_INTERNATIONAL_URL=https://olivialms.cloud \
-  -t domestic-frontend ./domestic-client
+  --build-arg REACT_APP_API_URL="${PUBLIC_HOST}:${BACKEND_PORT}" \
+  --build-arg REACT_APP_SOCKET_URL="${PUBLIC_HOST}:${BACKEND_PORT}" \
+  -t debtify-frontend ./client
 
 echo ">> Stopping old containers..."
-docker stop lms-backend 2>/dev/null || true
-docker rm lms-backend 2>/dev/null || true
-docker stop lms-frontend 2>/dev/null || true
-docker rm lms-frontend 2>/dev/null || true
+docker stop debtify-backend-c 2>/dev/null || true
+docker rm debtify-backend-c 2>/dev/null || true
+docker stop debtify-frontend-c 2>/dev/null || true
+docker rm debtify-frontend-c 2>/dev/null || true
 
-# ── Domestic backend: rescue uploads BEFORE removing old container ──────────
-echo ">> Rescuing uploaded documents from old domestic-backend container..."
-mkdir -p /root/Olivialms/domestic-server/uploads
-# Copy any files from inside the old container to the host (safe even if container absent)
-if docker inspect domestic-backend > /dev/null 2>&1; then
-  docker cp domestic-backend:/app/uploads/. /root/Olivialms/domestic-server/uploads/ 2>/dev/null || echo "  (no uploads to rescue or already on host)"
-fi
-docker stop domestic-backend 2>/dev/null || true
-docker rm domestic-backend 2>/dev/null || true
-docker stop domestic-frontend 2>/dev/null || true
-docker rm domestic-frontend 2>/dev/null || true
-
-echo ">> Starting LMS backend..."
-docker run -d --network host \
+echo ">> Starting backend on port ${BACKEND_PORT}..."
+docker run -d \
+  -p ${BACKEND_PORT}:5000 \
   --env-file ./server/.env \
-  --name lms-backend \
+  --name debtify-backend-c \
   --restart unless-stopped \
-  --memory=8g \
-  -e CLUSTER_WORKERS=4 \
-  olivialms-backend
+  --memory=4g \
+  debtify-backend
 
-echo ">> Starting LMS frontend..."
-docker run -d --network host \
-  --name lms-frontend \
+echo ">> Starting frontend on port ${FRONTEND_PORT}..."
+docker run -d \
+  -p ${FRONTEND_PORT}:3000 \
+  --name debtify-frontend-c \
   --restart unless-stopped \
-  olivialms-frontend
-
-echo ">> Starting Domestic LMS backend..."
-# Ensure uploads directory exists on host before mounting
-mkdir -p /root/Olivialms/domestic-server/uploads
-docker run -d --network host \
-  --env-file ./domestic-server/.env \
-  --name domestic-backend \
-  --restart unless-stopped \
-  -v /root/Olivialms/domestic-server/uploads:/app/uploads \
-  domestic-backend
-
-echo ">> Starting Domestic LMS frontend..."
-docker run -d --network host \
-  --name domestic-frontend \
-  --restart unless-stopped \
-  domestic-frontend
+  debtify-frontend
 
 echo ">> Cleaning up old images..."
 docker image prune -f
 
-echo ">> All services deployed successfully!"
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+echo ">> Deployed. Frontend: ${PUBLIC_HOST}:${FRONTEND_PORT}  |  Backend: ${PUBLIC_HOST}:${BACKEND_PORT}"

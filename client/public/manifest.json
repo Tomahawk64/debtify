@@ -1,15 +1,15 @@
 {
-  "short_name": "LMS",
-  "name": "Lead Management System",
+  "short_name": "Debtify",
+  "name": "Debtify - Lead Management",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#6d28d9",
   "background_color": "#ffffff"
 }

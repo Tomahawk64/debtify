@@ -449,7 +449,7 @@ const DataVendorDashboard = () => {
     <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-xl p-5 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <img src="/rglogo2.png" alt="Logo" className="h-12 w-auto object-contain" loading="eager" />
+          <img src="/debtify-logo.svg" alt="Debtify" className="h-12 w-auto object-contain" loading="eager" />
           <div className="border-l border-slate-600 pl-4">
             {/* Breadcrumb */}
             <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">

@@ -223,8 +223,8 @@ const AffiliateDashboard = () => {
               style={{ background: 'rgba(234,179,8,0.12)', border: '1px solid rgba(234,179,8,0.25)' }}
             >
               <img
-                src="/rglogo2.png"
-                alt="RG Consultancy"
+                src="/debtify-logo.svg"
+                alt="Debtify"
                 style={{ height: 52, width: 'auto', filter: 'brightness(1.05)' }}
               />
             </div>
@@ -541,7 +541,7 @@ const AffiliateDashboard = () => {
 
         {/* ── Footer branding ───────────────────────────────────── */}
         <div className="flex items-center justify-center gap-3 pt-2 pb-4 opacity-40">
-          <img src="/rglogo2.png" alt="RG" style={{ height: 18, width: 'auto' }} />
+          <img src="/debtify-logo.svg" alt="Debtify" style={{ height: 18, width: 'auto' }} />
           <span className="text-xs text-slate-400 font-medium tracking-widest uppercase">
             RG Consultancy · Affiliate Portal
           </span>

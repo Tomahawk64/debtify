@@ -311,8 +311,8 @@ const RestrictedAdminDashboard = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <img
-                src="/rglogo2.png"
-                alt="RG Consultancy"
+                src="/debtify-logo.svg"
+                alt="Debtify"
                 className="h-12 w-auto object-contain"
                 loading="eager"
               />
@@ -717,7 +717,7 @@ const RestrictedAdminDashboard = () => {
 
         {/* ── Footer ──────────────────────────────────────────────── */}
         <div className="flex items-center justify-center gap-2 py-3 opacity-60">
-          <img src="/rglogo2.png" alt="" className="h-5 w-auto" loading="lazy" />
+          <img src="/debtify-logo.svg" alt="Debtify" className="h-5 w-auto" loading="lazy" />
           <span className="text-xs font-medium text-slate-400">RG CONSULTANCY</span>
         </div>
 

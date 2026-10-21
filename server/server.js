@@ -57,18 +57,13 @@ const getCorsOrigins = () => {
     return ['http://localhost:3000', 'http://127.0.0.1:3000'];
   }
 
-  const base = [
-    'https://olivialms.cloud',
-    'https://www.olivialms.cloud',
-    'http://olivialms.cloud',
-    'http://www.olivialms.cloud'
-  ];
-
+  // Production origins come entirely from CORS_ORIGIN (comma-separated list),
+  // e.g. CORS_ORIGIN=http://123.45.67.89:7861,https://debtify.example.com
   if (process.env.CORS_ORIGIN) {
-    base.push(process.env.CORS_ORIGIN);
+    return process.env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);
   }
 
-  return base;
+  return [];
 };
 
 const corsOrigins = getCorsOrigins();
@@ -115,7 +110,7 @@ app.use('/api', limiter);
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: dev ? 50 : 200,
+  max: dev ? 2000 : 200,
   message: 'Too many login attempts.',
   standardHeaders: true,
   legacyHeaders: false,

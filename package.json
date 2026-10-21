@@ -1,7 +1,7 @@
 {
-  "name": "lms-system",
+  "name": "debtify",
   "version": "1.0.0",
-  "description": "Lead Management System - Full Stack Application",
+  "description": "Debtify - Lead Management System",
   "main": "server/server.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
@@ -14,9 +14,7 @@
     "install-all": "npm run install-server && npm run install-client",
     "seed": "cd server && npm run seed",
     "start": "cd server && npm start",
-    "deploy": "chmod +x deploy.sh && ./deploy.sh",
-    "update": "chmod +x update.sh && ./update.sh",
-    "status": "chmod +x status.sh && ./status.sh"
+    "deploy": "chmod +x deploy.sh && ./deploy.sh"
   },
   "keywords": [
     "lead-management",
@@ -27,7 +25,7 @@
     "jwt",
     "socket.io"
   ],
-  "author": "LMS Development Team",
+  "author": "Debtify",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.0"

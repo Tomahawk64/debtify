@@ -10,7 +10,7 @@
  *            application/x-www-form-urlencoded  (fallback)
  *
  * Webhook URL to share with Loop company:
- *   https://olivialms.cloud/api/webhook/loop
+ *   https://<your-deployed-domain>/api/webhook/loop
  */
 
 const express = require('express');

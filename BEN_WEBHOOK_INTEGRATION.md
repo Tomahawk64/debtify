@@ -9,7 +9,7 @@ When a user submits a form on Ben's website, your frontend should send a `POST` 
 ## Endpoint
 
 ```
-POST https://olivialms.cloud/api/webhook/ben-leads
+POST https://<your-deployed-domain>/api/webhook/ben-leads
 ```
 
 ---
@@ -53,7 +53,7 @@ Send a JSON object with the following fields:
 ### Qualify Form (debt form)
 
 ```http
-POST https://olivialms.cloud/api/webhook/ben-leads
+POST https://<your-deployed-domain>/api/webhook/ben-leads
 Content-Type: application/json
 x-api-key: d30b9786ca66bb5326588e875c57ca3808e213880e30610ad0f67b7216cecae6
 
@@ -76,7 +76,7 @@ x-api-key: d30b9786ca66bb5326588e875c57ca3808e213880e30610ad0f67b7216cecae6
 ### Contact Form (message form)
 
 ```http
-POST https://olivialms.cloud/api/webhook/ben-leads
+POST https://<your-deployed-domain>/api/webhook/ben-leads
 Content-Type: application/json
 x-api-key: d30b9786ca66bb5326588e875c57ca3808e213880e30610ad0f67b7216cecae6
 
@@ -121,7 +121,7 @@ HTTP 201 Created
 ### JavaScript / Node.js (fetch)
 
 ```javascript
-const response = await fetch('https://olivialms.cloud/api/webhook/ben-leads', {
+const response = await fetch('https://<your-deployed-domain>/api/webhook/ben-leads', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ $payload = json_encode([
     'smsOptIn'        => true,
 ]);
 
-$ch = curl_init('https://olivialms.cloud/api/webhook/ben-leads');
+$ch = curl_init('https://<your-deployed-domain>/api/webhook/ben-leads');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
@@ -173,7 +173,7 @@ echo $response;
 import requests
 
 response = requests.post(
-    'https://olivialms.cloud/api/webhook/ben-leads',
+    'https://<your-deployed-domain>/api/webhook/ben-leads',
     headers={
         'Content-Type': 'application/json',
         'x-api-key': 'd30b9786ca66bb5326588e875c57ca3808e213880e30610ad0f67b7216cecae6'

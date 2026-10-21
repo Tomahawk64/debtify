@@ -681,7 +681,7 @@ const AdminDashboard = () => {
     if (!isReddingtonAdmin) return;
     const hasUnread = websiteLeadsBadge > 0;
     if (!hasUnread) {
-      document.title = 'Lead Management System';
+      document.title = 'Debtify';
       window.dispatchEvent(new CustomEvent('adminWebsiteLeadAlert', { detail: { active: false } }));
       return;
     }
@@ -690,9 +690,9 @@ const AdminDashboard = () => {
 
     const TITLES = [
       '🚨 NEW WEBSITE LEAD!',
-      '⚠️ Lead Management System',
+      '⚠️ Debtify',
       '🔴 NEW WEBSITE LEAD!',
-      '⚡ Lead Management System',
+      '⚡ Debtify',
     ];
     let idx = 0;
     document.title = TITLES[0];
@@ -708,7 +708,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     return () => {
-      document.title = 'Lead Management System';
+      document.title = 'Debtify';
       window.dispatchEvent(new CustomEvent('adminWebsiteLeadAlert', {
         detail: { active: false }
       }));

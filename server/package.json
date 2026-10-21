@@ -1,7 +1,7 @@
 {
-  "name": "lms-backend",
+  "name": "debtify-backend",
   "version": "1.0.0",
-  "description": "Lead Management System Backend API",
+  "description": "Debtify Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,7 +9,7 @@
     "dev": "nodemon server.js --delay 2 --verbose",
     "dev:debug": "nodemon --inspect server.js",
     "dev:monitor": "node monitor.js",
-    "seed": "node seeds/newSuperAdminSeed.js",
+    "seed": "node seeds/debtifyDemoSeed.js",
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop all",
     "pm2:restart": "pm2 restart all",
@@ -22,7 +22,7 @@
     "jwt",
     "socket.io"
   ],
-  "author": "LMS Development Team",
+  "author": "Debtify",
   "license": "MIT",
   "dependencies": {
     "@socket.io/redis-adapter": "^8.3.0",
