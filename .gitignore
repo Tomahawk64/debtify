@@ -4,7 +4,6 @@
 node_modules/
 jspm_packages/
 web_modules/
-package-lock.json
 
 # ========================
 # Environment / Secrets
