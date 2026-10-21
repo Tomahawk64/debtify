@@ -125,14 +125,17 @@ After running `npm run seed` (password `Demo@1234` for all):
 - Security headers with Helmet
 - Protected routes based on user roles
 
-## Deployment
+## Deployment (debtify.solutions)
 
-The project ships with Dockerfiles for both `server/` and `client/`, and a [deploy.sh](deploy.sh) script for a Docker-based VPS deployment on non-standard ports (so it can coexist with other apps on the same server). Before running it on a new VPS:
+The project ships with Dockerfiles for both `server/` and `client/`, a [deploy.sh](deploy.sh) script, and an [nginx/debtify.solutions.conf](nginx/debtify.solutions.conf) reverse-proxy config. The containers bind to `127.0.0.1` only on two internal ports (so they coexist safely with other apps on the same VPS), and Nginx exposes the whole thing under `https://debtify.solutions` on 80/443 — frontend and API share one origin, so there's no CORS to worry about.
 
-1. Edit the `BACKEND_PORT` / `FRONTEND_PORT` / `PUBLIC_HOST` variables at the top of `deploy.sh`.
-2. Confirm the chosen ports are free: `ss -tlnp | grep -E ':<port>'`.
-3. Place a real `server/.env` on the VPS (not committed to git) with a working `MONGODB_URI`.
-4. `git pull`, then `bash deploy.sh`.
+One-time setup on a fresh VPS:
+
+1. Point DNS: in GoDaddy, change the `debtify.solutions` (and `www`) A records from "Parked" to this VPS's public IP.
+2. Verify ports 7860/7861 are free: `ss -tlnp | grep -E ':7860|:7861'` (change them in `deploy.sh` + the Nginx config together if not).
+3. Install the Nginx config and get a TLS cert — see the instructions at the top of `nginx/debtify.solutions.conf`.
+4. Place a real `server/.env` on the VPS (not committed to git) with a working `MONGODB_URI` and `CORS_ORIGIN=https://debtify.solutions,https://www.debtify.solutions`.
+5. `git pull`, then `bash deploy.sh`.
 
 ## License
 
