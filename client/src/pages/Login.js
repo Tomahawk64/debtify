@@ -39,61 +39,78 @@ const Login = () => {
   };
 
   const FormCard = ({ compact }) => (
-    <div
-      className={`w-full ${compact ? 'max-w-sm' : 'max-w-md'} bg-white/85 backdrop-blur-xl border border-white/60 shadow-2xl shadow-primary-900/20 rounded-3xl p-8 ${compact ? '' : 'lg:p-10'}`}
-    >
-      <h2 className="text-2xl font-semibold text-gray-900 mb-1 tracking-tight">Welcome back</h2>
-      <p className="text-sm text-gray-500 mb-7">Sign in to your account to continue</p>
+    <div className={`relative w-full ${compact ? 'max-w-sm' : 'max-w-[420px]'}`}>
+      {/* soft brand glow behind the card */}
+      {!compact && (
+        <div className="absolute -inset-6 bg-primary-400/25 blur-3xl rounded-[48px] -z-10" aria-hidden="true" />
+      )}
 
-      <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-            <input
-              id="email" name="email" type="email" autoComplete="email" required
-              value={formData.email} onChange={handleChange}
-              placeholder="you@company.com"
-              className="w-full pl-10 pr-3 py-2.5 bg-white/70 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
-            />
-          </div>
-        </div>
+      {/* gradient ring frame */}
+      <div className="p-px rounded-[28px] bg-gradient-to-br from-white/90 via-primary-200/50 to-white/40 shadow-2xl shadow-primary-950/20">
+        <div className={`rounded-[27px] bg-white/90 backdrop-blur-2xl p-8 ${compact ? '' : 'lg:p-10'}`}>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-            <input
-              id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" required
-              value={formData.password} onChange={handleChange}
-              placeholder="••••••••"
-              className="w-full pl-10 pr-10 py-2.5 bg-white/70 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
-            />
+          <h2 className="text-[26px] font-bold text-gray-900 mb-1.5 tracking-tight">Welcome back</h2>
+          <div className="h-1 w-10 rounded-full bg-gradient-to-r from-primary-500 to-primary-300 mb-4" />
+          <p className="text-sm text-gray-500 mb-7">Sign in to your account to continue</p>
+
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+            <div>
+              <label htmlFor="email" className="block text-xs font-semibold text-gray-600 tracking-wide uppercase mb-2">Email address</label>
+              <div className="relative">
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-primary-50 flex items-center justify-center pointer-events-none">
+                  <Mail className="h-3.5 w-3.5 text-primary-600" />
+                </div>
+                <input
+                  id="email" name="email" type="email" autoComplete="email" required
+                  value={formData.email} onChange={handleChange}
+                  placeholder="you@company.com"
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200/80 rounded-2xl text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-all focus:outline-none focus:bg-white focus:border-primary-400 focus:ring-4 focus:ring-primary-500/10"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-xs font-semibold text-gray-600 tracking-wide uppercase mb-2">Password</label>
+              <div className="relative">
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-primary-50 flex items-center justify-center pointer-events-none">
+                  <Lock className="h-3.5 w-3.5 text-primary-600" />
+                </div>
+                <input
+                  id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" required
+                  value={formData.password} onChange={handleChange}
+                  placeholder="••••••••"
+                  className="w-full pl-12 pr-11 py-3 bg-gray-50 border border-gray-200/80 rounded-2xl text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-all focus:outline-none focus:bg-white focus:border-primary-400 focus:ring-4 focus:ring-primary-500/10"
+                />
+                <button
+                  type="button" tabIndex={-1} onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 px-3.5 py-3 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                {error}
+              </div>
+            )}
+
             <button
-              type="button" tabIndex={-1} onClick={() => setShowPassword(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              type="submit" disabled={isSubmitting}
+              className="group relative w-full overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-2xl text-white text-sm font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 shadow-lg shadow-primary-900/30 hover:shadow-xl hover:shadow-primary-900/40 hover:-translate-y-0.5"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <span className="pointer-events-none absolute inset-0 -translate-x-[120%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-[120%]" />
+              <span className="relative flex items-center gap-2">
+                {isSubmitting
+                  ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Signing in…</>
+                  : <>Sign in <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+              </span>
             </button>
-          </div>
+          </form>
         </div>
-
-        {error && (
-          <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
-            {error}
-          </div>
-        )}
-
-        <button
-          type="submit" disabled={isSubmitting}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900 shadow-lg shadow-primary-900/25"
-        >
-          {isSubmitting
-            ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Signing in…</>
-            : <>Sign in <ArrowRight className="h-4 w-4" /></>}
-        </button>
-      </form>
+      </div>
     </div>
   );
 
@@ -112,7 +129,7 @@ const Login = () => {
             <span className="text-xl font-bold text-white tracking-tight drop-shadow">Debtify</span>
           </div>
         </div>
-        <div className="flex-1 flex items-start justify-center px-5 -mt-10 pb-10">
+        <div className="flex-1 flex items-start justify-center px-5 -mt-10 pb-10 animate-fade-in">
           <FormCard compact />
         </div>
       </div>
@@ -125,19 +142,26 @@ const Login = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-transparent" />
 
+        {/* ambient brand glow blobs */}
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary-400/15 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
+        <div className="absolute bottom-10 right-1/3 w-72 h-72 bg-amber-300/10 rounded-full blur-3xl pointer-events-none" />
+
         <div className="relative z-10 min-h-screen flex flex-col justify-between px-16 py-10">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 animate-fade-in">
             <img src="/favicon.svg" alt="Debtify" className="h-10 w-10 drop-shadow-lg" />
             <span className="text-2xl font-bold text-white tracking-tight" style={{ textShadow: '0 2px 16px rgba(0,0,0,0.35)' }}>Debtify</span>
           </div>
 
           <div className="flex items-center justify-between gap-16 flex-1">
-            <div className="max-w-md">
-              <h1
-                className="text-5xl font-bold leading-tight mb-5 text-white"
-                style={{ textShadow: '0 4px 24px rgba(0,0,0,0.35)' }}
-              >
-                Manage leads.<br />Close faster.
+            <div className="max-w-md animate-fade-in">
+              <h1 className="text-5xl font-bold leading-tight mb-5 text-white" style={{ textShadow: '0 4px 24px rgba(0,0,0,0.35)' }}>
+                Manage leads.<br />
+                <span
+                  className="bg-gradient-to-r from-white to-primary-200 bg-clip-text text-transparent"
+                  style={{ filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.4))' }}
+                >
+                  Close faster.
+                </span>
               </h1>
               <p className="text-white/90 text-base leading-relaxed mb-10" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>
                 A single, secure platform for your sales team to track, assign, and convert leads in real time.
@@ -145,7 +169,7 @@ const Login = () => {
               <div className="space-y-4">
                 {FEATURES.map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-white/25 to-white/5 backdrop-blur-sm border border-white/25 flex items-center justify-center flex-shrink-0 shadow-lg">
                       <Icon className="h-4 w-4 text-white" />
                     </div>
                     <span className="text-sm text-white/90" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.3)' }}>{text}</span>
@@ -154,7 +178,9 @@ const Login = () => {
               </div>
             </div>
 
-            <FormCard />
+            <div className="animate-fade-in" style={{ animationDelay: '120ms', animationFillMode: 'backwards' }}>
+              <FormCard />
+            </div>
           </div>
 
           <p className="text-xs text-white/70" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.3)' }}>
