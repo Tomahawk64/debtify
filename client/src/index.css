@@ -51,6 +51,35 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Default UI density
+   Tailwind's spacing/font-size scale is rem-based, so scaling the root
+   font-size shrinks text, padding and gaps everywhere proportionally —
+   the same effect as browser zoom, without touching any component code.
+   Deliberately NOT using the CSS `zoom` property here: it also rescales
+   the coordinate system that mouse events and getBoundingClientRect()
+   report, which would desync anything positioned via JS (the draggable
+   People Search panel, dropdown/tooltip positioning, etc.). Root
+   font-size leaves that math untouched — only rem-sized things shrink.
+   Scales down further on narrower (laptop-width) screens; large desktop
+   monitors get a more comfortable size since they have room to spare.
+   ───────────────────────────────────────────────────────────────────── */
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 1919px) {
+  html { font-size: 14px; }
+}
+
+@media (max-width: 1536px) {
+  html { font-size: 13px; }
+}
+
+@media (max-width: 1366px) {
+  html { font-size: 12px; }
+}
+
 /* Custom animations */
 @keyframes shimmer {
   0% {
