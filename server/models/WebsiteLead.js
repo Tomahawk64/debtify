@@ -1,6 +1,6 @@
 /**
  * WebsiteLead — separate collection for leads that arrive via the marketing
- * website webhook.  These are raw/unprocessed leads until Reddington admin
+ * website webhook.  These are raw/unprocessed leads until main organization admin
  * decides to import them into the main Lead collection.
  */
 const mongoose = require('mongoose');

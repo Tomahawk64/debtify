@@ -9,8 +9,8 @@ const { syncWithChatService } = require('../utils/chatSync');
 const { notifyPasswordChange } = require('../utils/notificationHelper');
 
 // Helper: check if a user is the main-org admin (privilege for chat service)
-// Override the org name via MAIN_ORG_NAME env var; default is 'REDDINGTON GLOBAL CONSULTANCY'
-const MAIN_ORG_NAME = (process.env.MAIN_ORG_NAME || 'REDDINGTON GLOBAL CONSULTANCY').trim().toUpperCase();
+// Override the org name via MAIN_ORG_NAME env var; default is 'DEBTIFY'
+const MAIN_ORG_NAME = (process.env.MAIN_ORG_NAME || 'DEBTIFY').trim().toUpperCase();
 
 const isMainOrgAdminUser = async (user) => {
   if (user.role !== 'admin' || !user.organization) return false;
@@ -159,12 +159,12 @@ router.post('/create-agent', protect, registerValidation, handleValidationErrors
     }
 
     // For admin users, agents must be in same organization
-    // Exception: Reddington admin may specify any org (like superadmin)
+    // Exception: main organization admin may specify any org (like superadmin)
     // For super admin, organization must be provided in the request body
     let organizationId = null;
     if (req.user.role === 'admin') {
-      const isReddington = await isMainOrgAdminUser(req.user);
-      if (isReddington && (req.body.organization || '').toString().trim()) {
+      const isMainOrgAdmin = await isMainOrgAdminUser(req.user);
+      if (isMainOrgAdmin && (req.body.organization || '').toString().trim()) {
         organizationId = (req.body.organization || '').toString().trim();
       } else {
         organizationId = req.user.organization;
@@ -415,7 +415,7 @@ router.post('/login', loginValidation, handleValidationErrors, async (req, res) 
     const token = generateToken(user._id);
 
     // Sync with chat service (non-blocking â€” never fails login)
-    // isMainOrgAdmin grants chat-service privilege to the Reddington org admin
+    // isMainOrgAdmin grants chat-service privilege to the main organization admin
     const mainOrgAdmin = user.role === 'admin' ? await isMainOrgAdminUser(user) : false;
     const chatToken = await syncWithChatService({
       source: 'lms',
@@ -616,7 +616,7 @@ router.put('/change-password', protect, [
     user.password = newPassword;
     await user.save();
 
-    // Fire-and-forget: notify superadmin + Reddington admin, and confirm to the user
+    // Fire-and-forget: notify superadmin + main organization admin, and confirm to the user
     notifyPasswordChange({ user: req.user }).catch((err) =>
       console.error('Password change notification error (non-fatal):', err.message)
     );
@@ -662,10 +662,10 @@ router.get('/agents', protect, async (req, res) => {
 
     let query = { role: { $in: ['agent1', 'agent2'] } };
 
-    // Reddington admin sees all orgs (like superadmin); regular admin sees own org only
+    // main organization admin sees all orgs (like superadmin); regular admin sees own org only
     if (req.user.role === 'admin') {
-      const isReddington = await isMainOrgAdminUser(req.user);
-      if (isReddington) {
+      const isMainOrgAdmin = await isMainOrgAdminUser(req.user);
+      if (isMainOrgAdmin) {
         // Optionally filter by org when provided
         if (req.query.organization) query.organization = req.query.organization;
       } else {

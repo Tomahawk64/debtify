@@ -1,7 +1,7 @@
 /**
  * BenWebsiteLead — separate collection for leads that arrive via the
  * /api/webhook/ben-leads endpoint.
- * Ben's admin can read only. Reddington (main org) admin can read + write.
+ * Ben's admin can read only. Main org admin can read + write.
  */
 const mongoose = require('mongoose');
 
@@ -45,7 +45,7 @@ const benWebsiteLeadSchema = new mongoose.Schema(
       default: null,
     },
     rawPayload: { type: mongoose.Schema.Types.Mixed },
-    // Reddington staff comments
+    // Internal staff comments
     comments: [
       {
         text:       { type: String, required: true, trim: true, maxlength: 1000 },

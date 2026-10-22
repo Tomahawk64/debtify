@@ -32,7 +32,7 @@ async function canViewLoopLeads(user) {
   try {
     const org = await Organization.findById(user.organization).lean();
     const orgName = (org?.name || '').trim().toUpperCase();
-    const isMainOrgByName = orgName === 'REDDINGTON GLOBAL CONSULTANCY';
+    const isMainOrgByName = orgName === 'DEBTIFY';
     const isMainOrgById = String(org?._id || '') === MAIN_ORG_ID;
     return !!(org && (org.showLoopLeads === true || isMainOrgByName || isMainOrgById));
   } catch {
@@ -49,7 +49,7 @@ async function canCommentOnLoopLeads(user) {
   try {
     const org = await Organization.findById(user.organization).lean();
     const orgName = (org?.name || '').trim().toUpperCase();
-    const isMainOrgByName = orgName === 'REDDINGTON GLOBAL CONSULTANCY';
+    const isMainOrgByName = orgName === 'DEBTIFY';
     const isMainOrgById = String(org?._id || '') === MAIN_ORG_ID;
     return !!(org && (isMainOrgByName || isMainOrgById));
   } catch {

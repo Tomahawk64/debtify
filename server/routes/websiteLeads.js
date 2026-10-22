@@ -11,7 +11,7 @@ const router = express.Router();
 // Returns { allowed: false }
 //      OR { allowed: true, canWrite: bool, orgFilter: ObjectId|null }
 //
-// canWrite=true  → Reddington admin or superadmin (full read + write)
+// canWrite=true  → main organization admin or superadmin (full read + write)
 // canWrite=false → any other org admin (read-only, scoped to their org)
 // orgFilter=null → no restriction (see all orgs)
 // orgFilter=<id> → restrict to that org's leads only
@@ -23,7 +23,7 @@ const getWebsiteLeadsAccess = async (user) => {
   try {
     const org = await Organization.findById(user.organization).lean();
     if (!org) return { allowed: false };
-    const isGlobal = org.name === 'REDDINGTON GLOBAL CONSULTANCY';
+    const isGlobal = org.name === 'DEBTIFY';
     return {
       allowed: true,
       canWrite: isGlobal,
@@ -40,7 +40,7 @@ router.get('/', protect, async (req, res) => {
   try {
     const access = await getWebsiteLeadsAccess(req.user);
     if (!access.allowed || !access.canWrite) {
-      return res.status(403).json({ success: false, message: 'Access restricted to Reddington admin.' });
+      return res.status(403).json({ success: false, message: 'Access restricted to the main organization admin.' });
     }
 
     const page   = Math.max(1, parseInt(req.query.page)  || 1);
@@ -101,7 +101,7 @@ router.patch('/:id/status', protect, async (req, res) => {
   try {
     const access = await getWebsiteLeadsAccess(req.user);
     if (!access.allowed || !access.canWrite) {
-      return res.status(403).json({ success: false, message: 'Access restricted to Reddington admin.' });
+      return res.status(403).json({ success: false, message: 'Access restricted to the main organization admin.' });
     }
 
     const { status } = req.body;
@@ -131,7 +131,7 @@ router.post('/:id/import', protect, async (req, res) => {
   try {
     const access = await getWebsiteLeadsAccess(req.user);
     if (!access.allowed || !access.canWrite) {
-      return res.status(403).json({ success: false, message: 'Access restricted to Reddington admin.' });
+      return res.status(403).json({ success: false, message: 'Access restricted to the main organization admin.' });
     }
 
     const websiteLead = await WebsiteLead.findById(req.params.id);
@@ -200,7 +200,7 @@ router.get('/:id', protect, async (req, res) => {
   try {
     const access = await getWebsiteLeadsAccess(req.user);
     if (!access.allowed || !access.canWrite) {
-      return res.status(403).json({ success: false, message: 'Access restricted to Reddington admin.' });
+      return res.status(403).json({ success: false, message: 'Access restricted to the main organization admin.' });
     }
 
     if (!req.params.id.match(/^[a-f\d]{24}$/i)) {
@@ -227,7 +227,7 @@ router.post('/:id/comments', protect, async (req, res) => {
   try {
     const access = await getWebsiteLeadsAccess(req.user);
     if (!access.allowed || !access.canWrite) {
-      return res.status(403).json({ success: false, message: 'Access restricted to Reddington admin.' });
+      return res.status(403).json({ success: false, message: 'Access restricted to the main organization admin.' });
     }
 
     if (!req.params.id.match(/^[a-f\d]{24}$/i)) {

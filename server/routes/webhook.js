@@ -1,7 +1,7 @@
 /**
  * Webhook route — receives lead submissions from marketing website forms.
  * Submissions are saved to the separate `websiteleads` collection (WebsiteLead model).
- * Reddington admin can then review and import them into the main Lead collection.
+ * main organization admin can then review and import them into the main Lead collection.
  *
  * Form 1 ("Send Us a Message"):
  *   firstName, lastName, email, phone, message, smsOptIn
@@ -136,7 +136,7 @@ router.post('/leads', webhookLimiter, async (req, res) => {
     // 6. Save to websiteleads collection
     const websiteLead = await WebsiteLead.create(doc);
 
-    // 7. Real-time notification to Reddington admin
+    // 7. Real-time notification to main organization admin
     if (req.io) {
       req.io.emit('newWebsiteLead', {
         _id:            websiteLead._id,

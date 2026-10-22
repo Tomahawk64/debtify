@@ -718,7 +718,7 @@ const RestrictedAdminDashboard = () => {
         {/* ── Footer ──────────────────────────────────────────────── */}
         <div className="flex items-center justify-center gap-2 py-3 opacity-60">
           <img src="/debtify-logo.svg" alt="Debtify" className="h-5 w-auto" loading="lazy" />
-          <span className="text-xs font-medium text-slate-400">RG CONSULTANCY</span>
+          <span className="text-xs font-medium text-slate-400">Restricted Admin Portal</span>
         </div>
 
       </div>

@@ -9,12 +9,12 @@ const User = require('../models/User');
 const Organization = require('../models/Organization');
 const Notification = require('../models/Notification');
 
-const MAIN_ORG_NAME = (process.env.MAIN_ORG_NAME || 'REDDINGTON GLOBAL CONSULTANCY').trim().toUpperCase();
+const MAIN_ORG_NAME = (process.env.MAIN_ORG_NAME || 'DEBTIFY').trim().toUpperCase();
 
 /**
  * Find all users that should receive "admin alert" notifications:
  *   - All active superadmins
- *   - All active admins of the main (Reddington) organisation
+ *   - All active admins of the main (main organization) organisation
  * Excludes the triggering user themselves.
  *
  * @param {string|ObjectId} excludeUserId – the user who triggered the action
@@ -79,8 +79,8 @@ const createNotificationsForMany = async (recipientIds, notifFields) => {
  * Called when an admin successfully downloads leads.
  *
  * Creates:
- *   1. An ALERT notification for all superadmins + Reddington admins
- *      (skips this step if the downloader IS a Reddington admin/superadmin)
+ *   1. An ALERT notification for all superadmins + main organization admins
+ *      (skips this step if the downloader IS a main organization admin/superadmin)
  *   2. A CONFIRM notification for the downloader themselves
  *
  * @param {object} params
@@ -98,7 +98,7 @@ const notifyLeadDownload = async ({ user, orgName, leadCount }) => {
       leadCount,
     };
 
-    // Alert for superadmin + Reddington admin (exclude the downloader)
+    // Alert for superadmin + main organization admin (exclude the downloader)
     const alertRecipients = await getAlertRecipients(user._id);
     if (alertRecipients.length > 0) {
       await createNotificationsForMany(alertRecipients, {
@@ -123,7 +123,7 @@ const notifyLeadDownload = async ({ user, orgName, leadCount }) => {
  * Called when a user successfully changes their password.
  *
  * Creates:
- *   1. An ALERT notification for all superadmins + Reddington admins
+ *   1. An ALERT notification for all superadmins + main organization admins
  *   2. A CONFIRM notification for the user themselves
  *
  * @param {object} params
@@ -148,7 +148,7 @@ const notifyPasswordChange = async ({ user }) => {
         ? 'Agent 2'
         : user.role;
 
-    // Alert for superadmin + Reddington admin (exclude the user themselves)
+    // Alert for superadmin + main organization admin (exclude the user themselves)
     const alertRecipients = await getAlertRecipients(user._id);
     if (alertRecipients.length > 0) {
       await createNotificationsForMany(alertRecipients, {

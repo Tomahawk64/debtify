@@ -142,12 +142,7 @@ organizationSchema.methods.getLeadIdPrefix = function() {
     return 'ORG'; // Fallback prefix
   }
   
-  // Special case for REDDINGTON GLOBAL CONSULTANCY
-  if (orgName.toUpperCase() === 'REDDINGTON GLOBAL CONSULTANCY') {
-    return 'RED';
-  }
-  
-  // For all other organizations: first 3 letters in uppercase
+  // First 3 letters in uppercase
   // Extract only letters and take first 3
   const letters = orgName.toUpperCase().replace(/[^A-Z]/g, '');
   return letters.substring(0, 3).padEnd(3, 'X'); // Pad with X if less than 3 letters

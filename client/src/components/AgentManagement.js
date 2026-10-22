@@ -19,8 +19,8 @@ const AgentManagement = () => {
   const [editFormData, setEditFormData] = useState({ name: '', email: '', vicidialAgentId: '' });
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Check if user can create agents (only REDDINGTON GLOBAL CONSULTANCY admins or superadmins)
-  const canCreateAgents = user?.role === 'superadmin' || user?.organization?.name === 'REDDINGTON GLOBAL CONSULTANCY';
+  // Check if user can create agents (only DEBTIFY admins or superadmins)
+  const canCreateAgents = user?.role === 'superadmin' || user?.organization?.name === 'DEBTIFY';
 
   useEffect(() => {
     fetchAgents();

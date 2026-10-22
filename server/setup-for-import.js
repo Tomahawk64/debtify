@@ -36,10 +36,10 @@ async function setupForImport() {
     } else if (users.length > 0 && orgs.length === 0) {
       // Create organization using first user
       const firstUser = users[0];
-      console.log(`Creating REDDINGTON GLOBAL CONSULTANCY organization using user: ${firstUser.name || firstUser.username}...\n`);
+      console.log(`Creating DEBTIFY organization using user: ${firstUser.name || firstUser.username}...\n`);
       
       const reddington = new Organization({
-        name: 'REDDINGTON GLOBAL CONSULTANCY',
+        name: 'DEBTIFY',
         orgPrefix: 'RED',
         contactEmail: 'admin@reddington.com',
         contactPhone: '1234567890',

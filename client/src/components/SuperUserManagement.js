@@ -9,7 +9,7 @@ import LoadingSpinner from './LoadingSpinner';
 import CreateAgentModal from './CreateAgentModal';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SuperUserManagement – cross-org user management for Reddington admin only
+// SuperUserManagement – cross-org user management for main organization admin only
 // ─────────────────────────────────────────────────────────────────────────────
 const SuperUserManagement = () => {
   const [organizations, setOrganizations] = useState([]);

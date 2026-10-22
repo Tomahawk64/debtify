@@ -6,12 +6,12 @@ const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 
-// Helper — true if the requesting user is the Reddington Global Consultancy admin
-const isReddingtonAdmin = async (user) => {
+// Helper — true if the requesting user is the main organization admin
+const isMainOrgAdmin = async (user) => {
   if (user.role !== 'admin' || !user.organization) return false;
   try {
     const org = await Organization.findById(user.organization).lean();
-    return !!(org && org.name === 'REDDINGTON GLOBAL CONSULTANCY');
+    return !!(org && org.name === 'DEBTIFY');
   } catch { return false; }
 };
 
@@ -142,12 +142,12 @@ const userValidation = [
 // @access  Private (SuperAdmin only)
 router.post('/', protect, organizationCreateValidation, handleValidationErrors, async (req, res) => {
   try {
-    // Check if user is superadmin or Reddington admin
-    const allowed = req.user.role === 'superadmin' || await isReddingtonAdmin(req.user);
+    // Check if user is superadmin or main organization admin
+    const allowed = req.user.role === 'superadmin' || await isMainOrgAdmin(req.user);
     if (!allowed) {
       return res.status(403).json({
         success: false,
-        message: 'Only superadmin or Reddington admin can create organizations'
+        message: 'Only superadmin or main organization admin can create organizations'
       });
     }
 
@@ -200,22 +200,22 @@ router.post('/', protect, organizationCreateValidation, handleValidationErrors, 
 // @access  Private (SuperAdmin only)
 router.get('/', protect, async (req, res) => {
   try {
-    // Check if user is superadmin or REDDINGTON GLOBAL CONSULTANCY admin
+    // Check if user is superadmin or DEBTIFY admin
     if (req.user.role === 'superadmin') {
       // SuperAdmin can see all organizations
     } else if (req.user.role === 'admin') {
-      // Check if admin is from REDDINGTON GLOBAL CONSULTANCY
+      // Check if admin is from DEBTIFY
       const adminOrganization = await Organization.findById(req.user.organization);
-      if (!adminOrganization || adminOrganization.name !== 'REDDINGTON GLOBAL CONSULTANCY') {
+      if (!adminOrganization || adminOrganization.name !== 'DEBTIFY') {
         return res.status(403).json({
           success: false,
-          message: 'Only superadmin or REDDINGTON GLOBAL CONSULTANCY admin can view all organizations'
+          message: 'Only superadmin or DEBTIFY admin can view all organizations'
         });
       }
     } else {
       return res.status(403).json({
         success: false,
-        message: 'Only superadmin or REDDINGTON GLOBAL CONSULTANCY admin can view all organizations'
+        message: 'Only superadmin or DEBTIFY admin can view all organizations'
       });
     }
 
@@ -271,12 +271,12 @@ router.get('/', protect, async (req, res) => {
 // @access  Private (SuperAdmin only)
 router.get('/:id', protect, async (req, res) => {
   try {
-    // Check if user is superadmin or Reddington admin
-    const allowed = req.user.role === 'superadmin' || await isReddingtonAdmin(req.user);
+    // Check if user is superadmin or main organization admin
+    const allowed = req.user.role === 'superadmin' || await isMainOrgAdmin(req.user);
     if (!allowed) {
       return res.status(403).json({
         success: false,
-        message: 'Only superadmin or Reddington admin can view organization details'
+        message: 'Only superadmin or main organization admin can view organization details'
       });
     }
 
@@ -327,12 +327,12 @@ router.get('/:id', protect, async (req, res) => {
 // @access  Private (SuperAdmin only)
 router.put('/:id', protect, organizationValidation, handleValidationErrors, async (req, res) => {
   try {
-    // Check if user is superadmin or Reddington admin
-    const allowed = req.user.role === 'superadmin' || await isReddingtonAdmin(req.user);
+    // Check if user is superadmin or main organization admin
+    const allowed = req.user.role === 'superadmin' || await isMainOrgAdmin(req.user);
     if (!allowed) {
       return res.status(403).json({
         success: false,
-        message: 'Only superadmin or Reddington admin can update organizations'
+        message: 'Only superadmin or main organization admin can update organizations'
       });
     }
 
@@ -412,12 +412,12 @@ router.put('/:id', protect, organizationValidation, handleValidationErrors, asyn
 // @access  Private (SuperAdmin only)
 router.delete('/:id', protect, async (req, res) => {
   try {
-    // Check if user is superadmin or Reddington admin
-    const allowed = req.user.role === 'superadmin' || await isReddingtonAdmin(req.user);
+    // Check if user is superadmin or main organization admin
+    const allowed = req.user.role === 'superadmin' || await isMainOrgAdmin(req.user);
     if (!allowed) {
       return res.status(403).json({
         success: false,
-        message: 'Only superadmin or Reddington admin can delete organizations'
+        message: 'Only superadmin or main organization admin can delete organizations'
       });
     }
 
@@ -461,12 +461,12 @@ router.delete('/:id', protect, async (req, res) => {
 // @access  Private (SuperAdmin only)
 router.post('/:id/users', protect, userValidation, handleValidationErrors, async (req, res) => {
   try {
-    // Check if user is superadmin or Reddington admin
-    const allowed = req.user.role === 'superadmin' || await isReddingtonAdmin(req.user);
+    // Check if user is superadmin or main organization admin
+    const allowed = req.user.role === 'superadmin' || await isMainOrgAdmin(req.user);
     if (!allowed) {
       return res.status(403).json({
         success: false,
-        message: 'Only superadmin or Reddington admin can create users in organizations'
+        message: 'Only superadmin or main organization admin can create users in organizations'
       });
     }
 
@@ -531,12 +531,12 @@ router.post('/:id/users', protect, userValidation, handleValidationErrors, async
 // @access  Private (SuperAdmin only)
 router.get('/:id/users', protect, async (req, res) => {
   try {
-    // Check if user is superadmin or Reddington admin
-    const allowed = req.user.role === 'superadmin' || await isReddingtonAdmin(req.user);
+    // Check if user is superadmin or main organization admin
+    const allowed = req.user.role === 'superadmin' || await isMainOrgAdmin(req.user);
     if (!allowed) {
       return res.status(403).json({
         success: false,
-        message: 'Only superadmin or Reddington admin can view organization users'
+        message: 'Only superadmin or main organization admin can view organization users'
       });
     }
 
@@ -676,12 +676,12 @@ router.delete('/:orgId/users/:userId', protect, async (req, res) => {
 
 // @desc    Generate a new webhook API key for an organization
 // @route   POST /api/organizations/:id/webhook-key
-// @access  Private (Admin of that org, SuperAdmin, or Reddington admin)
+// @access  Private (Admin of that org, SuperAdmin, or main organization admin)
 router.post('/:id/webhook-key', protect, async (req, res) => {
   try {
     const allowed =
       req.user.role === 'superadmin' ||
-      (await isReddingtonAdmin(req.user)) ||
+      (await isMainOrgAdmin(req.user)) ||
       (req.user.role === 'admin' && String(req.user.organization) === String(req.params.id));
 
     if (!allowed) {
@@ -722,12 +722,12 @@ router.post('/:id/webhook-key', protect, async (req, res) => {
 
 // @desc    Generate a new Ben webhook API key for an organization
 // @route   POST /api/organizations/:id/ben-webhook-key
-// @access  Private (SuperAdmin or Reddington admin)
+// @access  Private (SuperAdmin or main organization admin)
 router.post('/:id/ben-webhook-key', protect, async (req, res) => {
   try {
-    const allowed = req.user.role === 'superadmin' || (await isReddingtonAdmin(req.user));
+    const allowed = req.user.role === 'superadmin' || (await isMainOrgAdmin(req.user));
     if (!allowed) {
-      return res.status(403).json({ success: false, message: 'Only superadmin or Reddington admin can generate Ben webhook keys.' });
+      return res.status(403).json({ success: false, message: 'Only superadmin or main organization admin can generate Ben webhook keys.' });
     }
 
     const organization = await Organization.findById(req.params.id);
@@ -756,12 +756,12 @@ router.post('/:id/ben-webhook-key', protect, async (req, res) => {
 
 // @desc    Get webhook status (masked key) for an organization
 // @route   GET /api/organizations/:id/webhook-key
-// @access  Private (Admin of that org, SuperAdmin, or Reddington admin)
+// @access  Private (Admin of that org, SuperAdmin, or main organization admin)
 router.get('/:id/webhook-key', protect, async (req, res) => {
   try {
     const allowed =
       req.user.role === 'superadmin' ||
-      (await isReddingtonAdmin(req.user)) ||
+      (await isMainOrgAdmin(req.user)) ||
       (req.user.role === 'admin' && String(req.user.organization) === String(req.params.id));
 
     if (!allowed) {

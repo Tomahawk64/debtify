@@ -2,8 +2,8 @@
  * Ben Website Leads routes — /api/ben-website-leads
  *
  * Access rules:
- *   READ  → any admin (org-scoped for non-Reddington orgs)
- *   WRITE → Reddington admin or superadmin only
+ *   READ  → any admin (org-scoped for other orgs)
+ *   WRITE → main organization admin or superadmin only
  */
 
 const express = require('express');
@@ -14,7 +14,7 @@ const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
-const MAIN_ORG = 'REDDINGTON GLOBAL CONSULTANCY';
+const MAIN_ORG = 'DEBTIFY';
 
 // Returns { allowed, canWrite, orgFilter }
 const getAccess = async (user) => {
@@ -77,7 +77,7 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
-// PATCH /api/ben-website-leads/:id/status  (write — Reddington only)
+// PATCH /api/ben-website-leads/:id/status  (write — main organization only)
 router.patch('/:id/status', protect, async (req, res) => {
   try {
     const access = await getAccess(req.user);
@@ -97,7 +97,7 @@ router.patch('/:id/status', protect, async (req, res) => {
   }
 });
 
-// POST /api/ben-website-leads/:id/import  (write — Reddington only)
+// POST /api/ben-website-leads/:id/import  (write — main organization only)
 router.post('/:id/import', protect, async (req, res) => {
   try {
     const access = await getAccess(req.user);
@@ -163,7 +163,7 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
-// POST /api/ben-website-leads/:id/comments  (write — Reddington only)
+// POST /api/ben-website-leads/:id/comments  (write — main organization only)
 router.post('/:id/comments', protect, async (req, res) => {
   try {
     const access = await getAccess(req.user);

@@ -5,9 +5,9 @@ const mongoose = require('mongoose');
  * This keeps queries simple: always filter by { recipient: userId }.
  *
  * Types:
- *   lead_download_alert    – sent to superadmin + Reddington admin when an org admin downloads
+ *   lead_download_alert    – sent to superadmin + main organization admin when an org admin downloads
  *   lead_download_confirm  – sent to the downloading admin as confirmation
- *   password_change_alert  – sent to superadmin + Reddington admin when any user changes password
+ *   password_change_alert  – sent to superadmin + main organization admin when any user changes password
  *   password_change_confirm– sent to the user themselves as confirmation
  */
 const notificationSchema = new mongoose.Schema(

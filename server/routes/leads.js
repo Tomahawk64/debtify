@@ -90,7 +90,7 @@ const getOrganizationNameById = async (organizationId) => {
  * Build the MongoDB filter that scopes a leads query to the org admin's visible leads.
  *
  * Returns:
- *   null                                       → Reddington admin, no scope restriction (sees all leads)
+ *   null                                       → main organization admin, no scope restriction (sees all leads)
  *   { $or: [sourceId match, vicidialDid match] } → org has both sourceIds and inboundDids
  *   { sourceId: { $in: [...] } }               → org has sourceIds configured; filter by source ID
  *   { vicidialDid: { $in: [...] } }            → org has inboundDids configured; filter by DID
@@ -103,7 +103,7 @@ const buildAdminLeadScopeFilter = async (user) => {
     .select('name sourceIds inboundDids')
     .lean();
   if (!adminOrg) return { organization: user.organization };
-  if (adminOrg.name === 'REDDINGTON GLOBAL CONSULTANCY') return null; // no restriction
+  if (adminOrg.name === 'DEBTIFY') return null; // no restriction
   const hasSourceIds = Array.isArray(adminOrg.sourceIds) && adminOrg.sourceIds.length > 0;
   const hasInboundDids = Array.isArray(adminOrg.inboundDids) && adminOrg.inboundDids.length > 0;
   if (hasSourceIds && hasInboundDids) {
@@ -591,12 +591,12 @@ router.get('/export', [
 
     // --- Permission gate ---
     // Superadmin: always allowed.
-    // Admin from REDDINGTON: always allowed (cross-org visibility).
+    // Admin from the main organization: always allowed (cross-org visibility).
     // Other admins: only allowed if canDownloadLeads === true.
     if (user.role === 'admin') {
       const exportOrg = await Organization.findById(user.organization).select('name').lean();
-      const isReddington = exportOrg && exportOrg.name === 'REDDINGTON GLOBAL CONSULTANCY';
-      if (!isReddington && !user.canDownloadLeads) {
+      const isMainOrgAdmin = exportOrg && exportOrg.name === 'DEBTIFY';
+      if (!isMainOrgAdmin && !user.canDownloadLeads) {
         return res.status(403).json({
           success: false,
           message: 'You do not have permission to download leads. Contact your administrator.'
@@ -612,7 +612,7 @@ router.get('/export', [
     if (req.user.role === 'admin') {
       const scopeFilter = await buildAdminLeadScopeFilter(req.user);
       if (scopeFilter === null) {
-        // Reddington admin — can optionally filter by a specific organisation
+        // main organization admin — can optionally filter by a specific organisation
         if (req.query.organization) {
           filter.organization = req.query.organization;
         }
@@ -972,7 +972,7 @@ router.get('/export', [
 
     res.status(200).send(csvContent);
 
-    // Fire-and-forget: notify superadmin + Reddington admin about the download,
+    // Fire-and-forget: notify superadmin + main organization admin about the download,
     // and confirm to the downloader themselves. This runs AFTER the response is sent.
     (async () => {
       try {
@@ -1125,7 +1125,7 @@ router.get('/', protect, [
     if (req.user.role === 'admin') {
       const scopeFilter = await buildAdminLeadScopeFilter(req.user);
       if (scopeFilter === null) {
-        // Reddington admin — can optionally filter by a specific organisation
+        // main organization admin — can optionally filter by a specific organisation
         if (req.query.organization) {
           filter.organization = req.query.organization;
         }
@@ -1365,7 +1365,7 @@ router.get('/available-agents', protect, async (req, res) => {
 
     // Get current user's organization
     const currentUserWithOrg = await User.findById(req.user._id).populate('organization');
-    const mainOrgName = 'REDDINGTON GLOBAL CONSULTANCY';
+    const mainOrgName = 'DEBTIFY';
     let availableAgents;
     
     if (currentUserWithOrg.organization.name === mainOrgName) {
@@ -1427,7 +1427,7 @@ router.get('/today-stats', protect, authorize('admin', 'superadmin'), async (req
     let orgFilter = {};
     if (req.user.role === 'admin') {
       const scopeFilter = await buildAdminLeadScopeFilter(req.user);
-      // null → Reddington admin → see all (orgFilter stays {})
+      // null → main organization admin → see all (orgFilter stays {})
       if (scopeFilter !== null) orgFilter = scopeFilter;
     }
 
@@ -1468,7 +1468,7 @@ router.get('/call-report', protect, authorize('admin', 'superadmin'), async (req
     let orgFilter = {};
     if (req.user.role === 'admin') {
       const scopeFilter = await buildAdminLeadScopeFilter(req.user);
-      // null → Reddington admin → see all (orgFilter stays {})
+      // null → main organization admin → see all (orgFilter stays {})
       if (scopeFilter !== null) orgFilter = scopeFilter;
     }
 
@@ -1600,9 +1600,9 @@ router.get('/:id', protect, async (req, res) => {
         .select('name sourceIds inboundDids')
         .lean();
 
-      const isReddington = adminOrg && adminOrg.name === 'REDDINGTON GLOBAL CONSULTANCY';
+      const isMainOrgAdmin = adminOrg && adminOrg.name === 'DEBTIFY';
 
-      if (!isReddington) {
+      if (!isMainOrgAdmin) {
         const hasSourceIds = Array.isArray(adminOrg?.sourceIds) && adminOrg.sourceIds.length > 0;
         const hasInboundDids = Array.isArray(adminOrg?.inboundDids) && adminOrg.inboundDids.length > 0;
 
@@ -1863,14 +1863,14 @@ router.put('/:id', protect, updateLeadValidation, handleValidationErrors, async 
       // Get admin's organization
       const adminOrganization = await Organization.findById(req.user.organization);
       
-      if (adminOrganization && adminOrganization.name === 'REDDINGTON GLOBAL CONSULTANCY') {
-        // REDDINGTON GLOBAL CONSULTANCY Admin can update leads from all organizations
-        console.log('REDDINGTON GLOBAL CONSULTANCY Admin authorized to update any lead');
+      if (adminOrganization && adminOrganization.name === 'DEBTIFY') {
+        // DEBTIFY Admin can update leads from all organizations
+        console.log('DEBTIFY Admin authorized to update any lead');
       } else {
         // Other organization admins can only VIEW leads from their organization (no update access)
         return res.status(403).json({
           success: false,
-          message: 'Only REDDINGTON GLOBAL CONSULTANCY admins can update leads'
+          message: 'Only DEBTIFY admins can update leads'
         });
       }
     } else if (['agent2', 'superadmin'].includes(req.user.role)) {
@@ -1898,11 +1898,11 @@ router.put('/:id', protect, updateLeadValidation, handleValidationErrors, async 
         'address', 'city', 'state', 'zipcode', 'notes', 'company', 'source'
       ];
     } else if (req.user.role === 'admin') {
-      // Check if admin is from REDDINGTON GLOBAL CONSULTANCY
+      // Check if admin is from DEBTIFY
       const adminOrganization = await Organization.findById(req.user.organization);
       
-      if (adminOrganization && adminOrganization.name === 'REDDINGTON GLOBAL CONSULTANCY') {
-        // REDDINGTON GLOBAL CONSULTANCY Admin can update ALL fields
+      if (adminOrganization && adminOrganization.name === 'DEBTIFY') {
+        // DEBTIFY Admin can update ALL fields
         allowedFields = [
           // Basic lead information
           'name', 'email', 'phone', 'alternatePhone', 'debtCategory', 'debtTypes',
@@ -2240,7 +2240,7 @@ router.post('/:id/assign', protect, [
 
     // Get current user's organization
     const currentUserWithOrg = await User.findById(req.user._id).populate('organization');
-    const mainOrgName = 'REDDINGTON GLOBAL CONSULTANCY';
+    const mainOrgName = 'DEBTIFY';
     
     // Check assignment rules based on organization
     if (currentUserWithOrg.organization.name === mainOrgName) {
@@ -2440,12 +2440,12 @@ router.get('/dashboard/stats', protect, async (req, res) => {
       });
       stats.activeAgents = activeAgents;
     } else if (role === 'admin') {
-      // Check if this admin belongs to REDDINGTON (same logic as the main leads list endpoint).
-      // REDDINGTON admin can see all organizations; other admins see only their own org / sourceId / inboundDid scope.
+      // Check if this admin belongs to the main organization (same logic as the main leads list endpoint).
+      // main organization admin can see all organizations; other admins see only their own org / sourceId / inboundDid scope.
       const adminOrganization = await Organization.findById(req.user.organization).select('name sourceIds inboundDids').lean();
-      const isReddingtonAdmin = adminOrganization && adminOrganization.name === 'REDDINGTON GLOBAL CONSULTANCY';
+      const isMainOrgAdmin = adminOrganization && adminOrganization.name === 'DEBTIFY';
       let orgFilter;
-      if (isReddingtonAdmin) {
+      if (isMainOrgAdmin) {
         orgFilter = {};
       } else {
         const hasSourceIds = adminOrganization && Array.isArray(adminOrganization.sourceIds) && adminOrganization.sourceIds.length > 0;
@@ -2515,8 +2515,8 @@ router.get('/dashboard/stats', protect, async (req, res) => {
       const closed = statusMap.closed || 0;
       const immediateEnrollment = results.sales[0]?.count || 0;
 
-      // REDDINGTON admin sees all agents; other admins see only their org's agents
-      const agentFilter = isReddingtonAdmin
+      // main organization admin sees all agents; other admins see only their org's agents
+      const agentFilter = isMainOrgAdmin
         ? { role: { $in: ['agent1', 'agent2'] }, isActive: { $ne: false } }
         : { organization: req.user.organization, role: { $in: ['agent1', 'agent2'] }, isActive: { $ne: false } };
       const activeAgents = await User.countDocuments(agentFilter);
@@ -2659,7 +2659,7 @@ router.get('/dashboard/follow-ups', protect, authorize('agent2', 'admin'), async
 
 // @desc    Reassign lead to another agent
 // @route   PUT /api/leads/:id/reassign
-// @access  Private (Admin of REDDINGTON GLOBAL CONSULTANCY only)
+// @access  Private (Admin of DEBTIFY only)
 router.put('/:id/reassign', protect, [
   body('assignedTo')
     .notEmpty()
@@ -2677,7 +2677,7 @@ router.put('/:id/reassign', protect, [
     console.log('Reassign request user:', req.user ? req.user.role : 'No user');
     console.log('Lead ID to reassign:', req.params.id);
 
-    // Check if user is admin of REDDINGTON GLOBAL CONSULTANCY
+    // Check if user is admin of DEBTIFY
     if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
       return res.status(403).json({
         success: false,
@@ -2685,13 +2685,13 @@ router.put('/:id/reassign', protect, [
       });
     }
 
-    // For admin role, check if they're from REDDINGTON GLOBAL CONSULTANCY
+    // For admin role, check if they're from DEBTIFY
     if (req.user.role === 'admin') {
       const adminOrganization = await Organization.findById(req.user.organization);
-      if (!adminOrganization || adminOrganization.name !== 'REDDINGTON GLOBAL CONSULTANCY') {
+      if (!adminOrganization || adminOrganization.name !== 'DEBTIFY') {
         return res.status(403).json({
           success: false,
-          message: 'Only REDDINGTON GLOBAL CONSULTANCY admins can reassign leads'
+          message: 'Only DEBTIFY admins can reassign leads'
         });
       }
     }

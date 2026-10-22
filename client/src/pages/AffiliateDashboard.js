@@ -543,7 +543,7 @@ const AffiliateDashboard = () => {
         <div className="flex items-center justify-center gap-3 pt-2 pb-4 opacity-40">
           <img src="/debtify-logo.svg" alt="Debtify" style={{ height: 18, width: 'auto' }} />
           <span className="text-xs text-slate-400 font-medium tracking-widest uppercase">
-            RG Consultancy · Affiliate Portal
+            Affiliate Portal
           </span>
         </div>
 

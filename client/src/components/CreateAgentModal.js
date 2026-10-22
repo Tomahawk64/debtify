@@ -7,8 +7,8 @@ import { useAuth } from '../contexts/AuthContext';
 const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] }) => {
   const { user } = useAuth();
   const isSuperAdmin = user?.role === 'superadmin';
-  const isReddingtonAdmin = user?.organization?.name === 'REDDINGTON GLOBAL CONSULTANCY';
-  const canPickOrg = isSuperAdmin || isReddingtonAdmin;
+  const isMainOrgAdmin = user?.organization?.name === 'DEBTIFY';
+  const canPickOrg = isSuperAdmin || isMainOrgAdmin;
 
   const [formData, setFormData] = useState({
     name: '',
@@ -183,7 +183,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
 
-          {/* Organization Field — SuperAdmin and Reddington admin (hidden for affiliate_admin) */}
+          {/* Organization Field — SuperAdmin and main organization admin (hidden for affiliate_admin) */}
           {canPickOrg && !isAffiliateRole && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

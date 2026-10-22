@@ -25,7 +25,7 @@ const fmt     = (v) => (v === undefined || v === null || v === '') ? '—' : v;
 const fmtDate = (d) => d ? new Date(d).toLocaleString('en-US', { timeZone: 'America/New_York', month: 'short', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 const fmtMoney = (n) => n != null ? `$${Number(n).toLocaleString()}` : '—';
 
-// canWrite comes from the API response — true for Reddington admin, false for Ben
+// canWrite comes from the API response — true for main organization admin, false for Ben
 const BenWebsiteLeadsModal = ({ onClose }) => {
   const [leads, setLeads]           = useState([]);
   const [summary, setSummary]       = useState({ new: 0, reviewed: 0, imported: 0, rejected: 0, total: 0 });
@@ -440,7 +440,7 @@ const BenWebsiteLeadsModal = ({ onClose }) => {
               </div>
             </div>
 
-            {/* Actions — Reddington admin only */}
+            {/* Actions — main organization admin only */}
             {canWrite && detail.status !== 'imported' && (
               <div className="border-t px-5 py-4 flex gap-2 flex-wrap bg-gray-50">
                 {detail.status !== 'reviewed' && (
