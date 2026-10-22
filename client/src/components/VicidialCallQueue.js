@@ -312,7 +312,7 @@ const VicidialCallQueue = ({ onLoadCallData, isFormActive }) => {
                         e.stopPropagation();
                         handleLoadCall(call);
                       }}
-                      className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors"
+                      className="px-3 py-1 text-xs font-medium text-white bg-primary-600 hover:bg-primary-700 rounded transition-colors"
                     >
                       Load
                     </button>

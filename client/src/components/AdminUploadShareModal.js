@@ -143,7 +143,7 @@ const AdminUploadShareModal = ({ isOpen, onClose }) => {
               <select
                 value={selectedAdmin}
                 onChange={e => setSelectedAdmin(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               >
                 <option value="">-- Select Restricted Admin --</option>
                 {restrictedAdmins.map(a => (

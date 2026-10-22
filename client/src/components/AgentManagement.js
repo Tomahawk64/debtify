@@ -243,7 +243,7 @@ const AgentManagement = () => {
           {canCreateAgents && (
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               <UserPlus size={20} className="mr-2" />
               Create Agent
@@ -263,7 +263,7 @@ const AgentManagement = () => {
             {canCreateAgents && (
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Create Agent
               </button>
@@ -307,7 +307,7 @@ const AgentManagement = () => {
                       type="checkbox"
                       checked={agents.length > 0 && selectedAgents.length === agents.length}
                       onChange={(e) => handleSelectAll(e.target.checked)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-blue-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900">Agent</th>
@@ -327,7 +327,7 @@ const AgentManagement = () => {
                         type="checkbox"
                         checked={selectedAgents.includes(agent._id)}
                         onChange={() => handleSelectAgent(agent._id)}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-blue-600 focus:ring-primary-500 border-gray-300 rounded"
                       />
                     </td>
                     <td className="py-4 px-4">
@@ -337,14 +337,14 @@ const AgentManagement = () => {
                             type="text"
                             value={editFormData.name}
                             onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                            className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             placeholder="Agent name"
                           />
                           <input
                             type="email"
                             value={editFormData.email}
                             onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
-                            className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             placeholder="Agent email"
                           />
                         </div>
@@ -361,7 +361,7 @@ const AgentManagement = () => {
                           type="text"
                           value={editFormData.vicidialAgentId}
                           onChange={(e) => setEditFormData({ ...editFormData, vicidialAgentId: e.target.value })}
-                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                           placeholder="Vicidial Agent ID"
                         />
                       ) : (

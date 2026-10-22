@@ -818,7 +818,7 @@ const SuperAdminDashboard = () => {
                     placeholder="Search admins by name or email..."
                     value={adminFilters.search}
                     onChange={(e) => setAdminFilters(prev => ({ ...prev, search: e.target.value }))}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
                 
@@ -826,7 +826,7 @@ const SuperAdminDashboard = () => {
                   <select
                     value={adminFilters.organization}
                     onChange={(e) => setAdminFilters(prev => ({ ...prev, organization: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">All Organizations</option>
                     {organizations.map(org => (
@@ -839,7 +839,7 @@ const SuperAdminDashboard = () => {
                   <select
                     value={adminFilters.status}
                     onChange={(e) => setAdminFilters(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">All Status</option>
                     <option value="active">Active</option>
@@ -964,7 +964,7 @@ const SuperAdminDashboard = () => {
                     placeholder="Search agents by name or email..."
                     value={agentFilters.search}
                     onChange={(e) => setAgentFilters(prev => ({ ...prev, search: e.target.value }))}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
                 
@@ -972,7 +972,7 @@ const SuperAdminDashboard = () => {
                   <select
                     value={agentFilters.organization}
                     onChange={(e) => setAgentFilters(prev => ({ ...prev, organization: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">All Organizations</option>
                     {organizations.map(org => (
@@ -985,7 +985,7 @@ const SuperAdminDashboard = () => {
                   <select
                     value={agentFilters.status}
                     onChange={(e) => setAgentFilters(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">All Status</option>
                     <option value="active">Active</option>

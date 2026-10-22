@@ -265,7 +265,7 @@ const ManualSaleModal = ({ isOpen, onClose, onSaleCreated }) => {
                   value={form.first_name}
                   onChange={e => set('first_name', e.target.value)}
                   placeholder="John"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                   required
                 />
               </div>
@@ -279,7 +279,7 @@ const ManualSaleModal = ({ isOpen, onClose, onSaleCreated }) => {
                   value={form.last_name}
                   onChange={e => set('last_name', e.target.value)}
                   placeholder="Doe"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
@@ -296,7 +296,7 @@ const ManualSaleModal = ({ isOpen, onClose, onSaleCreated }) => {
                   value={form.phone_number}
                   onChange={e => set('phone_number', e.target.value)}
                   placeholder="8001234567"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                   required
                 />
               </div>
@@ -310,7 +310,7 @@ const ManualSaleModal = ({ isOpen, onClose, onSaleCreated }) => {
                   value={form.email}
                   onChange={e => set('email', e.target.value)}
                   placeholder="john@example.com"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>

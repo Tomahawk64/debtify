@@ -1443,7 +1443,7 @@ const Agent1Dashboard = () => {
                 📥 INBOUND CALL — DID: {activeVicidialDid}
               </div>
             ) : (
-              <div className="bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-t-xl flex items-center gap-2">
+              <div className="bg-primary-600 text-white text-xs font-semibold px-4 py-2 rounded-t-xl flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-white animate-pulse inline-block" />
                 📤 OUTBOUND CALL — fields auto-filled from ViciDial
               </div>
@@ -2460,7 +2460,7 @@ const Agent1Dashboard = () => {
                     </label>
                     <select
                       required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       value={assignmentData.assignedTo}
                       onChange={(e) => setAssignmentData({
                         ...assignmentData,
@@ -2489,7 +2489,7 @@ const Agent1Dashboard = () => {
                     <textarea
                       rows="3"
                       required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter the closure name - this field is mandatory"
                       value={assignmentData.assignmentNotes}
                       onChange={(e) => setAssignmentData({
@@ -2508,14 +2508,14 @@ const Agent1Dashboard = () => {
                   <button
                     type="button"
                     onClick={() => setShowAssignModal(false)}
-                    className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submitting || !assignmentData.assignedTo || !assignmentData.assignmentNotes.trim()}
-                    className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                    className="px-6 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
                   >
                     {submitting ? (
                       <span className="flex items-center">

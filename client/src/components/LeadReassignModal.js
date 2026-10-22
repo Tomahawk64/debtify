@@ -126,7 +126,7 @@ const LeadReassignModal = ({
               <select
                 value={selectedAgent}
                 onChange={(e) => setSelectedAgent(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">Select an Agent 2</option>
                 {agents.map(agent => (
@@ -150,7 +150,7 @@ const LeadReassignModal = ({
               placeholder="Add any notes about this reassignment..."
               rows={3}
               maxLength={500}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
             />
             <div className="text-xs text-gray-500 mt-1">
               {assignmentNotes.length}/500 characters
@@ -170,7 +170,7 @@ const LeadReassignModal = ({
           <button
             onClick={handleReassign}
             disabled={loading || !selectedAgent || fetchingAgents}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
           >
             {loading ? (
               <>

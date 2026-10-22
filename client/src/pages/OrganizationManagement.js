@@ -289,7 +289,7 @@ const OrganizationManagement = () => {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+          className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200"
         >
           <Plus className="h-5 w-5 mr-2" />
           Create Organization
@@ -361,7 +361,7 @@ const OrganizationManagement = () => {
             <input
               type="text"
               placeholder="Search organizations..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -369,7 +369,7 @@ const OrganizationManagement = () => {
           <div className="flex items-center gap-2">
             <Filter className="h-5 w-5 text-gray-400" />
             <select
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
@@ -553,7 +553,7 @@ const OrganizationManagement = () => {
                       <input
                         type="text"
                         required
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.name}
                         onChange={(e) => setOrganizationForm({...organizationForm, name: e.target.value})}
                       />
@@ -563,7 +563,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Description</label>
                       <textarea
                         rows="3"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.description}
                         onChange={(e) => setOrganizationForm({...organizationForm, description: e.target.value})}
                       />
@@ -573,7 +573,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Email</label>
                       <input
                         type="email"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.email}
                         onChange={(e) => setOrganizationForm({...organizationForm, email: e.target.value})}
                       />
@@ -583,7 +583,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Phone</label>
                       <input
                         type="tel"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.phone}
                         onChange={(e) => setOrganizationForm({...organizationForm, phone: e.target.value})}
                       />
@@ -593,7 +593,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Website</label>
                       <input
                         type="url"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.website}
                         onChange={(e) => setOrganizationForm({...organizationForm, website: e.target.value})}
                       />
@@ -603,7 +603,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Address</label>
                       <textarea
                         rows="2"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.address}
                         onChange={(e) => setOrganizationForm({...organizationForm, address: e.target.value})}
                       />
@@ -615,13 +615,13 @@ const OrganizationManagement = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
                   >
                     {submitting ? 'Creating...' : 'Create Organization'}
                   </button>
                   <button
                     type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={() => setShowCreateModal(false)}
                   >
                     Cancel
@@ -658,7 +658,7 @@ const OrganizationManagement = () => {
                       <input
                         type="text"
                         required
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.name}
                         onChange={(e) => setOrganizationForm({...organizationForm, name: e.target.value})}
                       />
@@ -668,7 +668,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Description</label>
                       <textarea
                         rows="3"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.description}
                         onChange={(e) => setOrganizationForm({...organizationForm, description: e.target.value})}
                       />
@@ -678,7 +678,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Email</label>
                       <input
                         type="email"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.email}
                         onChange={(e) => setOrganizationForm({...organizationForm, email: e.target.value})}
                       />
@@ -688,7 +688,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Phone</label>
                       <input
                         type="tel"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.phone}
                         onChange={(e) => setOrganizationForm({...organizationForm, phone: e.target.value})}
                       />
@@ -698,7 +698,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Website</label>
                       <input
                         type="url"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.website}
                         onChange={(e) => setOrganizationForm({...organizationForm, website: e.target.value})}
                       />
@@ -708,7 +708,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Address</label>
                       <textarea
                         rows="2"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={organizationForm.address}
                         onChange={(e) => setOrganizationForm({...organizationForm, address: e.target.value})}
                       />
@@ -724,7 +724,7 @@ const OrganizationManagement = () => {
                         <input
                           type="text"
                           placeholder="Enter source ID (e.g. SRC01)"
-                          className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm uppercase focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm uppercase focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                           value={sourceIdInput}
                           onChange={(e) => setSourceIdInput(e.target.value.toUpperCase().replace(/[^A-Za-z0-9]/g, ''))}
                           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddSourceId(); } }}
@@ -733,7 +733,7 @@ const OrganizationManagement = () => {
                         <button
                           type="button"
                           onClick={handleAddSourceId}
-                          className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="px-3 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         >
                           Add
                         </button>
@@ -828,13 +828,13 @@ const OrganizationManagement = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
                   >
                     {submitting ? 'Updating...' : 'Update Organization'}
                   </button>
                   <button
                     type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={() => setShowEditModal(false)}
                   >
                     Cancel
@@ -871,7 +871,7 @@ const OrganizationManagement = () => {
                       <input
                         type="text"
                         required
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={userForm.name}
                         onChange={(e) => setUserForm({...userForm, name: e.target.value})}
                       />
@@ -882,7 +882,7 @@ const OrganizationManagement = () => {
                       <input
                         type="email"
                         required
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={userForm.email}
                         onChange={(e) => setUserForm({...userForm, email: e.target.value})}
                       />
@@ -894,7 +894,7 @@ const OrganizationManagement = () => {
                         type="password"
                         required
                         minLength="6"
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={userForm.password}
                         onChange={(e) => setUserForm({...userForm, password: e.target.value})}
                       />
@@ -907,7 +907,7 @@ const OrganizationManagement = () => {
                       <label className="block text-sm font-medium text-gray-700">Role *</label>
                       <select
                         required
-                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={userForm.role}
                         onChange={(e) => setUserForm({...userForm, role: e.target.value, canDownloadLeads: false})}
                       >
@@ -948,13 +948,13 @@ const OrganizationManagement = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
                   >
                     {submitting ? 'Creating...' : 'Create User'}
                   </button>
                   <button
                     type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={() => setShowUserModal(false)}
                   >
                     Cancel

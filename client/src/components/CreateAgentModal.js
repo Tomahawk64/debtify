@@ -153,7 +153,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                   errors.name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Enter full name"
@@ -174,7 +174,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Enter email address"
@@ -195,7 +195,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
                   name="organization"
                   value={formData.organization}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                     errors.organization ? 'border-red-500' : 'border-gray-300'
                   }`}
                 >
@@ -220,7 +220,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="agent1">Agent 1 (Lead Generation &amp; Qualification)</option>
                 <option value="agent2">Agent 2 (Follow-up &amp; Conversion)</option>
@@ -244,7 +244,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
                 name="vicidialAgentId"
                 value={formData.vicidialAgentId}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="e.g. AGENT001"
               />
             </div>
@@ -264,7 +264,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                   errors.password ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Enter password"
@@ -285,7 +285,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                   errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Confirm password"
@@ -306,7 +306,7 @@ const CreateAgentModal = ({ isOpen, onClose, onAgentCreated, organizations = [] 
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
             >
               {loading ? 'Creating...' : isAffiliateRole ? 'Create Affiliate Admin' : 'Create Agent'}
             </button>

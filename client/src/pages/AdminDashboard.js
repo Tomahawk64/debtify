@@ -1468,7 +1468,7 @@ const AdminDashboard = () => {
                   placeholder="Search leads by name, phone, email, lead ID, or client ID..."
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 text-sm placeholder-gray-400"
+                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 text-sm placeholder-gray-400"
                 />
               </div>
               {searchTerm && (
@@ -1556,14 +1556,14 @@ const AdminDashboard = () => {
                 type="date"
                 value={dateFilter.startDate}
                 onChange={(e) => handleDateFilterChange('custom', e.target.value, dateFilter.endDate)}
-                className="px-2 py-1 text-xs border-2 border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="px-2 py-1 text-xs border-2 border-gray-200 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
               />
               <span className="text-xs text-gray-400 font-medium">to</span>
               <input
                 type="date"
                 value={dateFilter.endDate}
                 onChange={(e) => handleDateFilterChange('custom', dateFilter.startDate, e.target.value)}
-                className="px-2 py-1 text-xs border-2 border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="px-2 py-1 text-xs border-2 border-gray-200 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
               />
             </div>
           </div>
@@ -1774,7 +1774,7 @@ const AdminDashboard = () => {
                       setOrganizationFilter(e.target.value);
                       resetPaginationAndFetch();
                     }}
-                    className="px-2 py-1.5 text-xs font-semibold border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                    className="px-2 py-1.5 text-xs font-semibold border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white"
                   >
                     <option value="all">All Orgs</option>
                     {organizations.map((org) => (
@@ -2803,7 +2803,7 @@ const AdminDashboard = () => {
             className="w-full flex items-center justify-between px-5 py-4 bg-gradient-to-r from-blue-50 to-white hover:from-blue-100 transition-colors duration-200 border-b border-gray-100"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm bg-blue-600">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm bg-primary-600">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
