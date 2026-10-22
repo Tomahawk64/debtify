@@ -1096,63 +1096,6 @@ const AdminDashboard = () => {
                   {formatEasternTimeForDisplay(lastUpdated, { includeTimezone: true })}
                 </p>
               </div>
-              {/* Website Leads button — main organization only */}
-              {isMainOrgAdmin && (
-                <button
-                  onClick={openWebsiteLeadsModal}
-                  className="relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 active:scale-95 shadow-md"
-                  style={{ background: 'linear-gradient(135deg,#0d9488,#0891b2)', boxShadow: '0 4px 12px rgba(8,145,178,0.4)' }}
-                  title="View website form submissions"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" />
-                  </svg>
-                  Website Leads
-                  {websiteLeadsBadge > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1">
-                      {websiteLeadsBadge > 99 ? '99+' : websiteLeadsBadge}
-                    </span>
-                  )}
-                </button>
-              )}
-              {/* Ben Website Leads button — all admins */}
-              {user?.role === 'admin' && (
-                <button
-                  onClick={() => { setShowBenWebsiteLeads(true); setBenLeadsBadge(0); }}
-                  className="relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 active:scale-95 shadow-md"
-                  style={{ background: 'linear-gradient(135deg,#f97316,#d97706)', boxShadow: '0 4px 12px rgba(249,115,22,0.4)' }}
-                  title="View Ben website leads"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" />
-                  </svg>
-                  Ben Website Leads
-                  {benLeadsBadge > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1">
-                      {benLeadsBadge > 99 ? '99+' : benLeadsBadge}
-                    </span>
-                  )}
-                </button>
-              )}
-              {/* MyDebt Review Leads button — orgs with showLoopLeads or main-org admin */}
-              {canAccessLoopLeads && (
-                <button
-                  onClick={() => { setShowLoopLeads(true); setLoopLeadsBadge(0); }}
-                  className="relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 active:scale-95 shadow-md"
-                  style={{ background: 'linear-gradient(135deg,#4f46e5,#7c3aed)', boxShadow: '0 4px 12px rgba(79,70,229,0.4)' }}
-                  title="View MyDebt Review inbound leads"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  MyDebt Review Leads
-                  {loopLeadsBadge > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1">
-                      {loopLeadsBadge > 99 ? '99+' : loopLeadsBadge}
-                    </span>
-                  )}
-                </button>
-              )}
               {/* People Search PiP launcher — main organization only */}
               {isMainOrgAdmin && (
                 <button
