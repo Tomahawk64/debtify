@@ -111,6 +111,10 @@ const Agent1Dashboard = () => {
   const confirmedCallbackDateRef = useRef(null);
   // Track if form is currently active to prevent multiple forms from opening
   const [isFormActive, setIsFormActive] = useState(false);
+  // Controls whether the Add New Lead panel is shown; collapsed by default to
+  // give the leads table more room, opens via the Add New Lead button or
+  // automatically when a call/lead loads data in (see isFormActive below).
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Pagination state
   const [pagination, setPagination] = useState({
@@ -213,6 +217,7 @@ const Agent1Dashboard = () => {
 
   const closeCreateLeadModal = useCallback(() => {
     setIsFormActive(false);
+    setShowCreateForm(false);
     setActiveVicidialCallId(null);
     setActiveVicidialDid('');
     setActiveVicidialCampaign('');
@@ -1168,7 +1173,7 @@ const Agent1Dashboard = () => {
             My Notes
           </button>
           <button
-            onClick={() => { closeCreateLeadModal(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            onClick={() => { closeCreateLeadModal(); setShowCreateForm(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200"
           >
             <Plus className="h-5 w-5 mr-2" />
@@ -1247,31 +1252,31 @@ const Agent1Dashboard = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Lead Info
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Phone
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Debt Types
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Financial Info
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Duplicate
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Assignment
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -1281,7 +1286,7 @@ const Agent1Dashboard = () => {
                 const isLeadDisposed = lead?.isDisposed || lead?.status?.toLowerCase() === 'dead';
                 return (
                   <tr key={lead.leadId || lead._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{lead.name}</div>
                       <div className="text-sm text-gray-500">{lead.company}</div>
@@ -1290,16 +1295,16 @@ const Agent1Dashboard = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{maskEmail(lead.email)}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{maskPhone(lead.phone)}</div>
                     {lead.alternatePhone && (
                       <div className="text-xs text-gray-500">Alt: {maskPhone(lead.alternatePhone)}</div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
                       {Array.isArray(lead.debtTypes) && lead.debtTypes.length > 0
                         ? (
@@ -1317,7 +1322,7 @@ const Agent1Dashboard = () => {
                             }[lead.debtCategory]) : '—'))}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
                       {lead.totalDebtAmount && (
                         <div>Debt: {maskAmount(lead.totalDebtAmount)}</div>
@@ -1334,7 +1339,7 @@ const Agent1Dashboard = () => {
                       {!lead.totalDebtAmount && !lead.numberOfCreditors && !lead.monthlyDebtPayment && !lead.creditScoreRange && '—'}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     {lead.isDuplicate ? (
                       <div className="text-sm">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -1355,10 +1360,10 @@ const Agent1Dashboard = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                     {formatEasternTimeForDisplay(lead.createdAt, { includeTime: false })}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     {lead.assignedTo ? (
                       <div className="text-sm">
                         <div className="text-green-600 font-medium">
@@ -1394,7 +1399,7 @@ const Agent1Dashboard = () => {
                       )
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
                     <button
                       onClick={() => openEditModal(lead)}
                       className="text-primary-600 hover:text-primary-900"
@@ -1407,7 +1412,7 @@ const Agent1Dashboard = () => {
               })}
               {leads.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="8" className="px-4 py-6 text-center text-gray-500">
                     No leads found. Create your first lead to get started!
                   </td>
                 </tr>
@@ -1433,8 +1438,10 @@ const Agent1Dashboard = () => {
 
       </div>{/* END LEFT COLUMN */}
 
-      {/* ===== RIGHT: Persistent Add Lead Form Panel ===== */}
-      <div className="w-full min-[900px]:w-[350px] lg:w-[460px] flex-shrink-0">
+      {/* ===== RIGHT: Add Lead Form Panel — collapsed by default, opens via the
+           Add New Lead button or automatically when a call/lead loads data in ===== */}
+      {(showCreateForm || isFormActive) && (
+      <div className="w-full min-[900px]:w-[340px] lg:w-[380px] flex-shrink-0">
         <div className="relative z-10 min-[900px]:sticky min-[900px]:top-4 min-[900px]:max-h-[calc(100vh-5rem)] min-[900px]:overflow-y-auto w-full">
           {isFormActive && (
             activeVicidialDid ? (
@@ -1938,6 +1945,7 @@ const Agent1Dashboard = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ── Floating People Search PiP Panel ─────────────────────────── */}
       {showSearchPanel && (

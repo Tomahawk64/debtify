@@ -1121,31 +1121,31 @@ const Agent2Dashboard = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Lead Info
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Debt Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Debt Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Duplicate Status
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Duplicate
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Qualification Status
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Qualification
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created Date
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Created
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -1155,7 +1155,7 @@ const Agent2Dashboard = () => {
                 const isInbound = !!(lead.vicidialDid && lead.vicidialDid.trim());
                 return (
                 <tr key={lead.leadId || lead._id} className={isInbound ? 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500' : 'bg-blue-50 hover:bg-blue-100 border-l-4 border-l-blue-500'}>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div>
                       {/* Inbound / Outbound call-type badge */}
                       {isInbound ? (
@@ -1190,20 +1190,20 @@ const Agent2Dashboard = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{maskEmail(lead.email)}</div>
                     <div className="text-sm text-gray-500">{maskPhone(lead.phone)}</div>
                     {lead.alternatePhone && (
                       <div className="text-xs text-gray-400">Alt: {maskPhone(lead.alternatePhone)}</div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     {getCategoryBadge(lead.category, lead.completionPercentage)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                     {lead.totalDebtAmount ? maskAmount(lead.totalDebtAmount) : 'N/A'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                     {Array.isArray(lead.debtTypes) && lead.debtTypes.length > 0 
                       ? (
                         <div className="space-y-1">
@@ -1216,7 +1216,7 @@ const Agent2Dashboard = () => {
                       )
                       : (lead.source || 'N/A')}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     {lead.isDuplicate ? (
                       <div>
                         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
@@ -1239,7 +1239,7 @@ const Agent2Dashboard = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       lead.qualificationStatus === 'qualified' ? 'bg-green-100 text-green-800' :
                       (lead.qualificationStatus === 'not-qualified' || lead.qualificationStatus === 'disqualified' || lead.qualificationStatus === 'unqualified') ? 'bg-red-100 text-red-800' :
@@ -1250,7 +1250,7 @@ const Agent2Dashboard = () => {
                        '⏳ Pending'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                     <div>
                       {formatEasternTimeForDisplay(lead.createdAt, { includeTime: false })}
                     </div>
@@ -1258,7 +1258,7 @@ const Agent2Dashboard = () => {
                       {formatEasternTimeForDisplay(lead.createdAt, { includeTime: true, timeOnly: true })}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
                     <button
                       onClick={() => openViewModal(lead)}
                       className="text-blue-600 hover:text-blue-900 mr-3"
@@ -1283,7 +1283,7 @@ const Agent2Dashboard = () => {
               })}
               {leads.length === 0 && (
                 <tr>
-                  <td colSpan="9" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="9" className="px-4 py-6 text-center text-gray-500">
                     No {type === 'qualification' ? 'pending qualification' : 'callback needed'} leads assigned to you.
                   </td>
                 </tr>
@@ -1628,10 +1628,10 @@ const Agent2Dashboard = () => {
             <StickyNote className="h-4 w-4" />
             My Notes
           </button>
-          {/* Add New Lead button — clears/resets the right-side form panel */}
+          {/* Add New Lead button — resets and opens the right-side form panel */}
           {user.role === 'agent2' && (
             <button
-              onClick={closeCreateForm}
+              onClick={() => { closeCreateForm(); setShowCreateForm(true); }}
               className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200"
             >
               <Plus className="h-5 w-5 mr-2" />
@@ -2052,31 +2052,31 @@ const Agent2Dashboard = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Lead Info
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Debt Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Debt Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Duplicate Status
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Duplicate
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Qualification Status
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Qualification
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created Date
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Created
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -2086,7 +2086,7 @@ const Agent2Dashboard = () => {
                 const isInbound = !!(lead.vicidialDid && lead.vicidialDid.trim());
                 return (
                 <tr key={lead.leadId || lead._id} className={isInbound ? 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500' : 'bg-blue-50 hover:bg-blue-100 border-l-4 border-l-blue-500'}>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div>
                       {/* Inbound / Outbound call-type badge */}
                       {isInbound ? (
@@ -2121,20 +2121,20 @@ const Agent2Dashboard = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{maskEmail(lead.email)}</div>
                     <div className="text-sm text-gray-500">{maskPhone(lead.phone)}</div>
                     {lead.alternatePhone && (
                       <div className="text-xs text-gray-400">Alt: {maskPhone(lead.alternatePhone)}</div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     {getCategoryBadge(lead.category, lead.completionPercentage)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                     {lead.totalDebtAmount ? maskAmount(lead.totalDebtAmount) : 'N/A'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                     {Array.isArray(lead.debtTypes) && lead.debtTypes.length > 0 
                       ? (
                         <div className="space-y-1">
@@ -2147,7 +2147,7 @@ const Agent2Dashboard = () => {
                       )
                       : (lead.source || 'N/A')}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     {lead.isDuplicate ? (
                       <div>
                         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
@@ -2170,7 +2170,7 @@ const Agent2Dashboard = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       lead.qualificationStatus === 'qualified' ? 'bg-green-100 text-green-800' :
                       (lead.qualificationStatus === 'not-qualified' || lead.qualificationStatus === 'disqualified' || lead.qualificationStatus === 'unqualified') ? 'bg-red-100 text-red-800' :
@@ -2181,7 +2181,7 @@ const Agent2Dashboard = () => {
                        '⏳ Pending'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                     <div>
                       {formatEasternTimeForDisplay(lead.createdAt, { includeTime: false })}
                     </div>
@@ -2189,7 +2189,7 @@ const Agent2Dashboard = () => {
                       {formatEasternTimeForDisplay(lead.createdAt, { includeTime: true, timeOnly: true })}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
                     <button
                       onClick={() => openViewModal(lead)}
                       className="text-blue-600 hover:text-blue-900 mr-3"
@@ -2214,7 +2214,7 @@ const Agent2Dashboard = () => {
               })}
               {leads.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="6" className="px-4 py-6 text-center text-gray-500">
                     No leads found matching your criteria.
                   </td>
                 </tr>
@@ -3235,9 +3235,10 @@ const Agent2Dashboard = () => {
 
       </div>{/* END LEFT COLUMN */}
 
-      {/* ===== RIGHT: Persistent Add New Lead Panel ===== */}
-      {user.role === 'agent2' && (
-        <div className="w-full min-[900px]:w-[360px] lg:w-[420px] flex-shrink-0">
+      {/* ===== RIGHT: Add New Lead Panel — collapsed by default, opens via the
+           Add New Lead button or automatically when a call/lead loads data in ===== */}
+      {user.role === 'agent2' && (showCreateForm || isFormActive) && (
+        <div className="w-full min-[900px]:w-[340px] lg:w-[360px] flex-shrink-0">
           <div className="relative z-10 min-[900px]:sticky min-[900px]:top-4 min-[900px]:max-h-[calc(100vh-5rem)] min-[900px]:overflow-y-auto w-full">
 
             {/* Inbound / Outbound call banner */}

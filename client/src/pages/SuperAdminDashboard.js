@@ -856,19 +856,19 @@ const SuperAdminDashboard = () => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
                       S.No
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Admin Info
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Created
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -879,30 +879,30 @@ const SuperAdminDashboard = () => {
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
                         {index + 1}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <div>
                           <div className="text-sm font-medium text-gray-900">{admin.name}</div>
                           <div className="text-sm text-gray-500">{admin.email}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           admin.role === 'restricted_admin' ? 'bg-orange-100 text-orange-800' : 'bg-purple-100 text-purple-800'
                         }`}>
                           {admin.role === 'restricted_admin' ? 'Restricted Admin' : 'Admin'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           admin.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {admin.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                         {formatEasternTimeForDisplay(admin.createdAt, { includeTime: false })}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-3">
                           {/* Slider Toggle */}
                           <div className="flex items-center">
@@ -938,7 +938,7 @@ const SuperAdminDashboard = () => {
                   ))}
                   {(!Array.isArray(admins) || admins.length === 0) && (
                     <tr>
-                      <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan="6" className="px-4 py-6 text-center text-gray-500">
                         No administrators found.
                       </td>
                     </tr>
@@ -1002,19 +1002,19 @@ const SuperAdminDashboard = () => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
                       S.No
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Agent Info
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Created
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -1025,30 +1025,30 @@ const SuperAdminDashboard = () => {
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
                         {index + 1}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <div>
                           <div className="text-sm font-medium text-gray-900">{agent.name}</div>
                           <div className="text-sm text-gray-500">{agent.email}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           agent.role === 'agent1' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
                         }`}>
                           {agent.role === 'agent1' ? 'Agent 1' : 'Agent 2'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           agent.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {agent.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                         {new Date(agent.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-3">
                           {/* Slider Toggle */}
                           <div className="flex items-center">
@@ -1084,7 +1084,7 @@ const SuperAdminDashboard = () => {
                   ))}
                   {(!Array.isArray(agents) || agents.length === 0) && (
                     <tr>
-                      <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan="6" className="px-4 py-6 text-center text-gray-500">
                         No agents found.
                       </td>
                     </tr>
@@ -1295,14 +1295,14 @@ const SuperAdminDashboard = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead Info</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Debt Details</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duplicate Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead Info</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Debt Details</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duplicate</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                    <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -1315,7 +1315,7 @@ const SuperAdminDashboard = () => {
                   ) : (
                     leads.map((lead) => (
                       <tr key={lead._id || lead.leadId} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3 whitespace-nowrap">
                           <div>
                             <div className="text-sm font-medium text-gray-900">{lead.name}</div>
                             <div className="text-sm text-gray-500">ID: {lead.leadId}</div>
@@ -1324,7 +1324,7 @@ const SuperAdminDashboard = () => {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
                             {lead.email && <div>{lead.email}</div>}
                             {lead.phone && <div>{lead.phone}</div>}
@@ -1333,12 +1333,12 @@ const SuperAdminDashboard = () => {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
                             {lead.organization?.name || 'Unknown'}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
                             <div>{lead.debtCategory || 'N/A'}</div>
                             {lead.totalDebtAmount && (
@@ -1353,7 +1353,7 @@ const SuperAdminDashboard = () => {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             lead.status === 'new' ? 'bg-blue-100 text-blue-800' :
                             lead.status === 'contacted' ? 'bg-yellow-100 text-yellow-800' :
@@ -1365,7 +1365,7 @@ const SuperAdminDashboard = () => {
                             {lead.status || 'new'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-3 whitespace-nowrap">
                           {lead.isDuplicate ? (
                             <div>
                               <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
@@ -1388,7 +1388,7 @@ const SuperAdminDashboard = () => {
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
                           <div>{formatEasternTimeForDisplay(lead.createdAt, { includeTime: false })}</div>
                           <div className="text-xs text-gray-400">
                             {formatEasternTimeForDisplay(lead.createdAt, { includeTime: true, timeOnly: true })}
@@ -1399,7 +1399,7 @@ const SuperAdminDashboard = () => {
                             </div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
                             <button
                               onClick={() => openEditLeadModal(lead)}
