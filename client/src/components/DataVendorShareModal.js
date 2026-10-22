@@ -358,6 +358,7 @@ const DataVendorShareModal = ({ isOpen, onClose }) => {
                       {r.runLabel ? ` — ${r.runLabel}` : ''}
                       {r.runDate ? ` — ${new Date(r.runDate).toLocaleDateString('en-GB')}` : ''}
                       {` — ${(r.totalLeads || 0).toLocaleString()} leads`}
+                      {r.uploadedByName ? ` — by ${r.uploadedByName}` : ''}
                     </option>
                   ))}
                 </select>

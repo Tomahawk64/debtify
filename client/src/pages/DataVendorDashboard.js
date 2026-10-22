@@ -11,6 +11,7 @@ import axios from '../utils/axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import VendorSelfUploadModal from '../components/VendorSelfUploadModal';
 
 // ── All 45 ViciDial columns for the records view ──────────────────
 const ALL_COLUMNS = [
@@ -135,6 +136,7 @@ const DataVendorDashboard = () => {
   const [lists, setLists] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
   const [listsRefreshing, setListsRefreshing] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   // ── RUNS VIEW ────────────────────────────────────────────────
   const [runs, setRuns] = useState([]);
@@ -496,10 +498,16 @@ const DataVendorDashboard = () => {
             </button>
           )}
           {view === 'lists' && (
-            <button onClick={() => fetchLists(true)} disabled={listsRefreshing}
-              className="px-4 py-2.5 text-sm font-medium bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-xl flex items-center gap-2 transition-all disabled:opacity-50">
-              <RefreshCw size={14} className={listsRefreshing ? 'animate-spin' : ''} /> Refresh
-            </button>
+            <>
+              <button onClick={() => setShowUploadModal(true)}
+                className="px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-purple-500/25 flex items-center gap-2 transition-all">
+                <FileSpreadsheet size={14} /> Upload My Leads
+              </button>
+              <button onClick={() => fetchLists(true)} disabled={listsRefreshing}
+                className="px-4 py-2.5 text-sm font-medium bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-xl flex items-center gap-2 transition-all disabled:opacity-50">
+                <RefreshCw size={14} className={listsRefreshing ? 'animate-spin' : ''} /> Refresh
+              </button>
+            </>
           )}
           {view === 'records' && (
             <button onClick={downloadCurrentRecords} disabled={!!downloadingId}
@@ -831,6 +839,12 @@ const DataVendorDashboard = () => {
             </div>
           )}
         </div>
+
+        <VendorSelfUploadModal
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onUploaded={() => { fetchLists(true); fetchSalesStats(salesStartDate, salesEndDate); }}
+        />
       </div>
     );
   }

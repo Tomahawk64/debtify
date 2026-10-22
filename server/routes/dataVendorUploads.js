@@ -187,10 +187,16 @@ router.post(
   '/upload',
   express.json({ limit: '50mb' }),
   protect,
-  requireAdminOrSuper,
+  requireRoles('admin', 'superadmin', 'data_vendor'),
   async (req, res) => {
     try {
-      const { fileData, fileName, vendorId, listName, runDate, runLabel } = req.body;
+      const { fileData, fileName, listName, runDate, runLabel } = req.body;
+      // Data vendors can only ever upload for themselves — never trust a
+      // client-supplied vendorId for this role, even if the request body
+      // is tampered with.
+      const vendorId = req.user.role === 'data_vendor'
+        ? req.user._id.toString()
+        : req.body.vendorId;
 
       if (!fileData || !vendorId || !listName) {
         return res.status(400).json({
@@ -342,10 +348,11 @@ router.get('/lists/:listName/runs', protect, requireRoles('data_vendor', 'admin'
             runBatchId: '$runBatchId',
             status:     { $toUpper: { $ifNull: ['$status', 'UNKNOWN'] } }
           },
-          count:     { $sum: 1 },
-          runNumber: { $first: '$runNumber' },
-          runDate:   { $first: '$runDate' },
-          runLabel:  { $first: '$runLabel' }
+          count:      { $sum: 1 },
+          runNumber:  { $first: '$runNumber' },
+          runDate:    { $first: '$runDate' },
+          runLabel:   { $first: '$runLabel' },
+          uploadedBy: { $first: '$uploadedBy' }
         }
       },
       // Stage 2: collect all statuses into a map per runBatchId
@@ -355,6 +362,7 @@ router.get('/lists/:listName/runs', protect, requireRoles('data_vendor', 'admin'
           runNumber:      { $first: '$runNumber' },
           runDate:        { $first: '$runDate' },
           runLabel:       { $first: '$runLabel' },
+          uploadedBy:     { $first: '$uploadedBy' },
           totalLeads:     { $sum: '$count' },
           dispositionArr: {
             $push: { k: '$_id.status', v: '$count' }
@@ -368,12 +376,35 @@ router.get('/lists/:listName/runs', protect, requireRoles('data_vendor', 'admin'
           runNumber:    1,
           runDate:      1,
           runLabel:     1,
+          uploadedBy:   1,
           totalLeads:   1,
           dispositions: { $arrayToObject: '$dispositionArr' }
         }
       },
       { $sort: { runNumber: 1 } }
     ]);
+
+    // Admin/superadmin get to see WHO uploaded each run (self-upload by the
+    // vendor vs an admin sharing it on their behalf) — lets admins track and
+    // audit vendor self-uploads. Not exposed to the vendor's own view.
+    if (req.user.role === 'admin' || req.user.role === 'superadmin') {
+      const uploaderIds = [...new Set(runs.map(r => r.uploadedBy?.toString()).filter(Boolean))];
+      if (uploaderIds.length) {
+        const uploaders = await User.find({ _id: { $in: uploaderIds } }).select('name email role').lean();
+        const uploaderMap = new Map(uploaders.map(u => [u._id.toString(), u]));
+        runs.forEach(r => {
+          const uploader = r.uploadedBy ? uploaderMap.get(r.uploadedBy.toString()) : null;
+          r.uploadedByName = uploader
+            ? (uploader.role === 'data_vendor' ? `${uploader.name} (self-uploaded)` : uploader.name)
+            : null;
+          delete r.uploadedBy;
+        });
+      } else {
+        runs.forEach(r => { r.uploadedByName = null; delete r.uploadedBy; });
+      }
+    } else {
+      runs.forEach(r => delete r.uploadedBy);
+    }
 
     res.json({ success: true, data: runs, listName });
   } catch (err) {
