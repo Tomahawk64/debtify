@@ -52,6 +52,11 @@ const dataVendorUploadSchema = new mongoose.Schema({
   // Populated when status = SALE; holds the enrolled/sale debt amount
   enrolled_debt:           { type: String, trim: true, default: '' },
 
+  // Call duration in seconds (from a ViciDial talk-time/length_in_sec
+  // column, when the vendor's export includes one). Used by the main
+  // org admin's lead audit view to flag long non-SALE calls.
+  duration:                { type: String, trim: true, default: '' },
+
   // ── Parsed date for efficient date-range queries ───────────────
   entryDateParsed: { type: Date, index: true },
 

@@ -17,6 +17,7 @@ import RestrictedAdminDashboard from './pages/RestrictedAdminDashboard';
 import AffiliateDashboard from './pages/AffiliateDashboard';
 import DataVendorDashboard from './pages/DataVendorDashboard';
 import PaymentStatus from './pages/PaymentStatus';
+import VendorLeadAudit from './pages/VendorLeadAudit';
 import Profile from './pages/Profile';
 import Chat from './pages/Chat';
 
@@ -125,6 +126,12 @@ function App() {
                 <Route path="payment-status" element={
                   <ProtectedRoute roles={['admin', 'superadmin']}>
                     <PaymentStatus />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="vendor-lead-audit" element={
+                  <ProtectedRoute roles={['admin', 'superadmin']}>
+                    <VendorLeadAudit />
                   </ProtectedRoute>
                 } />
 

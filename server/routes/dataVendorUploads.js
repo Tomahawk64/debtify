@@ -60,7 +60,18 @@ const HEADER_MAP = {
   'enrolleddebt': 'enrolled_debt',
   'enrolled debt': 'enrolled_debt',
   'enrolleddebtamount': 'enrolled_debt',
-  'enrolled_debt_amount': 'enrolled_debt'
+  'enrolled_debt_amount': 'enrolled_debt',
+
+  // Call duration — seconds, from a ViciDial talk-time/length_in_sec column
+  'duration': 'duration',
+  'call_duration': 'duration',
+  'call_duration_seconds': 'duration',
+  'duration_sec': 'duration',
+  'duration_seconds': 'duration',
+  'talk_time': 'duration',
+  'talktime': 'duration',
+  'call_length': 'duration',
+  'length_in_sec': 'duration'
 };
 
 const DATE_FIELDS = new Set(['entry_date', 'modify_date', 'last_local_call_time']);

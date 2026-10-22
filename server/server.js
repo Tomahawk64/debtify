@@ -37,6 +37,7 @@ const benWebhookRoutes   = require('./routes/benWebhook');
 const benWebsiteLeadsRoutes = require('./routes/benWebsiteLeads');
 const affiliateRoutes = require('./routes/affiliate');
 const dataVendorRoutes = require('./routes/dataVendorUploads');
+const vendorAuditRoutes = require('./routes/vendorAudit');
 
 const app = express();
 const server = http.createServer(app);
@@ -207,6 +208,7 @@ app.use('/api/website-leads', websiteLeadsRoutes);
 app.use('/api/ben-website-leads', benWebsiteLeadsRoutes);
 app.use('/api/affiliate', affiliateRoutes);
 app.use('/api/data-vendor-uploads', dataVendorRoutes);
+app.use('/api/vendor-audit', vendorAuditRoutes);
 app.use('/api/notifications', require('./routes/notifications'));
 
 // =========================

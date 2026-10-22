@@ -21,7 +21,8 @@ import {
   KeyRound,
   CheckCircle2,
   Trash2,
-  CreditCard
+  CreditCard,
+  ShieldAlert
 } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 import toast from 'react-hot-toast';
@@ -248,6 +249,7 @@ const Layout = ({ onDashboardRefresh }) => {
       ];
       if (user.isMainOrgAdmin) {
         adminItems.push({ name: 'Payment Status', href: '/payment-status', icon: CreditCard });
+        adminItems.push({ name: 'Vendor Lead Audit', href: '/vendor-lead-audit', icon: ShieldAlert });
       }
       return [...adminItems, ...baseItems];
     } else if (user.role === 'agent2') {
