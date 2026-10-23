@@ -209,6 +209,15 @@ const createLeadValidation = [
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 1000 })
     .withMessage('Requirements cannot exceed 1000 characters'),
+  // Backdated entry date — only honoured for the main organization admin (see POST handler)
+  body('entryDate')
+    .optional({ nullable: true, checkFalsy: true })
+    .custom((value) => {
+      if (!isValidDraftDateInput(value)) {
+        throw new Error('Entry date must be dd/mm/yyyy or a valid ISO date');
+      }
+      return true;
+    }),
   body('notes')
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 2000 })
@@ -1658,9 +1667,42 @@ router.post('/', protect, createLeadValidation, handleValidationErrors, async (r
       createdBy: req.user._id,
       organization: req.user.organization
     };
+    // entryDate is handled separately below (backdating); never let it, or a raw
+    // createdAt/updatedAt, pass straight through from the request body.
+    delete leadData.entryDate;
+    delete leadData.createdAt;
+    delete leadData.updatedAt;
 
     const organizationName = await getOrganizationNameById(req.user.organization);
     const isGtiOrg = isGtiOrganizationName(organizationName);
+
+    // Backdated entry date — lets the main organization admin record a lead
+    // dated in the past (e.g. importing historical records). Gated to the
+    // main org admin / superadmin server-side, independent of the UI.
+    if (req.body.entryDate) {
+      const isMainOrgAdmin = req.user.role === 'superadmin'
+        || (req.user.role === 'admin' && (organizationName || '').trim().toUpperCase() === 'DEBTIFY');
+      if (!isMainOrgAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'Only the main organization admin can backdate a lead'
+        });
+      }
+      const parsedEntryDate = parseDraftDateInput(req.body.entryDate);
+      if (!parsedEntryDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'Entry date must be dd/mm/yyyy or a valid ISO date'
+        });
+      }
+      if (parsedEntryDate.getTime() > Date.now()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Entry date cannot be in the future'
+        });
+      }
+      leadData.createdAt = parsedEntryDate;
+    }
     const dispositionText = typeof req.body.disposition1 === 'string' ? req.body.disposition1.trim() : '';
     const hasDisposition = dispositionText.length > 0;
     const shouldDisposeLead = Boolean(hasDisposition && req.body.isDisposed === true);

@@ -16,7 +16,8 @@ import {
   Download,
   UserCheck,
   TrendingUp,
-  Database
+  Database,
+  CalendarClock
 } from 'lucide-react';
 import axios from '../utils/axios';
 import toast from 'react-hot-toast';
@@ -31,6 +32,7 @@ import ManualSaleModal from '../components/ManualSaleModal';
 import WebsiteLeadsModal from '../components/WebsiteLeadsModal';
 import BenWebsiteLeadsModal from '../components/BenWebsiteLeadsModal';
 import LoopLeadsModal from '../components/LoopLeadsModal';
+import BackdatedLeadModal from '../components/BackdatedLeadModal';
 import Pagination from '../components/Pagination';
 import { useSocket } from '../contexts/SocketContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -149,6 +151,7 @@ const AdminDashboard = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showVendorModal, setShowVendorModal] = useState(false);
   const [showManualSaleModal, setShowManualSaleModal] = useState(false);
+  const [showBackdatedLeadModal, setShowBackdatedLeadModal] = useState(false);
 
   // Website leads modal (main organization admin only)
   const [showWebsiteLeads, setShowWebsiteLeads] = useState(false);
@@ -1735,6 +1738,13 @@ const AdminDashboard = () => {
               /* main organization admin: full action bar — Vendor Data, Share Data, Export CSV */
               <div className="ml-auto flex items-center gap-2">
                 <button
+                  onClick={() => setShowBackdatedLeadModal(true)}
+                  className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-1.5"
+                >
+                  <CalendarClock size={14} />
+                  <span>Add Backdated Lead</span>
+                </button>
+                <button
                   onClick={() => setShowManualSaleModal(true)}
                   className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-1.5"
                 >
@@ -2789,6 +2799,15 @@ const AdminDashboard = () => {
         isOpen={showManualSaleModal}
         onClose={() => setShowManualSaleModal(false)}
       />
+
+      {/* Add Backdated Lead Modal — main organization admin only */}
+      {isMainOrgAdmin && (
+        <BackdatedLeadModal
+          isOpen={showBackdatedLeadModal}
+          onClose={() => setShowBackdatedLeadModal(false)}
+          onCreated={() => { fetchStats(); fetchLeads(false, 1); }}
+        />
+      )}
 
       {/* Website Leads Modal — main organization admin only */}
       {isMainOrgAdmin && showWebsiteLeads && (
