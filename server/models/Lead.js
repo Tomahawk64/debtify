@@ -516,11 +516,17 @@ leadSchema.pre('save', async function(next) {
     }
   }
 
+  // An admin can manually override the hot/warm/cold category on an existing
+  // lead (see PUT /api/leads/:id). Respect that instead of silently
+  // recomputing over it on every save — only auto-derive it on creation, or
+  // on an update that didn't touch category itself.
+  const categoryManuallySet = !this.isNew && this.isModified('category');
+
   const requiredFields = [
-    'name', 'email', 'phone', 'totalDebtAmount', 'debtCategory', 
+    'name', 'email', 'phone', 'totalDebtAmount', 'debtCategory',
     'numberOfCreditors', 'monthlyDebtPayment', 'creditScoreRange'
   ];
-  
+
   let filledFields = 0;
   requiredFields.forEach(field => {
     if (this[field] && this[field] !== '') {
@@ -531,12 +537,14 @@ leadSchema.pre('save', async function(next) {
   this.completionPercentage = Math.round((filledFields / requiredFields.length) * 100);
 
   // Categorize based on completion percentage
-  if (this.completionPercentage >= 80) {
-    this.category = 'hot';
-  } else if (this.completionPercentage >= 50) {
-    this.category = 'warm';
-  } else {
-    this.category = 'cold';
+  if (!categoryManuallySet) {
+    if (this.completionPercentage >= 80) {
+      this.category = 'hot';
+    } else if (this.completionPercentage >= 50) {
+      this.category = 'warm';
+    } else {
+      this.category = 'cold';
+    }
   }
 
   // Normalize phone numbers to include +1 prefix

@@ -2260,8 +2260,8 @@ const AdminDashboard = () => {
                         <span className="text-sm font-medium text-gray-600">Category:</span>
                         {isMainOrgAdmin && isEditing ? (
                           <select
-                            value={editedLead.debtCategory || editedLead.category || ''}
-                            onChange={(e) => handleInputChange('debtCategory', e.target.value)}
+                            value={editedLead.category || ''}
+                            onChange={(e) => handleInputChange('category', e.target.value)}
                             className="text-sm border border-gray-300 rounded px-2 py-1 w-24"
                           >
                             <option value="">Select</option>
