@@ -188,7 +188,8 @@ const Agent2Dashboard = () => {
     city: '',
     state: '',
     zipcode: '',
-    notes: ''
+    notes: '',
+    leadVendor: ''
   });
 
   // Form errors for validation
@@ -293,7 +294,8 @@ const Agent2Dashboard = () => {
       city: '',
       state: '',
       zipcode: '',
-      notes: ''
+      notes: '',
+      leadVendor: ''
     });
     setFormErrors({});
   }, [clearActiveInboundCall]);
@@ -318,7 +320,8 @@ const Agent2Dashboard = () => {
       city: callData.city || '',
       state: callData.state || '',
       zipcode: callData.zipcode || '',
-      notes: ''
+      notes: '',
+      leadVendor: ''
     });
 
     setFormErrors({});
@@ -456,7 +459,8 @@ const Agent2Dashboard = () => {
         city: callData.city || '',
         state: callData.state || '',
         zipcode: callData.zipcode || '',
-        notes: ''
+        notes: '',
+        leadVendor: ''
       });
       setFormErrors({ phone: '', alternatePhone: '', email: '' });
       setActiveVicidialCallId(callData._id || null);
@@ -1528,6 +1532,11 @@ const Agent2Dashboard = () => {
       // Add notes
       if (createFormData.notes && createFormData.notes.trim() !== '') {
         cleanFormData.notes = createFormData.notes.trim();
+      }
+
+      // Lead vendor — optional free-text tag for which vendor/source referred this lead
+      if (createFormData.leadVendor && createFormData.leadVendor.trim() !== '') {
+        cleanFormData.leadVendor = createFormData.leadVendor.trim();
       }
 
       // Stamp DID and campaign from active vicidial call (inbound call identification)
@@ -3342,6 +3351,14 @@ const Agent2Dashboard = () => {
                     </div>
                     {formErrors.alternatePhone && <p className="mt-1 text-xs text-red-600">{formErrors.alternatePhone}</p>}
                   </div>
+                </div>
+
+                {/* Lead Vendor */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Lead Vendor <span className="normal-case font-normal text-gray-400">(optional)</span></label>
+                  <input type="text" name="leadVendor"
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-400 transition-all duration-200 bg-gray-50 focus:bg-white text-sm"
+                    value={createFormData.leadVendor} onChange={handleCreateFormChange} placeholder="Name of the lead vendor" />
                 </div>
 
                 {/* Address */}

@@ -112,7 +112,8 @@ const SuperAdminDashboard = () => {
     state: '',
     zipcode: '',
     notes: '',
-    requirements: ''
+    requirements: '',
+    leadVendor: ''
   });
 
   const fetchAdmins = useCallback(async (filters = adminFiltersRef.current) => {
@@ -429,9 +430,10 @@ const SuperAdminDashboard = () => {
         state: '',
         zipcode: '',
         notes: '',
-        requirements: ''
+        requirements: '',
+        leadVendor: ''
       });
-      
+
       setShowLeadModal(false);
       fetchLeads();
     } catch (error) {
@@ -477,6 +479,7 @@ const SuperAdminDashboard = () => {
       if (leadFormData.zipcode) cleanData.zipcode = leadFormData.zipcode.trim();
       if (leadFormData.notes) cleanData.notes = leadFormData.notes.trim();
       if (leadFormData.requirements) cleanData.requirements = leadFormData.requirements.trim();
+      if (leadFormData.leadVendor) cleanData.leadVendor = leadFormData.leadVendor.trim();
 
       cleanData.lastUpdatedBy = user?.name || 'SuperAdmin';
       cleanData.lastUpdatedAt = formatEasternTime(getEasternNow());
@@ -527,7 +530,8 @@ const SuperAdminDashboard = () => {
       state: lead.state || '',
       zipcode: lead.zipcode || '',
       notes: lead.notes || '',
-      requirements: lead.requirements || ''
+      requirements: lead.requirements || '',
+      leadVendor: lead.leadVendor || ''
     });
     setShowEditLeadModal(true);
   };
@@ -1692,12 +1696,12 @@ const SuperAdminDashboard = () => {
                     <h3 className="text-lg font-medium text-gray-900">Edit Lead - {selectedLead.name}</h3>
                     <p className="text-sm text-gray-500">Lead ID: {selectedLead.leadId}</p>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Personal Information */}
                     <div className="space-y-4">
                       <h4 className="font-medium text-gray-900 border-b pb-2">Personal Information</h4>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Full Name *</label>
                         <input
@@ -1726,6 +1730,16 @@ const SuperAdminDashboard = () => {
                           className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           value={leadFormData.phone}
                           onChange={(e) => setLeadFormData({...leadFormData, phone: e.target.value})}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Lead Vendor</label>
+                        <input
+                          type="text"
+                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          value={leadFormData.leadVendor}
+                          onChange={(e) => setLeadFormData({...leadFormData, leadVendor: e.target.value})}
                         />
                       </div>
 

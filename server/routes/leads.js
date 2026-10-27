@@ -222,6 +222,10 @@ const createLeadValidation = [
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 2000 })
     .withMessage('Notes cannot exceed 2000 characters'),
+  body('leadVendor')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 100 })
+    .withMessage('Lead vendor cannot exceed 100 characters'),
   body('address')
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 200 })
@@ -335,6 +339,10 @@ const updateLeadValidation = [
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 2000 })
     .withMessage('Notes cannot exceed 2000 characters'),
+  body('leadVendor')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 100 })
+    .withMessage('Lead vendor cannot exceed 100 characters'),
   body('company')
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 100 })
@@ -1308,7 +1316,7 @@ router.get('/', protect, [
       monthlyDebtPayment: 1, creditScore: 1, creditScoreRange: 1,
       requestedLoanAmount: 1,
       address: 1, city: 1, state: 1, zipcode: 1,
-      notes: 1, followUpDate: 1, followUpTime: 1, followUpNotes: 1,
+      notes: 1, leadVendor: 1, followUpDate: 1, followUpTime: 1, followUpNotes: 1,
       draftDate: 1, adminProcessed: 1, adminProcessedAt: 1,
       assignedAt: 1, assignmentNotes: 1,
       createdBy: 1, updatedBy: 1, assignedTo: 1, assignedBy: 1,
@@ -1937,7 +1945,7 @@ router.put('/:id', protect, updateLeadValidation, handleValidationErrors, async 
       allowedFields = [
         'name', 'email', 'phone', 'alternatePhone', 'debtCategory', 'debtTypes',
         'totalDebtAmount', 'numberOfCreditors', 'monthlyDebtPayment', 'creditScore', 'creditScoreRange',
-        'address', 'city', 'state', 'zipcode', 'notes', 'company', 'source'
+        'address', 'city', 'state', 'zipcode', 'notes', 'leadVendor', 'company', 'source'
       ];
     } else if (req.user.role === 'admin') {
       // Check if admin is from DEBTIFY
@@ -1949,7 +1957,7 @@ router.put('/:id', protect, updateLeadValidation, handleValidationErrors, async 
           // Basic lead information
           'name', 'email', 'phone', 'alternatePhone', 'debtCategory', 'debtTypes',
           'totalDebtAmount', 'numberOfCreditors', 'monthlyDebtPayment', 'creditScore', 'creditScoreRange',
-          'address', 'city', 'state', 'zipcode', 'notes', 'company', 'source', 'category', 'completionPercentage',
+          'address', 'city', 'state', 'zipcode', 'notes', 'leadVendor', 'company', 'source', 'category', 'completionPercentage',
           // Status fields
           'status', 'leadStatus', 'contactStatus', 'qualificationOutcome', 
           'callDisposition', 'engagementOutcome', 'disqualification',
@@ -1973,7 +1981,7 @@ router.put('/:id', protect, updateLeadValidation, handleValidationErrors, async 
         // Basic lead information
         'name', 'email', 'phone', 'alternatePhone', 'debtCategory', 'debtTypes',
         'totalDebtAmount', 'numberOfCreditors', 'monthlyDebtPayment', 'creditScore', 'creditScoreRange',
-        'address', 'city', 'state', 'zipcode', 'notes', 'company', 'source', 'category', 'completionPercentage',
+        'address', 'city', 'state', 'zipcode', 'notes', 'leadVendor', 'company', 'source', 'category', 'completionPercentage',
         // Status fields
         'status', 'leadStatus', 'contactStatus', 'qualificationOutcome', 
         'callDisposition', 'engagementOutcome', 'disqualification',

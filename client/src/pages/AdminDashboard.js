@@ -2172,6 +2172,20 @@ const AdminDashboard = () => {
                           <span className="text-sm text-gray-900 text-right">{selectedLead.alternatePhone || '—'}</span>
                         )}
                       </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Lead Vendor:</span>
+                        {isMainOrgAdmin && isEditing ? (
+                          <input
+                            type="text"
+                            value={editedLead.leadVendor || ''}
+                            onChange={(e) => handleInputChange('leadVendor', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                            placeholder="Optional"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.leadVendor || '—'}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 

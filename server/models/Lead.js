@@ -179,6 +179,15 @@ const leadSchema = new mongoose.Schema({
     type: String,
     maxlength: [2000, 'Notes cannot exceed 2000 characters']
   },
+  // Optional free-text tag for which vendor/source referred this lead.
+  // Filled in (optionally) by Agent2 at creation; visible and editable by
+  // admin/superadmin from the lead details panel.
+  leadVendor: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Lead vendor cannot exceed 100 characters'],
+    default: ''
+  },
 
   // Address Information
   address: {
