@@ -1322,15 +1322,18 @@ const Agent2Dashboard = () => {
     const total = filteredLeads.length;
     const newLeads = filteredLeads.filter(lead => lead.status === 'new').length;
     const interested = filteredLeads.filter(lead => lead.status === 'interested').length;
-    const successful = filteredLeads.filter(lead => lead.status === 'successful').length;
+    // Agent2's status-update flow writes to leadProgressStatus (SALE /
+    // Immediate Enrollment), never the legacy `status` field — match the
+    // same definition the admin "today-stats" sale count uses.
+    const sale = filteredLeads.filter(lead => ['SALE', 'Immediate Enrollment'].includes(lead.leadProgressStatus)).length;
     const followUp = filteredLeads.filter(lead => lead.status === 'follow-up').length;
 
-    return { 
-      total, 
-      newLeads, 
-      interested, 
-      successful, 
-      followUp, 
+    return {
+      total,
+      newLeads,
+      interested,
+      sale,
+      followUp,
       todaysLeads: filteredLeads,
       // Add persistent leads counts
       pendingQualificationCount: pendingQualificationLeads.length,
@@ -1848,8 +1851,8 @@ const Agent2Dashboard = () => {
                   <CheckCircle className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-600">Successful</p>
-                  <p className="text-xl font-bold text-gray-900">{stats.successful}</p>
+                  <p className="text-sm font-medium text-gray-600">Sale</p>
+                  <p className="text-xl font-bold text-gray-900">{stats.sale}</p>
                 </div>
               </div>
             </div>

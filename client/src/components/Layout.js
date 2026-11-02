@@ -134,9 +134,13 @@ const Layout = ({ onDashboardRefresh }) => {
   // Prevent copying FROM the dashboard for restricted roles.
   // Paste INTO the dashboard is intentionally allowed.
   // Main org admins (isMainOrgAdmin) are exempt from copy restriction.
+  // Main org agent2 users are exempt too (org-scoped, same as admins — agent2
+  // accounts in other orgs stay restricted).
   useEffect(() => {
     const restrictedRoles = ['admin', 'agent1', 'agent2', 'restricted_admin'];
-    if (!user || !restrictedRoles.includes(user.role) || user.isMainOrgAdmin) return;
+    const orgName = (user?.organization?.name || '').trim().toUpperCase();
+    const isMainOrgAgent2 = user?.role === 'agent2' && orgName === 'DEBTIFY';
+    if (!user || !restrictedRoles.includes(user.role) || user.isMainOrgAdmin || isMainOrgAgent2) return;
 
     const block = (e) => e.preventDefault();
 
