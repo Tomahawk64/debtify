@@ -2136,8 +2136,20 @@ router.put('/:id', protect, updateLeadValidation, handleValidationErrors, async 
     lead.lastUpdatedBy = req.user.name || req.user.email;
     lead.lastUpdatedAt = getEasternNow();
 
-    // Mark as admin processed if updated by admin or superadmin
-    if (['admin', 'superadmin'].includes(req.user.role)) {
+    // Mark as admin processed only on an explicit disposition/status action —
+    // not on every save. Previously ANY admin/superadmin save (even editing
+    // just the name, notes, or debt amount) silently flagged the lead as
+    // processed, which hides it from the agent's persistent Callback Needed /
+    // Pending Qualification queue (see GET /assigned-to-me above) even though
+    // nothing about its actual status changed.
+    const STATUS_ACTION_FIELDS = [
+      'status', 'leadProgressStatus', 'qualificationStatus', 'contactStatus',
+      'qualificationOutcome', 'callDisposition', 'engagementOutcome', 'disqualification'
+    ];
+    const isExplicitStatusAction = hasDispositionField || hasIsDisposedField ||
+      STATUS_ACTION_FIELDS.some(field => Object.prototype.hasOwnProperty.call(req.body, field));
+
+    if (['admin', 'superadmin'].includes(req.user.role) && isExplicitStatusAction) {
       lead.adminProcessed = true;
       lead.adminProcessedAt = getEasternNow();
     }
