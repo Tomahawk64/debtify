@@ -450,13 +450,18 @@ const OrganizationManagement = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      <div className="flex space-x-4">
+                      <div className="flex flex-wrap gap-2">
                         <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                           Admin: {org.userCounts?.admin || 0}
                         </span>
                         <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
                           Agents: {(org.userCounts?.agent1 || 0) + (org.userCounts?.agent2 || 0)}
                         </span>
+                        {((org.userCounts?.restricted_admin || 0) + (org.userCounts?.affiliate_admin || 0) + (org.userCounts?.multivendor_admin || 0) + (org.userCounts?.data_vendor || 0)) > 0 && (
+                          <span className="text-xs bg-cyan-100 text-cyan-800 px-2 py-1 rounded">
+                            Other: {(org.userCounts?.restricted_admin || 0) + (org.userCounts?.affiliate_admin || 0) + (org.userCounts?.multivendor_admin || 0) + (org.userCounts?.data_vendor || 0)}
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         Total: {org.userCounts?.total || 0}

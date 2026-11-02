@@ -5,6 +5,11 @@ import toast from 'react-hot-toast';
 import LoadingSpinner from './LoadingSpinner';
 import CreateAgentModal from './CreateAgentModal';
 
+// Roles routed through the /api/auth/admins/* endpoints (as opposed to
+// /agents or /data-vendors) for status toggling, editing, and deletion.
+const ADMIN_BUCKET_ROLES = ['admin', 'restricted_admin', 'affiliate_admin', 'multivendor_admin'];
+const isAdminBucketRole = (role) => ADMIN_BUCKET_ROLES.includes(role);
+
 const SuperAdminUserManagement = () => {
   const [users, setUsers] = useState([]);
   const [organizations, setOrganizations] = useState([]);
@@ -78,12 +83,12 @@ const SuperAdminUserManagement = () => {
       let endpoint;
       if (targetUser.role === 'data_vendor') {
         endpoint = 'data-vendors';
-      } else if (targetUser.role === 'admin' || targetUser.role === 'restricted_admin') {
+      } else if (isAdminBucketRole(targetUser.role)) {
         endpoint = 'admins';
       } else {
         endpoint = 'agents';
       }
-      
+
       const response = await axios.put(`/api/auth/${endpoint}/${userId}/status`, {
         isActive: !currentStatus
       });
@@ -186,7 +191,7 @@ const SuperAdminUserManagement = () => {
   const deleteUser = async (userId, userName) => {
     const targetUser = users.find(u => u._id === userId);
     const userType = targetUser.role === 'data_vendor' ? 'data vendor'
-                   : (targetUser.role === 'admin' || targetUser.role === 'restricted_admin') ? 'admin' : 'agent';
+                   : isAdminBucketRole(targetUser.role) ? 'admin' : 'agent';
     
     if (!window.confirm(`Are you sure you want to delete ${userType} "${userName}"? This action cannot be undone.`)) {
       return;
@@ -196,7 +201,7 @@ const SuperAdminUserManagement = () => {
       let endpoint;
       if (targetUser.role === 'data_vendor') {
         endpoint = 'data-vendors';
-      } else if (targetUser.role === 'admin' || targetUser.role === 'restricted_admin') {
+      } else if (isAdminBucketRole(targetUser.role)) {
         endpoint = 'admins';
       } else {
         endpoint = 'agents';
@@ -257,7 +262,7 @@ const SuperAdminUserManagement = () => {
         const user = users.find(u => u._id === userId);
         if (user.role === 'data_vendor') {
           vendorIds.push(userId);
-        } else if (user.role === 'admin' || user.role === 'restricted_admin') {
+        } else if (isAdminBucketRole(user.role)) {
           adminIds.push(userId);
         } else {
           agentIds.push(userId);
@@ -298,6 +303,8 @@ const SuperAdminUserManagement = () => {
         return 'bg-orange-100 text-orange-800';
       case 'affiliate_admin':
         return 'bg-indigo-100 text-indigo-800';
+      case 'multivendor_admin':
+        return 'bg-cyan-100 text-cyan-800';
       case 'data_vendor':
         return 'bg-violet-100 text-violet-800';
       default:
@@ -317,6 +324,8 @@ const SuperAdminUserManagement = () => {
         return 'Restricted Data Access';
       case 'affiliate_admin':
         return 'Affiliate Campaign Dashboard';
+      case 'multivendor_admin':
+        return 'Multi Vendor Lead Dashboard';
       case 'data_vendor':
         return 'ViciDial Data Transparency';
       default:
@@ -431,6 +440,16 @@ const SuperAdminUserManagement = () => {
               }`}
             >
               Affiliate Admin ({users.filter(u => u.role === 'affiliate_admin').length})
+            </button>
+            <button
+              onClick={() => setRoleFilter('multivendor_admin')}
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                roleFilter === 'multivendor_admin'
+                  ? 'bg-cyan-100 text-cyan-700 border border-cyan-300'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Multi Vendor Admin ({users.filter(u => u.role === 'multivendor_admin').length})
             </button>
             <button
               onClick={() => setRoleFilter('data_vendor')}

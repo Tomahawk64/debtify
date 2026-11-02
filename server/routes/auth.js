@@ -881,8 +881,8 @@ router.put('/users/:id', protect, [
       });
     }
 
-    // SuperAdmin can update agent1, agent2, admin, restricted_admin, and data_vendor users
-    if (!['agent1', 'agent2', 'admin', 'restricted_admin', 'affiliate_admin', 'data_vendor'].includes(targetUser.role)) {
+    // SuperAdmin can update agent1, agent2, admin, restricted_admin, affiliate_admin, multivendor_admin, and data_vendor users
+    if (!['agent1', 'agent2', 'admin', 'restricted_admin', 'affiliate_admin', 'multivendor_admin', 'data_vendor'].includes(targetUser.role)) {
       return res.status(400).json({
         success: false,
         message: 'Can only update agent1, agent2, or admin users'
@@ -1020,7 +1020,7 @@ router.get('/admins', protect, async (req, res) => {
       });
     }
 
-    let query = { role: { $in: ['admin', 'restricted_admin'] } };
+    let query = { role: { $in: ['admin', 'restricted_admin', 'affiliate_admin', 'multivendor_admin'] } };
 
     // SuperAdmin can filter by organization
     if (req.query.organization) {
@@ -1061,6 +1061,47 @@ router.get('/admins', protect, async (req, res) => {
   }
 });
 
+// @desc    Update admin/restricted_admin/affiliate_admin/multivendor_admin active status (SuperAdmin only)
+// @route   PUT /api/auth/admins/:id/status
+// @access  Private (SuperAdmin only)
+router.put('/admins/:id/status', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'superadmin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only superadmin can update admin status'
+      });
+    }
+
+    const { isActive } = req.body;
+    const admin = await User.findById(req.params.id);
+
+    if (!admin || !['admin', 'restricted_admin', 'affiliate_admin', 'multivendor_admin'].includes(admin.role)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+
+    admin.isActive = isActive;
+    await admin.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Admin ${isActive ? 'activated' : 'deactivated'} successfully`,
+      data: { admin: admin.toJSON() }
+    });
+
+  } catch (error) {
+    console.error('Update admin status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating admin status',
+      error: process.env.NODE_ENV === 'development' ? error.message : {}
+    });
+  }
+});
+
 // @desc    Delete admin (SuperAdmin only)
 // @route   DELETE /api/auth/admins/:id
 // @access  Private (SuperAdmin only)
@@ -1076,7 +1117,7 @@ router.delete('/admins/:id', protect, async (req, res) => {
 
     const admin = await User.findById(req.params.id);
 
-    if (!admin || !['admin', 'restricted_admin'].includes(admin.role)) {
+    if (!admin || !['admin', 'restricted_admin', 'affiliate_admin', 'multivendor_admin'].includes(admin.role)) {
       return res.status(404).json({
         success: false,
         message: 'Admin not found'

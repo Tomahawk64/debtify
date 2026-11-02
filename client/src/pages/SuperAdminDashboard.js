@@ -21,13 +21,15 @@ import {
   Edit,
   Trash,
   Filter,
-  Download
+  Download,
+  Tags
 } from 'lucide-react';
 import axios from '../utils/axios';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
 import OrganizationManagement from './OrganizationManagement';
 import SuperAdminUserManagement from '../components/SuperAdminUserManagement';
+import LeadVendorOptionsModal from '../components/LeadVendorOptionsModal';
 import Pagination from '../components/Pagination';
 import { formatEasternTimeForDisplay, formatEasternTime, getEasternNow } from '../utils/dateUtils';
 
@@ -40,6 +42,7 @@ const SuperAdminDashboard = () => {
   const [leads, setLeads] = useState([]);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [showManageVendorsModal, setShowManageVendorsModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
@@ -664,6 +667,13 @@ const SuperAdminDashboard = () => {
           </h1>
           <p className="text-gray-600">Manage organizations, administrators and system users</p>
         </div>
+        <button
+          onClick={() => setShowManageVendorsModal(true)}
+          className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-sky-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center gap-1.5"
+        >
+          <Tags size={16} />
+          Manage Lead Vendors
+        </button>
       </div>
 
       {/* Navigation Tabs */}
@@ -899,9 +909,14 @@ const SuperAdminDashboard = () => {
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          admin.role === 'restricted_admin' ? 'bg-orange-100 text-orange-800' : 'bg-purple-100 text-purple-800'
+                          admin.role === 'restricted_admin' ? 'bg-orange-100 text-orange-800' :
+                          admin.role === 'affiliate_admin' ? 'bg-amber-100 text-amber-800' :
+                          admin.role === 'multivendor_admin' ? 'bg-cyan-100 text-cyan-800' :
+                          'bg-purple-100 text-purple-800'
                         }`}>
-                          {admin.role === 'restricted_admin' ? 'Restricted Admin' : 'Admin'}
+                          {admin.role === 'restricted_admin' ? 'Restricted Admin' :
+                           admin.role === 'affiliate_admin' ? 'Affiliate Admin' :
+                           admin.role === 'multivendor_admin' ? 'Multi Vendor Admin' : 'Admin'}
                         </span>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
@@ -1938,6 +1953,11 @@ const SuperAdminDashboard = () => {
           </div>
         </div>
       )}
+
+      <LeadVendorOptionsModal
+        isOpen={showManageVendorsModal}
+        onClose={() => setShowManageVendorsModal(false)}
+      />
     </div>
   );
 };

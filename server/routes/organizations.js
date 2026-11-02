@@ -240,7 +240,11 @@ router.get('/', protect, async (req, res) => {
           total: 0,
           admin: 0,
           agent1: 0,
-          agent2: 0
+          agent2: 0,
+          restricted_admin: 0,
+          affiliate_admin: 0,
+          multivendor_admin: 0,
+          data_vendor: 0
         };
 
         userCounts.forEach(({ _id, count }) => {
