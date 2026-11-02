@@ -266,6 +266,10 @@ const Layout = ({ onDashboardRefresh }) => {
       return [
         { name: 'Dashboard', href: '/affiliate', icon: Database }
       ];
+    } else if (user.role === 'multivendor_admin') {
+      return [
+        { name: 'Dashboard', href: '/multivendor-dashboard', icon: Database }
+      ];
     } else if (user.role === 'data_vendor') {
       return [
         { name: 'Dashboard', href: '/vendor-dashboard', icon: BarChart3 },
@@ -332,6 +336,7 @@ const Layout = ({ onDashboardRefresh }) => {
                  user.role === 'admin' ? 'Administrator' : 
                  user.role === 'restricted_admin' ? 'Restricted Admin' :
                  user.role === 'affiliate_admin' ? 'Affiliate Admin' :
+                 user.role === 'multivendor_admin' ? 'Multi Vendor Admin' :
                  user.role === 'data_vendor' ? 'Data Vendor' : 'Super Administrator'}
               </p>
             </div>

@@ -17,11 +17,13 @@ import {
   UserCheck,
   TrendingUp,
   Database,
-  CalendarClock
+  CalendarClock,
+  Tags
 } from 'lucide-react';
 import axios from '../utils/axios';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import LeadVendorOptionsModal from '../components/LeadVendorOptionsModal';
 import AgentManagement from '../components/AgentManagement';
 import SuperUserManagement from '../components/SuperUserManagement';
 import OrganizationManagement from './OrganizationManagement';
@@ -54,6 +56,18 @@ const AdminDashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(getEasternNow());
   const [showLeadsSection, setShowLeadsSection] = useState(false);
+
+  // Managed Lead Vendor options (set by the main org admin) — used by the
+  // lead-details edit dropdown and the "Manage Lead Vendors" modal below.
+  const [leadVendorOptions, setLeadVendorOptions] = useState([]);
+  const [showManageVendorsModal, setShowManageVendorsModal] = useState(false);
+  const fetchLeadVendorOptions = useCallback(async () => {
+    try {
+      const res = await axios.get('/api/lead-vendor-options');
+      if (res.data?.success) setLeadVendorOptions(res.data.data || []);
+    } catch { /* non-critical */ }
+  }, []);
+  useEffect(() => { fetchLeadVendorOptions(); }, [fetchLeadVendorOptions]);
 
   // ── People Search floating PiP panel ─────────────────────────────
   const [showSearchPanel, setShowSearchPanel] = useState(false);
@@ -1745,6 +1759,13 @@ const AdminDashboard = () => {
                   <span>Add Backdated Lead</span>
                 </button>
                 <button
+                  onClick={() => setShowManageVendorsModal(true)}
+                  className="px-4 py-1.5 bg-gradient-to-r from-cyan-600 to-sky-600 text-white text-xs font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-1.5"
+                >
+                  <Tags size={14} />
+                  <span>Manage Lead Vendors</span>
+                </button>
+                <button
                   onClick={() => setShowManualSaleModal(true)}
                   className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-1.5"
                 >
@@ -2175,13 +2196,16 @@ const AdminDashboard = () => {
                       <div className="flex justify-between items-start">
                         <span className="text-sm font-medium text-gray-600">Lead Vendor:</span>
                         {isMainOrgAdmin && isEditing ? (
-                          <input
-                            type="text"
+                          <select
                             value={editedLead.leadVendor || ''}
                             onChange={(e) => handleInputChange('leadVendor', e.target.value)}
                             className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
-                            placeholder="Optional"
-                          />
+                          >
+                            <option value="">—</option>
+                            {leadVendorOptions.map(opt => (
+                              <option key={opt._id} value={opt.name}>{opt.name}</option>
+                            ))}
+                          </select>
                         ) : (
                           <span className="text-sm text-gray-900 text-right">{selectedLead.leadVendor || '—'}</span>
                         )}
@@ -2819,6 +2843,15 @@ const AdminDashboard = () => {
           isOpen={showBackdatedLeadModal}
           onClose={() => setShowBackdatedLeadModal(false)}
           onCreated={() => { fetchStats(); fetchLeads(false, 1); }}
+        />
+      )}
+
+      {/* Manage Lead Vendors Modal — main organization admin only */}
+      {isMainOrgAdmin && (
+        <LeadVendorOptionsModal
+          isOpen={showManageVendorsModal}
+          onClose={() => setShowManageVendorsModal(false)}
+          onChanged={fetchLeadVendorOptions}
         />
       )}
 

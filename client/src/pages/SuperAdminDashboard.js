@@ -116,6 +116,14 @@ const SuperAdminDashboard = () => {
     leadVendor: ''
   });
 
+  // Managed Lead Vendor options — used by the Edit Lead dropdown below.
+  const [leadVendorOptions, setLeadVendorOptions] = useState([]);
+  useEffect(() => {
+    axios.get('/api/lead-vendor-options')
+      .then(res => { if (res.data?.success) setLeadVendorOptions(res.data.data || []); })
+      .catch(() => {});
+  }, []);
+
   const fetchAdmins = useCallback(async (filters = adminFiltersRef.current) => {
     try {
       const params = new URLSearchParams();
@@ -1735,12 +1743,16 @@ const SuperAdminDashboard = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Lead Vendor</label>
-                        <input
-                          type="text"
+                        <select
                           className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                           value={leadFormData.leadVendor}
                           onChange={(e) => setLeadFormData({...leadFormData, leadVendor: e.target.value})}
-                        />
+                        >
+                          <option value="">—</option>
+                          {leadVendorOptions.map(opt => (
+                            <option key={opt._id} value={opt.name}>{opt.name}</option>
+                          ))}
+                        </select>
                       </div>
 
                       <div>

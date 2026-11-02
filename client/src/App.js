@@ -15,6 +15,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import RestrictedAdminDashboard from './pages/RestrictedAdminDashboard';
 import AffiliateDashboard from './pages/AffiliateDashboard';
+import MultiVendorDashboard from './pages/MultiVendorDashboard';
 import DataVendorDashboard from './pages/DataVendorDashboard';
 import PaymentStatus from './pages/PaymentStatus';
 import VendorLeadAudit from './pages/VendorLeadAudit';
@@ -108,6 +109,12 @@ function App() {
                 <Route path="affiliate" element={
                   <ProtectedRoute roles={['affiliate_admin', 'superadmin']}>
                     <AffiliateDashboard />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="multivendor-dashboard" element={
+                  <ProtectedRoute roles={['multivendor_admin', 'superadmin']}>
+                    <MultiVendorDashboard />
                   </ProtectedRoute>
                 } />
 

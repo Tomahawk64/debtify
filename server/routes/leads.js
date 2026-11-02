@@ -4,6 +4,7 @@ const moment = require('moment-timezone');
 const Lead = require('../models/Lead');
 const User = require('../models/User');
 const Organization = require('../models/Organization');
+const LeadVendorOption = require('../models/LeadVendorOption');
 const { protect, authorize } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 const { 
@@ -84,6 +85,14 @@ const getOrganizationNameById = async (organizationId) => {
   }
   const org = await Organization.findById(organizationId).select('name');
   return org ? org.name : null;
+};
+
+// Lead Vendor is now a managed list (see LeadVendorOption / routes/leadVendorOptions.js)
+// rather than free text — reject anything that isn't a currently-active option.
+const isValidLeadVendorValue = async (value) => {
+  if (value === undefined || value === null || value === '') return true;
+  const exists = await LeadVendorOption.exists({ name: value, isActive: true });
+  return !!exists;
 };
 
 /**
@@ -225,7 +234,14 @@ const createLeadValidation = [
   body('leadVendor')
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 100 })
-    .withMessage('Lead vendor cannot exceed 100 characters'),
+    .withMessage('Lead vendor cannot exceed 100 characters')
+    .bail()
+    .custom(async (value) => {
+      if (!(await isValidLeadVendorValue(value))) {
+        throw new Error('Lead vendor must be one of the configured options');
+      }
+      return true;
+    }),
   body('address')
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 200 })
@@ -342,7 +358,14 @@ const updateLeadValidation = [
   body('leadVendor')
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 100 })
-    .withMessage('Lead vendor cannot exceed 100 characters'),
+    .withMessage('Lead vendor cannot exceed 100 characters')
+    .bail()
+    .custom(async (value) => {
+      if (!(await isValidLeadVendorValue(value))) {
+        throw new Error('Lead vendor must be one of the configured options');
+      }
+      return true;
+    }),
   body('company')
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 100 })
@@ -607,6 +630,14 @@ router.get('/export', [
     console.log(`Export request from ${user.role} user: ${user._id}`);
 
     // --- Permission gate ---
+    // Roles with their own dedicated, properly-scoped endpoint must never
+    // reach this general export (see GET / and GET /:id above for the same rule).
+    if (['restricted_admin', 'affiliate_admin', 'data_vendor', 'multivendor_admin'].includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: `User role ${user.role} is not authorized to access this route`
+      });
+    }
     // Superadmin: always allowed.
     // Admin from the main organization: always allowed (cross-org visibility).
     // Other admins: only allowed if canDownloadLeads === true.
@@ -1130,13 +1161,24 @@ router.get('/', protect, [
     .withMessage('Invalid date filter type')
 ], handleValidationErrors, async (req, res) => {
   try {
+    // Roles with their own dedicated, properly-scoped dashboard/endpoint
+    // (restricted_admin → /api/admin-uploads, affiliate_admin → /api/affiliate,
+    // data_vendor → /api/data-vendor-uploads, multivendor_admin → /api/multivendor)
+    // must never reach this general, effectively-unscoped endpoint directly.
+    if (['restricted_admin', 'affiliate_admin', 'data_vendor', 'multivendor_admin'].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: `User role ${req.user.role} is not authorized to access this route`
+      });
+    }
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 100;
     const skip = (page - 1) * limit;
 
     // Build filter object
     const filter = {};
-    
+
     // IMPORTANT: Apply organisation scope filter FIRST for admin users.
     // This ensures all subsequent filters work within the correct organisation scope.
     if (req.user.role === 'admin') {
@@ -1589,6 +1631,15 @@ router.get('/call-report', protect, authorize('admin', 'superadmin'), async (req
 // @access  Private
 router.get('/:id', protect, async (req, res) => {
   try {
+    // Same dedicated-dashboard roles excluded from the list endpoint above
+    // must also be excluded here — a lookup by ID is not itself a scope check.
+    if (['restricted_admin', 'affiliate_admin', 'data_vendor', 'multivendor_admin'].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: `User role ${req.user.role} is not authorized to access this route`
+      });
+    }
+
     const lead = await Lead.findByLeadId(req.params.id)
       .populate('createdBy', 'name email organization')
       .populate('updatedBy', 'name email')
@@ -2454,6 +2505,13 @@ router.post('/:id/unassign', protect, async (req, res) => {
 router.get('/dashboard/stats', protect, async (req, res) => {
   try {
     const { role, _id: userId } = req.user;
+
+    if (['restricted_admin', 'affiliate_admin', 'data_vendor', 'multivendor_admin'].includes(role)) {
+      return res.status(403).json({
+        success: false,
+        message: `User role ${role} is not authorized to access this route`
+      });
+    }
 
     // Short-lived cache to absorb the 30s polling from all users
     const statsCacheKey = role === 'superadmin'

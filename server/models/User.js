@@ -24,8 +24,16 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['agent1', 'agent2', 'admin', 'superadmin', 'restricted_admin', 'affiliate_admin', 'data_vendor'],
+    enum: ['agent1', 'agent2', 'admin', 'superadmin', 'restricted_admin', 'affiliate_admin', 'data_vendor', 'multivendor_admin'],
     default: 'agent1'
+  },
+  // Only meaningful for role === 'multivendor_admin': the set of Lead Vendor
+  // option names (see LeadVendorOption) this account is scoped to see leads
+  // for. Stored as the option's `name` string, not an ObjectId ref, so it
+  // keeps working even if an option is later renamed/retired.
+  subLeadVendors: {
+    type: [{ type: String, trim: true }],
+    default: undefined
   },
   isActive: {
     type: Boolean,

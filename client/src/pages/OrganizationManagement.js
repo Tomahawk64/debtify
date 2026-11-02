@@ -52,8 +52,17 @@ const OrganizationManagement = () => {
     name: '',
     email: '',
     password: '',
-    role: 'admin'
+    role: 'admin',
+    subLeadVendors: []
   });
+
+  // Managed Lead Vendor options — used for the Multi Vendor Admin multiselect
+  const [leadVendorOptions, setLeadVendorOptions] = useState([]);
+  useEffect(() => {
+    axios.get('/api/lead-vendor-options')
+      .then(res => { if (res.data?.success) setLeadVendorOptions(res.data.data || []); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetchOrganizations();
@@ -142,6 +151,12 @@ const OrganizationManagement = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
+
+    if (userForm.role === 'multivendor_admin' && userForm.subLeadVendors.length === 0) {
+      toast.error('Select at least one lead vendor for a Multi Vendor Admin account');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -162,7 +177,8 @@ const OrganizationManagement = () => {
         email: '',
         password: '',
         role: 'admin',
-        canDownloadLeads: false
+        canDownloadLeads: false,
+        subLeadVendors: []
       });
       setShowUserModal(false);
       setSelectedOrg(null);
@@ -195,7 +211,7 @@ const OrganizationManagement = () => {
 
   const openUserModal = (org) => {
     setSelectedOrg(org);
-    setUserForm({ name: '', email: '', password: '', role: 'admin', canDownloadLeads: false });
+    setUserForm({ name: '', email: '', password: '', role: 'admin', canDownloadLeads: false, subLeadVendors: [] });
     setShowUserModal(true);
   };
 
@@ -909,15 +925,55 @@ const OrganizationManagement = () => {
                         required
                         className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={userForm.role}
-                        onChange={(e) => setUserForm({...userForm, role: e.target.value, canDownloadLeads: false})}
+                        onChange={(e) => setUserForm({...userForm, role: e.target.value, canDownloadLeads: false, subLeadVendors: []})}
                       >
                         <option value="admin">Admin</option>
                         <option value="agent1">Agent 1</option>
                         <option value="agent2">Agent 2</option>
                         <option value="restricted_admin">Restricted Admin</option>
                         <option value="data_vendor">Data Vendor</option>
+                        <option value="multivendor_admin">Multi Vendor Admin</option>
                       </select>
                     </div>
+
+                    {/* Sub Lead Vendors — multivendor_admin only */}
+                    {userForm.role === 'multivendor_admin' && (
+                      <div className="p-3 bg-cyan-50 border border-cyan-200 rounded-lg">
+                        <label className="text-sm font-medium text-gray-800 block mb-1">
+                          Sub Lead Vendors *
+                        </label>
+                        <p className="text-xs text-gray-500 mb-2">
+                          This account will see every lead whose Lead Vendor tag matches one of the selections below.
+                        </p>
+                        {leadVendorOptions.length === 0 ? (
+                          <p className="text-xs text-amber-600">
+                            No lead vendor options exist yet — add some first from the admin dashboard's "Manage Lead Vendors".
+                          </p>
+                        ) : (
+                          <div className="max-h-40 overflow-y-auto space-y-1.5 bg-white rounded-md border border-gray-200 p-2">
+                            {leadVendorOptions.map(opt => {
+                              const checked = userForm.subLeadVendors.includes(opt.name);
+                              return (
+                                <label key={opt._id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer px-1 py-0.5 rounded hover:bg-gray-50">
+                                  <input
+                                    type="checkbox"
+                                    className="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500 cursor-pointer"
+                                    checked={checked}
+                                    onChange={(e) => {
+                                      const next = e.target.checked
+                                        ? [...userForm.subLeadVendors, opt.name]
+                                        : userForm.subLeadVendors.filter(n => n !== opt.name);
+                                      setUserForm({...userForm, subLeadVendors: next});
+                                    }}
+                                  />
+                                  {opt.name}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Download permission — admin only */}
                     {userForm.role === 'admin' && (

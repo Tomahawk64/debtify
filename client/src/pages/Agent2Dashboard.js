@@ -199,6 +199,15 @@ const Agent2Dashboard = () => {
     email: ''
   });
 
+  // Managed Lead Vendor options (set by the main org admin) — fetched once,
+  // used to populate the Lead Vendor dropdown in Add New Lead.
+  const [leadVendorOptions, setLeadVendorOptions] = useState([]);
+  useEffect(() => {
+    axios.get('/api/lead-vendor-options')
+      .then(res => { if (res.data?.success) setLeadVendorOptions(res.data.data || []); })
+      .catch(() => {}); // non-critical — the dropdown just stays empty
+  }, []);
+
   const getLeadOrganizationName = (lead) => {
     if (!lead) return '';
     if (lead.organization && typeof lead.organization === 'object') {
@@ -3356,9 +3365,14 @@ const Agent2Dashboard = () => {
                 {/* Lead Vendor */}
                 <div>
                   <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Lead Vendor <span className="normal-case font-normal text-gray-400">(optional)</span></label>
-                  <input type="text" name="leadVendor"
+                  <select name="leadVendor"
                     className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-400 transition-all duration-200 bg-gray-50 focus:bg-white text-sm"
-                    value={createFormData.leadVendor} onChange={handleCreateFormChange} placeholder="Name of the lead vendor" />
+                    value={createFormData.leadVendor} onChange={handleCreateFormChange}>
+                    <option value="">Select a lead vendor…</option>
+                    {leadVendorOptions.map(opt => (
+                      <option key={opt._id} value={opt.name}>{opt.name}</option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Address */}

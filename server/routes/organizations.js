@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const { body } = require('express-validator');
 const Organization = require('../models/Organization');
 const User = require('../models/User');
+const LeadVendorOption = require('../models/LeadVendorOption');
 const { protect } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 
@@ -133,8 +134,12 @@ const userValidation = [
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
     .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
   body('role')
-    .isIn(['admin', 'agent1', 'agent2', 'restricted_admin'])
-    .withMessage('Role must be admin, agent1, agent2, or restricted_admin')
+    .isIn(['admin', 'agent1', 'agent2', 'restricted_admin', 'multivendor_admin'])
+    .withMessage('Role must be admin, agent1, agent2, restricted_admin, or multivendor_admin'),
+  body('subLeadVendors')
+    .if(body('role').equals('multivendor_admin'))
+    .isArray({ min: 1 })
+    .withMessage('Select at least one lead vendor for a Multi Vendor Admin account')
 ];
 
 // @desc    Create organization (SuperAdmin only)
@@ -493,6 +498,32 @@ router.post('/:id/users', protect, userValidation, handleValidationErrors, async
     // canDownloadLeads is only meaningful for admin role; sanitise to boolean
     const canDownloadLeads = role === 'admin' ? Boolean(req.body.canDownloadLeads) : false;
 
+    // subLeadVendors is only meaningful for multivendor_admin; validate every
+    // selected name is a currently-active, real lead vendor option so an
+    // account can never be scoped to a typo'd or already-retired name.
+    let subLeadVendors;
+    if (role === 'multivendor_admin') {
+      const requested = Array.isArray(req.body.subLeadVendors)
+        ? [...new Set(req.body.subLeadVendors.map(v => String(v).trim()).filter(Boolean))]
+        : [];
+      if (requested.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Select at least one lead vendor for a Multi Vendor Admin account'
+        });
+      }
+      const validOptions = await LeadVendorOption.find({ name: { $in: requested }, isActive: true }).select('name').lean();
+      const validNames = new Set(validOptions.map(o => o.name));
+      const invalid = requested.filter(v => !validNames.has(v));
+      if (invalid.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `These lead vendor options are not valid or active: ${invalid.join(', ')}`
+        });
+      }
+      subLeadVendors = requested;
+    }
+
     // Create user
     const user = await User.create({
       name,
@@ -500,6 +531,7 @@ router.post('/:id/users', protect, userValidation, handleValidationErrors, async
       password,
       role,
       canDownloadLeads,
+      ...(subLeadVendors ? { subLeadVendors } : {}),
       organization: req.params.id,
       createdBy: req.user._id
     });
