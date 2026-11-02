@@ -17,6 +17,7 @@ const {
 const { sendGTIPostback, syncLeadWithInboundCall } = require('../utils/gtiPostbackService');
 const cache = require('../utils/cache');
 const { notifyLeadDownload } = require('../utils/notificationHelper');
+const { escapeRegex } = require('../utils/regexUtils');
 
 const EASTERN_TIMEZONE = 'America/New_York';
 
@@ -709,12 +710,13 @@ router.get('/export', [
 
     // Search functionality
     if (req.query.search) {
+      const searchRegex = escapeRegex(req.query.search);
       filter.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { email: { $regex: req.query.search, $options: 'i' } },
-        { company: { $regex: req.query.search, $options: 'i' } },
-        { phone: { $regex: req.query.search, $options: 'i' } },
-        { leadId: { $regex: req.query.search, $options: 'i' } }
+        { name: { $regex: searchRegex, $options: 'i' } },
+        { email: { $regex: searchRegex, $options: 'i' } },
+        { company: { $regex: searchRegex, $options: 'i' } },
+        { phone: { $regex: searchRegex, $options: 'i' } },
+        { leadId: { $regex: searchRegex, $options: 'i' } }
       ];
     }
 
@@ -1241,13 +1243,14 @@ router.get('/', protect, [
 
     // Search functionality
     if (req.query.search) {
+      const searchRegex2 = escapeRegex(req.query.search);
       filter.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { email: { $regex: req.query.search, $options: 'i' } },
-        { company: { $regex: req.query.search, $options: 'i' } },
-        { phone: { $regex: req.query.search, $options: 'i' } },
-        { leadId: { $regex: req.query.search, $options: 'i' } },
-        { clientId: { $regex: req.query.search, $options: 'i' } }
+        { name: { $regex: searchRegex2, $options: 'i' } },
+        { email: { $regex: searchRegex2, $options: 'i' } },
+        { company: { $regex: searchRegex2, $options: 'i' } },
+        { phone: { $regex: searchRegex2, $options: 'i' } },
+        { leadId: { $regex: searchRegex2, $options: 'i' } },
+        { clientId: { $regex: searchRegex2, $options: 'i' } }
       ];
     }
 

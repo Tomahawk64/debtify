@@ -11,6 +11,7 @@ const BenWebsiteLead = require('../models/BenWebsiteLead');
 const Lead = require('../models/Lead');
 const Organization = require('../models/Organization');
 const { protect } = require('../middleware/auth');
+const { escapeRegex } = require('../utils/regexUtils');
 
 const router = express.Router();
 
@@ -45,10 +46,11 @@ router.get('/', protect, async (req, res) => {
     if (access.orgFilter) filter.organization = access.orgFilter;
     if (status && ['new', 'reviewed', 'imported', 'rejected'].includes(status)) filter.status = status;
     if (search) {
+      const searchRegex = escapeRegex(search);
       filter.$or = [
-        { name:  { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } },
+        { name:  { $regex: searchRegex, $options: 'i' } },
+        { email: { $regex: searchRegex, $options: 'i' } },
+        { phone: { $regex: searchRegex, $options: 'i' } },
       ];
     }
 

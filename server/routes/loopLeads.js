@@ -18,6 +18,7 @@ const express       = require('express');
 const LoopLead      = require('../models/LoopLead');
 const Organization  = require('../models/Organization');
 const { protect }   = require('../middleware/auth');
+const { escapeRegex } = require('../utils/regexUtils');
 
 const router = express.Router();
 
@@ -80,13 +81,14 @@ router.get('/', protect, async (req, res) => {
     }
 
     if (search) {
+      const searchRegex = escapeRegex(search);
       filter.$or = [
-        { firstname: { $regex: search, $options: 'i' } },
-        { lastname:  { $regex: search, $options: 'i' } },
-        { email:     { $regex: search, $options: 'i' } },
-        { phone:     { $regex: search, $options: 'i' } },
-        { city:      { $regex: search, $options: 'i' } },
-        { state:     { $regex: search, $options: 'i' } },
+        { firstname: { $regex: searchRegex, $options: 'i' } },
+        { lastname:  { $regex: searchRegex, $options: 'i' } },
+        { email:     { $regex: searchRegex, $options: 'i' } },
+        { phone:     { $regex: searchRegex, $options: 'i' } },
+        { city:      { $regex: searchRegex, $options: 'i' } },
+        { state:     { $regex: searchRegex, $options: 'i' } },
       ];
     }
 

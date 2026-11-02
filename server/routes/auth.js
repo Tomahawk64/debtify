@@ -7,6 +7,7 @@ const handleValidationErrors = require('../middleware/validation');
 const { notifyCheckIn, notifyCheckOut } = require('../services/hrmsAttendance');
 const { syncWithChatService } = require('../utils/chatSync');
 const { notifyPasswordChange } = require('../utils/notificationHelper');
+const { escapeRegex } = require('../utils/regexUtils');
 
 // Helper: check if a user is the main-org admin (privilege for chat service)
 // Override the org name via MAIN_ORG_NAME env var; default is 'DEBTIFY'
@@ -680,9 +681,10 @@ router.get('/agents', protect, async (req, res) => {
 
     // Search by name or email
     if (req.query.search) {
+      const searchRegex = escapeRegex(req.query.search);
       query.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { email: { $regex: req.query.search, $options: 'i' } }
+        { name: { $regex: searchRegex, $options: 'i' } },
+        { email: { $regex: searchRegex, $options: 'i' } }
       ];
     }
 
@@ -1029,9 +1031,10 @@ router.get('/admins', protect, async (req, res) => {
 
     // Search by name or email
     if (req.query.search) {
+      const searchRegex = escapeRegex(req.query.search);
       query.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { email: { $regex: req.query.search, $options: 'i' } }
+        { name: { $regex: searchRegex, $options: 'i' } },
+        { email: { $regex: searchRegex, $options: 'i' } }
       ];
     }
 

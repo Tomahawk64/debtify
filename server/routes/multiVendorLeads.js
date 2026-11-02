@@ -14,6 +14,7 @@ const LeadVendorOption = require('../models/LeadVendorOption');
 const { protect, authorize } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 const { formatEasternTime } = require('../utils/timeFilters');
+const { escapeRegex } = require('../utils/regexUtils');
 
 const router = express.Router();
 
@@ -106,7 +107,7 @@ router.get(
       };
 
       if (req.query.search) {
-        const re = { $regex: req.query.search, $options: 'i' };
+        const re = { $regex: escapeRegex(req.query.search), $options: 'i' };
         filter.$or = [{ name: re }, { phone: re }];
       }
 
@@ -143,7 +144,7 @@ router.get(
         ...buildDateFilter(req.query.startDate, req.query.endDate),
       };
       if (req.query.search) {
-        const re = { $regex: req.query.search, $options: 'i' };
+        const re = { $regex: escapeRegex(req.query.search), $options: 'i' };
         filter.$or = [{ name: re }, { phone: re }];
       }
 

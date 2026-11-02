@@ -5,6 +5,7 @@ const XLSX = require('xlsx');
 const DataVendorUpload = require('../models/DataVendorUpload');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { escapeRegex } = require('../utils/regexUtils');
 
 // ── Header normalisation map (mirrors adminUploads.js) ──────────
 const HEADER_MAP = {
@@ -446,7 +447,7 @@ router.get('/runs/:runBatchId', protect, requireRoles('data_vendor', 'admin', 's
     }
 
     if (search) {
-      const re = { $regex: search, $options: 'i' };
+      const re = { $regex: escapeRegex(search), $options: 'i' };
       query.$or = [
         { lead_id: re }, { phone_number: re }, { first_name: re },
         { last_name: re }, { email: re }, { status: re }, { comments: re }
