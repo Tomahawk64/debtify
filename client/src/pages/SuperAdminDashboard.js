@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRefresh } from '../contexts/RefreshContext';
 import { scrollToTop } from '../utils/scrollUtils';
-import { 
-  Shield, 
-  Users, 
-  UserCheck, 
+import {
+  Shield,
+  Users,
+  UserCheck,
   Plus,
   Trash2,
   Building2,
@@ -19,6 +19,9 @@ import {
   AlertCircle,
   TrendingUp,
   Edit,
+  Edit3,
+  Save,
+  X,
   Trash,
   Filter,
   Download,
@@ -30,8 +33,9 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import OrganizationManagement from './OrganizationManagement';
 import SuperAdminUserManagement from '../components/SuperAdminUserManagement';
 import LeadVendorOptionsModal from '../components/LeadVendorOptionsModal';
+import LeadReassignModal from '../components/LeadReassignModal';
 import Pagination from '../components/Pagination';
-import { formatEasternTimeForDisplay, formatEasternTime, getEasternNow } from '../utils/dateUtils';
+import { formatEasternTimeForDisplay, formatEasternTime, getEasternNow, formatDateAsDDMMYYYY } from '../utils/dateUtils';
 
 const SuperAdminDashboard = () => {
   const { user } = useAuth();
@@ -46,9 +50,18 @@ const SuperAdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
-  const [showEditLeadModal, setShowEditLeadModal] = useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Lead view/edit modal — full detail parity with the main-org admin dashboard
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [editedLead, setEditedLead] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Lead reassignment
+  const [showReassignModal, setShowReassignModal] = useState(false);
+  const [leadToReassign, setLeadToReassign] = useState(null);
   
   // Pagination state for leads
   const [pagination, setPagination] = useState({
@@ -116,7 +129,8 @@ const SuperAdminDashboard = () => {
     zipcode: '',
     notes: '',
     requirements: '',
-    leadVendor: ''
+    leadVendor: '',
+    organization: ''
   });
 
   // Managed Lead Vendor options — used by the Edit Lead dropdown below.
@@ -251,8 +265,10 @@ const SuperAdminDashboard = () => {
     
     // Close all modals and reset form states
     setShowLeadModal(false);
-    setShowEditLeadModal(false);
+    setShowViewModal(false);
     setSelectedLead(null);
+    setEditedLead(null);
+    setIsEditing(false);
     
     // Reset to overview tab
     setActiveTab('overview');
@@ -383,11 +399,18 @@ const SuperAdminDashboard = () => {
 
   const handleCreateLead = async (e) => {
     e.preventDefault();
+
+    if (!leadFormData.organization) {
+      toast.error('Please select an organization');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
       const cleanData = {
-        name: leadFormData.name.trim()
+        name: leadFormData.name.trim(),
+        organization: leadFormData.organization
       };
 
       // Add optional fields if they have values
@@ -442,7 +465,8 @@ const SuperAdminDashboard = () => {
         zipcode: '',
         notes: '',
         requirements: '',
-        leadVendor: ''
+        leadVendor: '',
+        organization: ''
       });
 
       setShowLeadModal(false);
@@ -450,60 +474,6 @@ const SuperAdminDashboard = () => {
     } catch (error) {
       console.error('Error creating lead:', error);
       toast.error(error.response?.data?.message || 'Failed to create lead');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleUpdateLead = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    try {
-      const cleanData = {
-        name: leadFormData.name.trim()
-      };
-
-      // Add optional fields if they have values
-      if (leadFormData.email) cleanData.email = leadFormData.email.trim();
-      if (leadFormData.phone) {
-        const cleaned = leadFormData.phone.replace(/\D/g, '');
-        cleanData.phone = `+${cleaned}`;
-      }
-      if (leadFormData.alternatePhone) {
-        const cleaned = leadFormData.alternatePhone.replace(/\D/g, '');
-        cleanData.alternatePhone = `+${cleaned}`;
-      }
-
-      cleanData.debtCategory = leadFormData.debtCategory;
-      cleanData.debtTypes = leadFormData.debtTypes;
-
-      if (leadFormData.totalDebtAmount) cleanData.totalDebtAmount = parseFloat(leadFormData.totalDebtAmount);
-      if (leadFormData.numberOfCreditors) cleanData.numberOfCreditors = parseInt(leadFormData.numberOfCreditors);
-      if (leadFormData.monthlyDebtPayment) cleanData.monthlyDebtPayment = parseFloat(leadFormData.monthlyDebtPayment);
-      if (leadFormData.creditScore) cleanData.creditScore = parseInt(leadFormData.creditScore);
-      if (leadFormData.creditScoreRange) cleanData.creditScoreRange = leadFormData.creditScoreRange;
-
-      if (leadFormData.address) cleanData.address = leadFormData.address.trim();
-      if (leadFormData.city) cleanData.city = leadFormData.city.trim();
-      if (leadFormData.state) cleanData.state = leadFormData.state.trim();
-      if (leadFormData.zipcode) cleanData.zipcode = leadFormData.zipcode.trim();
-      if (leadFormData.notes) cleanData.notes = leadFormData.notes.trim();
-      if (leadFormData.requirements) cleanData.requirements = leadFormData.requirements.trim();
-      if (leadFormData.leadVendor) cleanData.leadVendor = leadFormData.leadVendor.trim();
-
-      cleanData.lastUpdatedBy = user?.name || 'SuperAdmin';
-      cleanData.lastUpdatedAt = formatEasternTime(getEasternNow());
-
-      await axios.put(`/api/leads/${selectedLead.leadId || selectedLead._id}`, cleanData);
-      toast.success('Lead updated successfully!');
-      
-      setShowEditLeadModal(false);
-      setSelectedLead(null);
-      fetchLeads();
-    } catch (error) {
-      console.error('Error updating lead:', error);
-      toast.error(error.response?.data?.message || 'Failed to update lead');
     } finally {
       setSubmitting(false);
     }
@@ -522,29 +492,89 @@ const SuperAdminDashboard = () => {
     }
   };
 
-  const openEditLeadModal = (lead) => {
+  // ── Lead View/Edit modal — full detail parity with the main-org admin
+  // dashboard. SuperAdmin always has full edit rights here (this page is
+  // superadmin-only), so no role gate is needed on any field.
+  const openViewModal = (lead) => {
     setSelectedLead(lead);
-    setLeadFormData({
-      name: lead.name || '',
-      email: lead.email || '',
-      phone: lead.phone || '',
-      alternatePhone: lead.alternatePhone || '',
-      debtCategory: lead.debtCategory || 'unsecured',
-      debtTypes: Array.isArray(lead.debtTypes) ? lead.debtTypes : [],
-      totalDebtAmount: lead.totalDebtAmount || '',
-      numberOfCreditors: lead.numberOfCreditors || '',
-      monthlyDebtPayment: lead.monthlyDebtPayment || '',
-      creditScore: lead.creditScore || '',
-      creditScoreRange: lead.creditScoreRange || '',
-      address: lead.address || '',
-      city: lead.city || '',
-      state: lead.state || '',
-      zipcode: lead.zipcode || '',
-      notes: lead.notes || '',
-      requirements: lead.requirements || '',
-      leadVendor: lead.leadVendor || ''
-    });
-    setShowEditLeadModal(true);
+    setEditedLead({ ...lead });
+    setIsEditing(false);
+    setShowViewModal(true);
+  };
+
+  const closeViewModal = () => {
+    setShowViewModal(false);
+    setSelectedLead(null);
+    setEditedLead(null);
+    setIsEditing(false);
+    setIsUpdating(false);
+  };
+
+  const handleEditToggle = () => {
+    if (isEditing) setEditedLead({ ...selectedLead });
+    setIsEditing(!isEditing);
+  };
+
+  const handleCancelEdit = () => {
+    setEditedLead({ ...selectedLead });
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditedLead(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLeadUpdate = async () => {
+    if (!editedLead) return;
+    setIsUpdating(true);
+    try {
+      const updateData = {
+        ...editedLead,
+        totalDebtAmount: editedLead.totalDebtAmount ? parseInt(editedLead.totalDebtAmount) : undefined,
+        numberOfCreditors: editedLead.numberOfCreditors ? parseInt(editedLead.numberOfCreditors) : undefined,
+        monthlyDebtPayment: editedLead.monthlyDebtPayment ? parseInt(editedLead.monthlyDebtPayment) : undefined,
+        conversionValue: editedLead.conversionValue ? parseInt(editedLead.conversionValue) : undefined,
+      };
+      updateData.lastUpdatedBy = user?.name || 'SuperAdmin';
+      updateData.lastUpdatedAt = formatEasternTime(getEasternNow());
+
+      const response = await axios.put(`/api/leads/${editedLead._id}`, updateData);
+      const updatedLead = response.data?.data?.lead;
+      if (updatedLead) {
+        // PUT /:id doesn't populate `organization` (just returns the raw id),
+        // unlike GET /. Organization is read-only in this modal and never
+        // changes here, so carry the already-populated value forward instead
+        // of letting it collapse to an id and show as "—" until the next fetch.
+        const merged = { ...updatedLead, organization: selectedLead.organization };
+        setLeads(prev => prev.map(l => l._id === editedLead._id ? merged : l));
+        setSelectedLead(merged);
+        setEditedLead(merged);
+      }
+      setIsEditing(false);
+      toast.success('Lead updated successfully');
+    } catch (error) {
+      console.error('Error updating lead:', error);
+      toast.error(error.response?.data?.message || 'Failed to update lead');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const openReassignModal = (lead) => {
+    setLeadToReassign(lead);
+    setShowReassignModal(true);
+  };
+
+  const closeReassignModal = () => {
+    setShowReassignModal(false);
+    setLeadToReassign(null);
+  };
+
+  const handleLeadReassigned = (updatedLead) => {
+    if (updatedLead?._id) {
+      setLeads(prev => prev.map(l => l._id === updatedLead._id ? updatedLead : l));
+    }
+    closeReassignModal();
   };
 
   // Load leads when tab is selected
@@ -638,6 +668,86 @@ const SuperAdminDashboard = () => {
   };
 
   const CREDIT_SCORE_RANGES = ['300-549', '550-649', '650-699', '700-749', '750-850'];
+
+  // ── Lead View/Edit modal helpers (ported from AdminDashboard's lead modal) ──
+  const leadProgressOptions = [
+    'SALE',
+    'Callback Needed',
+    'Existing Client',
+    'Unacceptable Creditors',
+    'Not Serviceable State',
+    'Sale Long Play',
+    'DO NOT CALL - Litigator',
+    'DO NOT CALL',
+    'Hang-up',
+    'Not Interested',
+    'No Answer',
+    'AIP Client',
+    'Not Qualified',
+    'Affordability',
+    'Others'
+  ];
+
+  const formatDraftDate = (dateValue) => formatDateAsDDMMYYYY(dateValue) || '—';
+
+  const formatDisposedByLabel = (disposedBy) => {
+    if (!disposedBy) return '—';
+    if (typeof disposedBy === 'string') return disposedBy;
+    if (disposedBy.name) return disposedBy.name;
+    if (disposedBy.email) return disposedBy.email;
+    if (disposedBy._id) return disposedBy._id;
+    return '—';
+  };
+
+  const getCategoryBadge = (category, completionPercentage = 0) => {
+    if (!category) return <span className="text-sm text-gray-500">—</span>;
+    const badges = {
+      hot: 'bg-red-100 text-red-800 border-red-200',
+      warm: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      cold: 'bg-blue-100 text-blue-800 border-blue-200'
+    };
+
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${badges[category] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+        {category.charAt(0).toUpperCase() + category.slice(1)} ({completionPercentage}%)
+      </span>
+    );
+  };
+
+  const getQualificationBadge = (qualificationStatus) => {
+    const badges = {
+      qualified: 'bg-green-100 text-green-800 border-green-200',
+      'not-qualified': 'bg-red-100 text-red-800 border-red-200',
+      disqualified: 'bg-red-100 text-red-800 border-red-200',
+      unqualified: 'bg-red-100 text-red-800 border-red-200',
+      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+    };
+
+    const icons = {
+      qualified: CheckCircle,
+      'not-qualified': XCircle,
+      disqualified: XCircle,
+      unqualified: XCircle,
+      pending: Clock
+    };
+
+    const Icon = icons[qualificationStatus] || Clock;
+
+    const labels = {
+      qualified: 'Qualified',
+      'not-qualified': 'Not - Qualified',
+      disqualified: 'Not - Qualified',
+      unqualified: 'Not - Qualified',
+      pending: 'Pending'
+    };
+
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${badges[qualificationStatus] || badges.pending}`}>
+        <Icon className="w-3 h-3 mr-1" />
+        {labels[qualificationStatus] || 'Pending'}
+      </span>
+    );
+  };
 
   if (loading) {
     return <LoadingSpinner message="Loading SuperAdmin dashboard..." />;
@@ -1429,13 +1539,22 @@ const SuperAdminDashboard = () => {
                         <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => openEditLeadModal(lead)}
+                              onClick={() => openViewModal(lead)}
+                              title="View / Edit Lead"
                               className="text-indigo-600 hover:text-indigo-900"
                             >
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() => openReassignModal(lead)}
+                              title="Reassign to Agent"
+                              className="text-purple-600 hover:text-purple-900"
+                            >
+                              <UserCheck className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => handleDeleteLead(lead.leadId || lead._id, lead.name)}
+                              title="Delete Lead"
                               className="text-red-600 hover:text-red-900"
                             >
                               <Trash className="w-4 h-4" />
@@ -1483,12 +1602,12 @@ const SuperAdminDashboard = () => {
                   <div className="mb-4">
                     <h3 className="text-lg font-medium text-gray-900">Create New Lead</h3>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Personal Information */}
                     <div className="space-y-4">
                       <h4 className="font-medium text-gray-900 border-b pb-2">Personal Information</h4>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Full Name *</label>
                         <input
@@ -1498,6 +1617,21 @@ const SuperAdminDashboard = () => {
                           value={leadFormData.name}
                           onChange={(e) => setLeadFormData({...leadFormData, name: e.target.value})}
                         />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Organization *</label>
+                        <select
+                          required
+                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          value={leadFormData.organization}
+                          onChange={(e) => setLeadFormData({...leadFormData, organization: e.target.value})}
+                        >
+                          <option value="">Select Organization</option>
+                          {organizations.map(org => (
+                            <option key={org._id} value={org._id}>{org.name}</option>
+                          ))}
+                        </select>
                       </div>
 
                       <div>
@@ -1701,258 +1835,651 @@ const SuperAdminDashboard = () => {
         </div>
       )}
 
-      {/* Edit Lead Modal */}
-      {showEditLeadModal && selectedLead && (
+      {/* Lead View/Edit Modal — full detail parity with the main-org admin dashboard */}
+      {showViewModal && selectedLead && editedLead && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div 
+              <div
                 className="absolute inset-0 bg-gray-500 opacity-75"
-                onClick={() => setShowEditLeadModal(false)}
+                onClick={closeViewModal}
               ></div>
             </div>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-              <form onSubmit={handleUpdateLead}>
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-medium text-gray-900">Edit Lead - {selectedLead.name}</h3>
-                    <p className="text-sm text-gray-500">Lead ID: {selectedLead.leadId}</p>
+            <div className="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
+              <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">
+                      {isEditing ? 'Edit Lead' : 'Lead Details'}: {selectedLead.name}
+                    </h3>
+                    <p className="text-indigo-100 text-sm">
+                      {isEditing ? 'Modify lead information and status' : 'Complete lead information and tracking'}
+                    </p>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Personal Information */}
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900 border-b pb-2">Personal Information</h4>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Full Name *</label>
-                        <input
-                          type="text"
-                          required
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.name}
-                          onChange={(e) => setLeadFormData({...leadFormData, name: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
-                        <input
-                          type="email"
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.email}
-                          onChange={(e) => setLeadFormData({...leadFormData, email: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Phone</label>
-                        <input
-                          type="tel"
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.phone}
-                          onChange={(e) => setLeadFormData({...leadFormData, phone: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Lead Vendor</label>
-                        <select
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.leadVendor}
-                          onChange={(e) => setLeadFormData({...leadFormData, leadVendor: e.target.value})}
+                  <div className="flex items-center gap-2">
+                    {isEditing ? (
+                      <>
+                        <button
+                          onClick={handleLeadUpdate}
+                          disabled={isUpdating}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50"
                         >
-                          <option value="">—</option>
-                          {leadVendorOptions.map(opt => (
-                            <option key={opt._id} value={opt.name}>{opt.name}</option>
-                          ))}
-                        </select>
-                      </div>
+                          <Save className="h-4 w-4" />
+                          {isUpdating ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={handleEditToggle}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        Edit
+                      </button>
+                    )}
+                    <button
+                      onClick={closeViewModal}
+                      className="text-white hover:text-indigo-200 transition-colors"
+                    >
+                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Alternate Phone</label>
-                        <input
-                          type="tel"
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.alternatePhone}
-                          onChange={(e) => setLeadFormData({...leadFormData, alternatePhone: e.target.value})}
-                        />
+              <div className="bg-white px-6 py-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Personal Information */}
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl border border-gray-200">
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                        <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Address</label>
-                        <textarea
-                          rows={3}
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.address}
-                          onChange={(e) => setLeadFormData({...leadFormData, address: e.target.value})}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">City</label>
+                      <h4 className="text-lg font-semibold text-gray-800">Personal Information</h4>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Name:</span>
+                        {isEditing ? (
                           <input
                             type="text"
-                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            value={leadFormData.city}
-                            onChange={(e) => setLeadFormData({...leadFormData, city: e.target.value})}
+                            value={editedLead.name || ''}
+                            onChange={(e) => handleInputChange('name', e.target.value)}
+                            className="text-sm text-gray-900 font-medium text-right border border-gray-300 rounded px-2 py-1 w-32"
                           />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">State</label>
-                          <input
-                            type="text"
-                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            value={leadFormData.state}
-                            onChange={(e) => setLeadFormData({...leadFormData, state: e.target.value})}
-                          />
-                        </div>
+                        ) : (
+                          <span className="text-sm text-gray-900 font-medium text-right">{selectedLead.name || '—'}</span>
+                        )}
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
-                        <input
-                          type="text"
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.zipcode}
-                          onChange={(e) => setLeadFormData({...leadFormData, zipcode: e.target.value})}
-                        />
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Email:</span>
+                        {isEditing ? (
+                          <input
+                            type="email"
+                            value={editedLead.email || ''}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-40"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right break-all">{selectedLead.email || '—'}</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Phone:</span>
+                        {isEditing ? (
+                          <input
+                            type="tel"
+                            value={editedLead.phone || ''}
+                            onChange={(e) => handleInputChange('phone', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.phone || '—'}</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Alt. Phone:</span>
+                        {isEditing ? (
+                          <input
+                            type="tel"
+                            value={editedLead.alternatePhone || ''}
+                            onChange={(e) => handleInputChange('alternatePhone', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.alternatePhone || '—'}</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Lead Vendor:</span>
+                        {isEditing ? (
+                          <select
+                            value={editedLead.leadVendor || ''}
+                            onChange={(e) => handleInputChange('leadVendor', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                          >
+                            <option value="">—</option>
+                            {leadVendorOptions.map(opt => (
+                              <option key={opt._id} value={opt.name}>{opt.name}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.leadVendor || '—'}</span>
+                        )}
                       </div>
                     </div>
+                  </div>
 
-                    {/* Debt Information */}
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900 border-b pb-2">Debt Information</h4>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Debt Category</label>
-                        <select
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.debtCategory}
-                          onChange={(e) => setLeadFormData({...leadFormData, debtCategory: e.target.value, debtTypes: []})}
-                        >
-                          <option value="unsecured">Unsecured</option>
-                          <option value="secured">Secured</option>
-                        </select>
+                  {/* Address Information */}
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-200">
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 bg-green-100 rounded-lg mr-3">
+                        <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Debt Types</label>
-                        <div className="mt-2 space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-3">
-                          {DEBT_TYPES_BY_CATEGORY[leadFormData.debtCategory].map((type) => (
-                            <label key={type} className="flex items-center">
-                              <input
-                                type="checkbox"
-                                checked={leadFormData.debtTypes.includes(type)}
-                                onChange={(e) => {
-                                  if (e.target.checked) {
-                                    setLeadFormData({
-                                      ...leadFormData,
-                                      debtTypes: [...leadFormData.debtTypes, type]
-                                    });
-                                  } else {
-                                    setLeadFormData({
-                                      ...leadFormData,
-                                      debtTypes: leadFormData.debtTypes.filter(t => t !== type)
-                                    });
-                                  }
-                                }}
-                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                              />
-                              <span className="ml-2 text-sm text-gray-700">{type}</span>
-                            </label>
-                          ))}
-                        </div>
+                      <h4 className="text-lg font-semibold text-gray-800">Address Information</h4>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Address:</span>
+                        {isEditing ? (
+                          <textarea
+                            value={editedLead.address || ''}
+                            onChange={(e) => handleInputChange('address', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-40 h-16 resize-none"
+                            placeholder="Enter address"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right max-w-xs">{selectedLead.address || '—'}</span>
+                        )}
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Total Debt Amount ($)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.totalDebtAmount}
-                          onChange={(e) => setLeadFormData({...leadFormData, totalDebtAmount: e.target.value})}
-                        />
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">City:</span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedLead.city || ''}
+                            onChange={(e) => handleInputChange('city', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                            placeholder="Enter city"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.city || '—'}</span>
+                        )}
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Number of Creditors</label>
-                        <input
-                          type="number"
-                          min="0"
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.numberOfCreditors}
-                          onChange={(e) => setLeadFormData({...leadFormData, numberOfCreditors: e.target.value})}
-                        />
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">State:</span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedLead.state || ''}
+                            onChange={(e) => handleInputChange('state', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-24"
+                            placeholder="Enter state"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.state || '—'}</span>
+                        )}
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Monthly Debt Payment ($)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.monthlyDebtPayment}
-                          onChange={(e) => setLeadFormData({...leadFormData, monthlyDebtPayment: e.target.value})}
-                        />
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Zipcode:</span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedLead.zipcode || ''}
+                            onChange={(e) => handleInputChange('zipcode', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-24"
+                            placeholder="Enter zipcode"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.zipcode || '—'}</span>
+                        )}
                       </div>
+                    </div>
+                  </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Credit Score Range</label>
-                        <select
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.creditScoreRange}
-                          onChange={(e) => setLeadFormData({...leadFormData, creditScoreRange: e.target.value})}
-                        >
-                          <option value="">Select Credit Score Range</option>
-                          {CREDIT_SCORE_RANGES.map((range) => (
-                            <option key={range} value={range}>{range}</option>
-                          ))}
-                        </select>
+                  {/* Debt Information */}
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-xl border border-purple-200">
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                        <svg className="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Notes</label>
-                        <textarea
-                          rows={3}
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                          value={leadFormData.notes}
-                          onChange={(e) => setLeadFormData({...leadFormData, notes: e.target.value})}
-                        />
+                      <h4 className="text-lg font-semibold text-gray-800">Debt Information</h4>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Category:</span>
+                        {isEditing ? (
+                          <select
+                            value={editedLead.debtCategory || ''}
+                            onChange={(e) => handleInputChange('debtCategory', e.target.value)}
+                            className="text-sm border border-gray-300 rounded px-2 py-1 w-24"
+                          >
+                            <option value="">Select</option>
+                            <option value="secured">Secured</option>
+                            <option value="unsecured">Unsecured</option>
+                          </select>
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right capitalize">{selectedLead.debtCategory || '—'}</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Source:</span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedLead.source || ''}
+                            onChange={(e) => handleInputChange('source', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                            placeholder="Lead source"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.source || '—'}</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Total Amount:</span>
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            value={editedLead.totalDebtAmount || ''}
+                            onChange={(e) => handleInputChange('totalDebtAmount', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                            placeholder="0"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right font-semibold">
+                            {selectedLead.totalDebtAmount ? `$${Number(selectedLead.totalDebtAmount).toLocaleString()}` : '—'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Creditors:</span>
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            value={editedLead.numberOfCreditors || ''}
+                            onChange={(e) => handleInputChange('numberOfCreditors', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-20"
+                            placeholder="0"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.numberOfCreditors || '—'}</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Monthly Payment:</span>
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            value={editedLead.monthlyDebtPayment || ''}
+                            onChange={(e) => handleInputChange('monthlyDebtPayment', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                            placeholder="0"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">
+                            {selectedLead.monthlyDebtPayment ? `$${Number(selectedLead.monthlyDebtPayment).toLocaleString()}` : '—'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Credit Score:</span>
+                        {isEditing ? (
+                          <select
+                            value={editedLead.creditScoreRange || ''}
+                            onChange={(e) => handleInputChange('creditScoreRange', e.target.value)}
+                            className="text-sm border border-gray-300 rounded px-2 py-1 w-32"
+                          >
+                            <option value="">Select Range</option>
+                            {CREDIT_SCORE_RANGES.map((range) => (
+                              <option key={range} value={range}>{range}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.creditScoreRange || '—'}</span>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
-                  >
-                    {submitting ? 'Updating...' : 'Update Lead'}
-                  </button>
-                  <button
-                    type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    onClick={() => {
-                      setShowEditLeadModal(false);
-                      setSelectedLead(null);
-                    }}
-                  >
-                    Cancel
-                  </button>
+                <div className="mt-6 bg-gradient-to-br from-indigo-50 to-indigo-100 p-5 rounded-xl border border-indigo-200">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">GTI Workflow Snapshot</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Disposition Status:</span>
+                      <p className={`mt-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${selectedLead.isDisposed ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                        {selectedLead.isDisposed ? 'Disposed' : 'Active'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Disposition Reason:</span>
+                      <p className="mt-1 text-sm text-gray-900 break-words">{selectedLead.disposition1 || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Disposed By:</span>
+                      <p className="mt-1 text-sm text-gray-900">{formatDisposedByLabel(selectedLead.disposedBy)}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Draft Date:</span>
+                      <p className="mt-1 text-sm text-gray-900">{formatDraftDate(selectedLead.draftDate)}</p>
+                    </div>
+                  </div>
                 </div>
-              </form>
+
+                {/* Management & Status Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                  {/* Management Information */}
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-xl border border-orange-200">
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 bg-orange-100 rounded-lg mr-3">
+                        <svg className="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                      </div>
+                      <h4 className="text-lg font-semibold text-gray-800">Management Info</h4>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Organization:</span>
+                        <span className="text-sm text-gray-900 text-right font-medium">{selectedLead.organization?.name || '—'}</span>
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Created By:</span>
+                        <span className="text-sm text-gray-900 text-right font-medium">{selectedLead.createdBy?.name || '—'}</span>
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Created At:</span>
+                        <span className="text-sm text-gray-900 text-right">
+                          {selectedLead.createdAt ? new Date(selectedLead.createdAt).toLocaleDateString() : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Category:</span>
+                        {isEditing ? (
+                          <select
+                            value={editedLead.category || ''}
+                            onChange={(e) => handleInputChange('category', e.target.value)}
+                            className="text-sm border border-gray-300 rounded px-2 py-1 w-24"
+                          >
+                            <option value="">Select</option>
+                            <option value="hot">Hot</option>
+                            <option value="warm">Warm</option>
+                            <option value="cold">Cold</option>
+                          </select>
+                        ) : (
+                          <div className="text-right">{getCategoryBadge(selectedLead.category, selectedLead.completionPercentage)}</div>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Qualification:</span>
+                        {isEditing ? (
+                          <div className="text-right">
+                            <select
+                              value={editedLead.qualificationStatus || ''}
+                              onChange={(e) => handleInputChange('qualificationStatus', e.target.value)}
+                              className="text-sm border border-gray-300 rounded px-2 py-1 w-32"
+                            >
+                              <option value="">Select Status</option>
+                              <option value="qualified">Qualified</option>
+                              <option value="not-qualified">Not - Qualified</option>
+                              <option value="pending">Pending</option>
+                            </select>
+                            <div className="text-xs text-blue-600 italic mt-1">Independent from Lead Progress</div>
+                          </div>
+                        ) : (
+                          <div className="text-right">{getQualificationBadge(selectedLead.qualificationStatus)}</div>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Company:</span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedLead.company || ''}
+                            onChange={(e) => handleInputChange('company', e.target.value)}
+                            className="text-sm text-gray-900 text-right border border-gray-300 rounded px-2 py-1 w-32"
+                            placeholder="Company name"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">{selectedLead.company || '—'}</span>
+                        )}
+                      </div>
+                      {selectedLead.lastUpdatedBy && (
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-medium text-gray-600">Updated By:</span>
+                          <span className="text-sm text-green-700 text-right font-medium">{selectedLead.lastUpdatedBy}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Agent2 Status Tracking */}
+                  <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-5 rounded-xl border border-teal-200">
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 bg-teal-100 rounded-lg mr-3">
+                        <svg className="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h4 className="text-lg font-semibold text-gray-800">Agent2 Actions & Status</h4>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="bg-white p-3 rounded-lg border border-teal-200">
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-medium text-gray-600">Lead Progress Status:</span>
+                          {isEditing ? (
+                            <select
+                              value={editedLead.leadProgressStatus || ''}
+                              onChange={(e) => handleInputChange('leadProgressStatus', e.target.value)}
+                              className="text-sm border border-gray-300 rounded px-2 py-1 w-48"
+                            >
+                              <option value="">Select Status</option>
+                              {leadProgressOptions.map((option) => (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            selectedLead.leadProgressStatus ? (
+                              <span className="text-sm bg-teal-100 text-teal-800 px-2 py-1 rounded-full font-medium text-right max-w-xs">
+                                {selectedLead.leadProgressStatus}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-gray-500 italic">No status update yet</span>
+                            )
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Follow-up Date:</span>
+                        {isEditing ? (
+                          <input
+                            type="date"
+                            value={editedLead.followUpDate ? new Date(editedLead.followUpDate).toISOString().split('T')[0] : ''}
+                            onChange={(e) => handleInputChange('followUpDate', e.target.value)}
+                            className="text-sm border border-gray-300 rounded px-2 py-1"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">
+                            {selectedLead.followUpDate ? new Date(selectedLead.followUpDate).toLocaleDateString() : '—'}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Follow-up Time:</span>
+                        {isEditing ? (
+                          <input
+                            type="time"
+                            value={editedLead.followUpTime || ''}
+                            onChange={(e) => handleInputChange('followUpTime', e.target.value)}
+                            className="text-sm border border-gray-300 rounded px-2 py-1"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-900 text-right">
+                            {selectedLead.followUpTime || '—'}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Client ID:</span>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedLead.clientId || ''}
+                            onChange={(e) => handleInputChange('clientId', e.target.value)}
+                            className="text-sm border border-gray-300 rounded px-2 py-1 w-40 font-mono"
+                            placeholder="e.g. ABC123"
+                          />
+                        ) : (
+                          <span className="text-sm text-green-700 font-mono font-semibold text-right">
+                            {selectedLead.clientId || '—'}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex justify-between items-start">
+                        <span className="text-sm font-medium text-gray-600">Conversion Value:</span>
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            value={editedLead.conversionValue || ''}
+                            onChange={(e) => handleInputChange('conversionValue', e.target.value)}
+                            className="text-sm border border-gray-300 rounded px-2 py-1 w-32"
+                            placeholder="0"
+                          />
+                        ) : (
+                          <span className="text-sm text-green-600 text-right font-semibold">
+                            {selectedLead.conversionValue ? `$${Number(selectedLead.conversionValue).toLocaleString()}` : '—'}
+                          </span>
+                        )}
+                      </div>
+
+                      {selectedLead.lastUpdatedBy && (
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-medium text-gray-600">Last Updated By:</span>
+                          <span className="text-sm text-teal-700 text-right font-medium">{selectedLead.lastUpdatedBy}</span>
+                        </div>
+                      )}
+
+                      {selectedLead.lastUpdatedAt && (
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-medium text-gray-600">Last Updated At:</span>
+                          <span className="text-sm text-gray-900 text-right">
+                            {formatEasternTimeForDisplay(selectedLead.lastUpdatedAt)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes & Comments Section */}
+                <div className="mt-6">
+                  <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-4 rounded-xl">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                      <svg className="h-5 w-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Notes & Comments
+                    </h4>
+
+                    <div className="space-y-4">
+                      {/* Agent1 Notes */}
+                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <div className="flex items-center mb-2">
+                          <span className="text-sm font-semibold text-blue-800">Agent1 Notes:</span>
+                        </div>
+                        {isEditing ? (
+                          <textarea
+                            value={editedLead.notes || ''}
+                            onChange={(e) => handleInputChange('notes', e.target.value)}
+                            className="w-full text-sm text-gray-900 border border-blue-300 rounded px-3 py-2 h-20 resize-none"
+                            placeholder="Enter Agent1 notes..."
+                          />
+                        ) : (
+                          <p className="text-sm text-gray-900 leading-relaxed">{selectedLead.notes || 'No notes available'}</p>
+                        )}
+                      </div>
+
+                      {/* Assignment Notes */}
+                      <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <div className="flex items-center mb-2">
+                          <span className="text-sm font-semibold text-purple-800">Assignment Notes:</span>
+                        </div>
+                        {isEditing ? (
+                          <textarea
+                            value={editedLead.assignmentNotes || ''}
+                            onChange={(e) => handleInputChange('assignmentNotes', e.target.value)}
+                            className="w-full text-sm text-gray-900 border border-purple-300 rounded px-3 py-2 h-20 resize-none"
+                            placeholder="Enter assignment notes..."
+                          />
+                        ) : (
+                          <p className="text-sm text-gray-900 leading-relaxed">{selectedLead.assignmentNotes || 'No assignment notes available'}</p>
+                        )}
+                      </div>
+
+                      {/* Agent2 Follow-up Notes */}
+                      <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <div className="flex items-center mb-2">
+                          <span className="text-sm font-semibold text-green-800">Agent2 Follow-up Notes:</span>
+                        </div>
+                        {isEditing ? (
+                          <textarea
+                            value={editedLead.followUpNotes || ''}
+                            onChange={(e) => handleInputChange('followUpNotes', e.target.value)}
+                            className="w-full text-sm text-gray-900 border border-green-300 rounded px-3 py-2 h-20 resize-none"
+                            placeholder="Enter follow-up notes..."
+                          />
+                        ) : (
+                          <p className="text-sm text-gray-900 leading-relaxed">{selectedLead.followUpNotes || 'No follow-up notes available'}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 px-6 py-3 flex justify-end">
+                <button
+                  onClick={closeViewModal}
+                  className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      <LeadReassignModal
+        isOpen={showReassignModal}
+        onClose={closeReassignModal}
+        lead={leadToReassign}
+        onLeadReassigned={handleLeadReassigned}
+      />
 
       <LeadVendorOptionsModal
         isOpen={showManageVendorsModal}

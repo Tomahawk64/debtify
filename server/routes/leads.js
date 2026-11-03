@@ -1715,19 +1715,47 @@ router.post('/', protect, createLeadValidation, handleValidationErrors, async (r
     console.log('Create lead request user:', req.user ? req.user.role : 'No user');
     console.log('Create lead request user ID:', req.user ? req.user._id : 'No user ID');
     
-    // Check if user has permission (agent1, agent2, or admin)
-    if (req.user && !['agent1', 'agent2', 'admin'].includes(req.user.role)) {
+    // Check if user has permission (agent1, agent2, admin, or superadmin)
+    if (req.user && !['agent1', 'agent2', 'admin', 'superadmin'].includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         message: `User role ${req.user.role} is not authorized to create leads`
       });
     }
-    
+
+    // SuperAdmin has no fixed organization of their own — they must specify
+    // which organization the lead belongs to. Every other role creates the
+    // lead in their own organization, as before.
+    let leadOrganizationId = req.user.organization;
+    if (req.user.role === 'superadmin') {
+      const requestedOrgId = (req.body.organization || '').toString().trim();
+      if (!requestedOrgId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Organization is required when creating a lead as SuperAdmin'
+        });
+      }
+      if (!requestedOrgId.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Selected organization does not exist'
+        });
+      }
+      const requestedOrg = await Organization.findById(requestedOrgId).select('_id');
+      if (!requestedOrg) {
+        return res.status(400).json({
+          success: false,
+          message: 'Selected organization does not exist'
+        });
+      }
+      leadOrganizationId = requestedOrg._id;
+    }
+
     const leadData = {
       ...req.body,
       source: req.body.source && req.body.source.trim() !== '' ? req.body.source : 'Personal Debt',
       createdBy: req.user._id,
-      organization: req.user.organization
+      organization: leadOrganizationId
     };
     // entryDate is handled separately below (backdating); never let it, or a raw
     // createdAt/updatedAt, pass straight through from the request body.
@@ -1735,7 +1763,7 @@ router.post('/', protect, createLeadValidation, handleValidationErrors, async (r
     delete leadData.createdAt;
     delete leadData.updatedAt;
 
-    const organizationName = await getOrganizationNameById(req.user.organization);
+    const organizationName = await getOrganizationNameById(leadOrganizationId);
     const isGtiOrg = isGtiOrganizationName(organizationName);
 
     // Backdated entry date — lets the main organization admin record a lead
@@ -2751,7 +2779,7 @@ router.get('/dashboard/stats', protect, async (req, res) => {
 // @desc    Get upcoming follow-ups
 // @route   GET /api/leads/follow-ups
 // @access  Private (Agent2, Admin)
-router.get('/dashboard/follow-ups', protect, authorize('agent2', 'admin'), async (req, res) => {
+router.get('/dashboard/follow-ups', protect, authorize('agent2', 'admin', 'superadmin'), async (req, res) => {
   try {
     const { today } = getEasternTimeRanges();
     const nextWeek = new Date(today);
