@@ -196,15 +196,17 @@ const MultiVendorDashboard = () => {
               <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
               Refresh
             </button>
-            <button
-              onClick={handleExport}
-              disabled={exporting || loading}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold disabled:opacity-50 transition-colors"
-              style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)', color: '#0f172a' }}
-            >
-              <Download size={15} />
-              {exporting ? 'Exporting…' : 'Export CSV'}
-            </button>
+            {(user.role === 'superadmin' || user.canExportLeads) && (
+              <button
+                onClick={handleExport}
+                disabled={exporting || loading}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold disabled:opacity-50 transition-colors"
+                style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)', color: '#0f172a' }}
+              >
+                <Download size={15} />
+                {exporting ? 'Exporting…' : 'Export CSV'}
+              </button>
+            )}
           </div>
         </div>
       </div>

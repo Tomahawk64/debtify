@@ -178,6 +178,7 @@ const OrganizationManagement = () => {
         password: '',
         role: 'admin',
         canDownloadLeads: false,
+        canExportLeads: false,
         subLeadVendors: []
       });
       setShowUserModal(false);
@@ -211,7 +212,7 @@ const OrganizationManagement = () => {
 
   const openUserModal = (org) => {
     setSelectedOrg(org);
-    setUserForm({ name: '', email: '', password: '', role: 'admin', canDownloadLeads: false, subLeadVendors: [] });
+    setUserForm({ name: '', email: '', password: '', role: 'admin', canDownloadLeads: false, canExportLeads: false, subLeadVendors: [] });
     setShowUserModal(true);
   };
 
@@ -930,7 +931,7 @@ const OrganizationManagement = () => {
                         required
                         className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         value={userForm.role}
-                        onChange={(e) => setUserForm({...userForm, role: e.target.value, canDownloadLeads: false, subLeadVendors: []})}
+                        onChange={(e) => setUserForm({...userForm, role: e.target.value, canDownloadLeads: false, canExportLeads: false, subLeadVendors: []})}
                       >
                         <option value="admin">Admin</option>
                         <option value="agent1">Agent 1</option>
@@ -977,6 +978,29 @@ const OrganizationManagement = () => {
                             })}
                           </div>
                         )}
+                      </div>
+                    )}
+
+                    {/* Export permission — multivendor_admin only, opt-in */}
+                    {userForm.role === 'multivendor_admin' && (
+                      <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                        <div className="flex items-center h-5 mt-0.5">
+                          <input
+                            id="canExportLeads"
+                            type="checkbox"
+                            className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer"
+                            checked={!!userForm.canExportLeads}
+                            onChange={(e) => setUserForm({...userForm, canExportLeads: e.target.checked})}
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="canExportLeads" className="text-sm font-medium text-gray-800 cursor-pointer">
+                            Allow CSV Export
+                          </label>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            This account will be able to export its leads from the Multi Vendor Dashboard as a CSV file. Off by default.
+                          </p>
+                        </div>
                       </div>
                     )}
 

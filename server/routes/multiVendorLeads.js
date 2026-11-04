@@ -138,6 +138,12 @@ router.get(
   handleValidationErrors,
   async (req, res) => {
     try {
+      // Export is opt-in per multivendor_admin account (superadmin always
+      // allowed — same as every other export in the app).
+      if (req.user.role === 'multivendor_admin' && !req.user.canExportLeads) {
+        return res.status(403).json({ success: false, message: 'Export access is not enabled for this account' });
+      }
+
       const allowedVendors = await resolveAllowedVendors(req.user, req.query.vendor);
       const filter = {
         leadVendor: { $in: allowedVendors },

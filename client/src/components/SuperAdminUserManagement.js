@@ -26,7 +26,8 @@ const SuperAdminUserManagement = () => {
     password: '',
     showPasswordField: false,
     vicidialAgentId: '',
-    subLeadVendors: []
+    subLeadVendors: [],
+    canExportLeads: false
   });
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -124,13 +125,14 @@ const SuperAdminUserManagement = () => {
       password: '',
       showPasswordField: false,
       vicidialAgentId: targetUser.vicidialAgentId || '',
-      subLeadVendors: Array.isArray(targetUser.subLeadVendors) ? [...targetUser.subLeadVendors] : []
+      subLeadVendors: Array.isArray(targetUser.subLeadVendors) ? [...targetUser.subLeadVendors] : [],
+      canExportLeads: !!targetUser.canExportLeads
     });
   };
 
   const cancelEditUser = () => {
     setEditingUser(null);
-    setEditFormData({ name: '', email: '', password: '', showPasswordField: false, vicidialAgentId: '', subLeadVendors: [] });
+    setEditFormData({ name: '', email: '', password: '', showPasswordField: false, vicidialAgentId: '', subLeadVendors: [], canExportLeads: false });
   };
 
   const togglePasswordField = () => {
@@ -171,9 +173,10 @@ const SuperAdminUserManagement = () => {
         updateData.vicidialAgentId = editFormData.vicidialAgentId.trim();
       }
 
-      // Include subLeadVendors for multivendor_admin accounts
+      // Include subLeadVendors and export permission for multivendor_admin accounts
       if (targetUserData && targetUserData.role === 'multivendor_admin') {
         updateData.subLeadVendors = editFormData.subLeadVendors;
+        updateData.canExportLeads = editFormData.canExportLeads;
       }
 
       // Include password only if it's being changed
@@ -191,13 +194,14 @@ const SuperAdminUserManagement = () => {
               name: editFormData.name.trim(),
               email: editFormData.email.trim(),
               vicidialAgentId: ['agent1', 'agent2'].includes(user.role) ? editFormData.vicidialAgentId.trim() || undefined : user.vicidialAgentId,
-              subLeadVendors: user.role === 'multivendor_admin' ? [...editFormData.subLeadVendors] : user.subLeadVendors
+              subLeadVendors: user.role === 'multivendor_admin' ? [...editFormData.subLeadVendors] : user.subLeadVendors,
+              canExportLeads: user.role === 'multivendor_admin' ? editFormData.canExportLeads : user.canExportLeads
             }
           : user
       ));
 
       setEditingUser(null);
-      setEditFormData({ name: '', email: '', password: '', showPasswordField: false, vicidialAgentId: '', subLeadVendors: [] });
+      setEditFormData({ name: '', email: '', password: '', showPasswordField: false, vicidialAgentId: '', subLeadVendors: [], canExportLeads: false });
       toast.success(response.data.message);
     } catch (error) {
       const message = error.response?.data?.message || 'Error updating user information';
@@ -658,6 +662,15 @@ const SuperAdminUserManagement = () => {
                                 })}
                               </div>
                             )}
+                            <label className="flex items-center gap-1.5 text-xs text-gray-700 cursor-pointer mt-2">
+                              <input
+                                type="checkbox"
+                                className="w-3.5 h-3.5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer"
+                                checked={!!editFormData.canExportLeads}
+                                onChange={(e) => setEditFormData({ ...editFormData, canExportLeads: e.target.checked })}
+                              />
+                              Allow CSV Export
+                            </label>
                           </div>
                         ) : (
                           <div className="text-xs text-gray-600 mt-1">
@@ -665,6 +678,11 @@ const SuperAdminUserManagement = () => {
                             {targetUser.role === 'multivendor_admin' && Array.isArray(targetUser.subLeadVendors) && targetUser.subLeadVendors.length > 0 && (
                               <div className="text-gray-500 mt-0.5" title={targetUser.subLeadVendors.join(', ')}>
                                 {targetUser.subLeadVendors.join(', ')}
+                              </div>
+                            )}
+                            {targetUser.role === 'multivendor_admin' && (
+                              <div className={`mt-0.5 ${targetUser.canExportLeads ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                Export: {targetUser.canExportLeads ? 'Allowed' : 'Off'}
                               </div>
                             )}
                           </div>

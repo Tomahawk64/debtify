@@ -67,6 +67,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  // Permission: whether this account can export/download leads as CSV from
+  // the Multi Vendor Dashboard. Only relevant for role === 'multivendor_admin'.
+  // Defaults to false — export is opt-in, granted explicitly per account.
+  canExportLeads: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now

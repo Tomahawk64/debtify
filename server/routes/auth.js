@@ -963,6 +963,10 @@ router.put('/users/:id', protect, [
         });
       }
       targetUser.subLeadVendors = requestedVendors;
+
+      // Export access is opt-in and only toggleable by superadmin (this
+      // whole route is already superadmin-only — see the check above).
+      targetUser.canExportLeads = Boolean(req.body.canExportLeads);
     }
 
     // Update password if provided

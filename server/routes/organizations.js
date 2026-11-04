@@ -502,6 +502,10 @@ router.post('/:id/users', protect, userValidation, handleValidationErrors, async
     // canDownloadLeads is only meaningful for admin role; sanitise to boolean
     const canDownloadLeads = role === 'admin' ? Boolean(req.body.canDownloadLeads) : false;
 
+    // canExportLeads is only meaningful for multivendor_admin; sanitise to
+    // boolean. Defaults to false — export access is opt-in per account.
+    const canExportLeads = role === 'multivendor_admin' ? Boolean(req.body.canExportLeads) : false;
+
     // subLeadVendors is only meaningful for multivendor_admin; validate every
     // selected name is a currently-active, real lead vendor option so an
     // account can never be scoped to a typo'd or already-retired name.
@@ -535,6 +539,7 @@ router.post('/:id/users', protect, userValidation, handleValidationErrors, async
       password,
       role,
       canDownloadLeads,
+      canExportLeads,
       ...(subLeadVendors ? { subLeadVendors } : {}),
       organization: req.params.id,
       createdBy: req.user._id
