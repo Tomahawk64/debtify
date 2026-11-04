@@ -2,6 +2,7 @@
 const { body } = require('express-validator');
 const User = require('../models/User');
 const Organization = require('../models/Organization');
+const LeadVendorOption = require('../models/LeadVendorOption');
 const { protect, generateToken } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 const { notifyCheckIn, notifyCheckOut } = require('../services/hrmsAttendance');
@@ -935,6 +936,33 @@ router.put('/users/:id', protect, [
     // Update vicidialAgentId for agents
     if (['agent1', 'agent2'].includes(targetUser.role)) {
       targetUser.vicidialAgentId = vicidialAgentId || undefined;
+    }
+
+    // Update subLeadVendors for multivendor_admin accounts — same validation
+    // as account creation (see POST /api/organizations/:id/users): every
+    // selected name must be a currently-active, real lead vendor option, and
+    // at least one must be selected so the account is never silently scoped
+    // to see nothing.
+    if (targetUser.role === 'multivendor_admin') {
+      const requestedVendors = Array.isArray(req.body.subLeadVendors)
+        ? [...new Set(req.body.subLeadVendors.map(v => String(v).trim()).filter(Boolean))]
+        : [];
+      if (requestedVendors.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Select at least one lead vendor for a Multi Vendor Admin account'
+        });
+      }
+      const validOptions = await LeadVendorOption.find({ name: { $in: requestedVendors }, isActive: true }).select('name').lean();
+      const validNames = new Set(validOptions.map(o => o.name));
+      const invalidVendors = requestedVendors.filter(v => !validNames.has(v));
+      if (invalidVendors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `These lead vendor options are not valid or active: ${invalidVendors.join(', ')}`
+        });
+      }
+      targetUser.subLeadVendors = requestedVendors;
     }
 
     // Update password if provided

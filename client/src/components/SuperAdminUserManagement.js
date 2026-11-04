@@ -20,14 +20,18 @@ const SuperAdminUserManagement = () => {
   
   // Edit user states
   const [editingUser, setEditingUser] = useState(null);
-  const [editFormData, setEditFormData] = useState({ 
-    name: '', 
-    email: '', 
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    email: '',
     password: '',
     showPasswordField: false,
-    vicidialAgentId: ''
+    vicidialAgentId: '',
+    subLeadVendors: []
   });
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Active Lead Vendor options — used to edit a multivendor_admin's scope.
+  const [leadVendorOptions, setLeadVendorOptions] = useState([]);
 
   // Filter state
   const [roleFilter, setRoleFilter] = useState('all'); // 'all', 'agent1', 'agent2', 'admin'
@@ -35,6 +39,9 @@ const SuperAdminUserManagement = () => {
   useEffect(() => {
     fetchUsers();
     fetchOrganizations();
+    axios.get('/api/lead-vendor-options')
+      .then(res => { if (res.data?.success) setLeadVendorOptions(res.data.data || []); })
+      .catch(() => {});
   }, []);
 
   const fetchOrganizations = async () => {
@@ -116,13 +123,14 @@ const SuperAdminUserManagement = () => {
       email: targetUser.email,
       password: '',
       showPasswordField: false,
-      vicidialAgentId: targetUser.vicidialAgentId || ''
+      vicidialAgentId: targetUser.vicidialAgentId || '',
+      subLeadVendors: Array.isArray(targetUser.subLeadVendors) ? [...targetUser.subLeadVendors] : []
     });
   };
 
   const cancelEditUser = () => {
     setEditingUser(null);
-    setEditFormData({ name: '', email: '', password: '', showPasswordField: false, vicidialAgentId: '' });
+    setEditFormData({ name: '', email: '', password: '', showPasswordField: false, vicidialAgentId: '', subLeadVendors: [] });
   };
 
   const togglePasswordField = () => {
@@ -144,9 +152,15 @@ const SuperAdminUserManagement = () => {
       return;
     }
 
+    const targetUserData = users.find(u => u._id === userId);
+
+    if (targetUserData && targetUserData.role === 'multivendor_admin' && editFormData.subLeadVendors.length === 0) {
+      toast.error('Select at least one lead vendor for a Multi Vendor Admin account');
+      return;
+    }
+
     setIsUpdating(true);
     try {
-      const targetUserData = users.find(u => u._id === userId);
       const updateData = {
         name: editFormData.name.trim(),
         email: editFormData.email.trim()
@@ -155,6 +169,11 @@ const SuperAdminUserManagement = () => {
       // Include vicidialAgentId for agents
       if (targetUserData && ['agent1', 'agent2'].includes(targetUserData.role)) {
         updateData.vicidialAgentId = editFormData.vicidialAgentId.trim();
+      }
+
+      // Include subLeadVendors for multivendor_admin accounts
+      if (targetUserData && targetUserData.role === 'multivendor_admin') {
+        updateData.subLeadVendors = editFormData.subLeadVendors;
       }
 
       // Include password only if it's being changed
@@ -167,17 +186,18 @@ const SuperAdminUserManagement = () => {
       // Update local state
       setUsers(prev => prev.map(user =>
         user._id === userId
-          ? { 
-              ...user, 
-              name: editFormData.name.trim(), 
+          ? {
+              ...user,
+              name: editFormData.name.trim(),
               email: editFormData.email.trim(),
-              vicidialAgentId: ['agent1', 'agent2'].includes(user.role) ? editFormData.vicidialAgentId.trim() || undefined : user.vicidialAgentId
+              vicidialAgentId: ['agent1', 'agent2'].includes(user.role) ? editFormData.vicidialAgentId.trim() || undefined : user.vicidialAgentId,
+              subLeadVendors: user.role === 'multivendor_admin' ? [...editFormData.subLeadVendors] : user.subLeadVendors
             }
           : user
       ));
 
       setEditingUser(null);
-      setEditFormData({ name: '', email: '', password: '', showPasswordField: false, vicidialAgentId: '' });
+      setEditFormData({ name: '', email: '', password: '', showPasswordField: false, vicidialAgentId: '', subLeadVendors: [] });
       toast.success(response.data.message);
     } catch (error) {
       const message = error.response?.data?.message || 'Error updating user information';
@@ -607,14 +627,48 @@ const SuperAdminUserManagement = () => {
                         )}
                       </td>
                       <td className="py-4 px-4">
-                        <div>
-                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(targetUser.role)}`}>
-                            {targetUser.role.toUpperCase()}
-                          </span>
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(targetUser.role)}`}>
+                          {targetUser.role.toUpperCase()}
+                        </span>
+                        {editingUser === targetUser._id && targetUser.role === 'multivendor_admin' ? (
+                          <div className="mt-1.5">
+                            <div className="text-xs font-medium text-gray-700 mb-1">Lead Vendors *</div>
+                            {leadVendorOptions.length === 0 ? (
+                              <p className="text-xs text-amber-600">No lead vendor options exist yet.</p>
+                            ) : (
+                              <div className="max-h-32 w-48 overflow-y-auto space-y-1 bg-white rounded-md border border-gray-200 p-1.5">
+                                {leadVendorOptions.map(opt => {
+                                  const checked = editFormData.subLeadVendors.includes(opt.name);
+                                  return (
+                                    <label key={opt._id} className="flex items-center gap-1.5 text-xs text-gray-700 cursor-pointer px-1 py-0.5 rounded hover:bg-gray-50">
+                                      <input
+                                        type="checkbox"
+                                        className="w-3.5 h-3.5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500 cursor-pointer"
+                                        checked={checked}
+                                        onChange={(e) => {
+                                          const next = e.target.checked
+                                            ? [...editFormData.subLeadVendors, opt.name]
+                                            : editFormData.subLeadVendors.filter(n => n !== opt.name);
+                                          setEditFormData({ ...editFormData, subLeadVendors: next });
+                                        }}
+                                      />
+                                      {opt.name}
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
                           <div className="text-xs text-gray-600 mt-1">
                             {getRoleDescription(targetUser.role)}
+                            {targetUser.role === 'multivendor_admin' && Array.isArray(targetUser.subLeadVendors) && targetUser.subLeadVendors.length > 0 && (
+                              <div className="text-gray-500 mt-0.5" title={targetUser.subLeadVendors.join(', ')}>
+                                {targetUser.subLeadVendors.join(', ')}
+                              </div>
+                            )}
                           </div>
-                        </div>
+                        )}
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center">
