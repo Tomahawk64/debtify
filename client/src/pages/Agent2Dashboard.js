@@ -51,6 +51,7 @@ const agent2LeadProgressOptions = [
   "AIP Client",
   "Not Qualified",
   "Affordability",
+  "Low Credit Score",
   "Others"
 ];
 

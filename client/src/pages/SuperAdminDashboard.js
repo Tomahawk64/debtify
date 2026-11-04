@@ -685,6 +685,7 @@ const SuperAdminDashboard = () => {
     'AIP Client',
     'Not Qualified',
     'Affordability',
+    'Low Credit Score',
     'Others'
   ];
 

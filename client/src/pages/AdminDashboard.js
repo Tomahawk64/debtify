@@ -947,6 +947,7 @@ const AdminDashboard = () => {
     'AIP Client',
     'Not Qualified',
     'Affordability',
+    'Low Credit Score',
     'Others'
   ];
 

@@ -247,6 +247,7 @@ const leadSchema = new mongoose.Schema({
           'AIP Client',
           'Not Qualified',
           'Affordability',
+          'Low Credit Score',
           'Others'
         ];
         
