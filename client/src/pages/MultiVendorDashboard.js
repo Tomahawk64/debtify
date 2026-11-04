@@ -13,15 +13,17 @@ import {
 import axios from '../utils/axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import { formatEasternTimeForDisplay } from '../utils/dateUtils';
 
+// The Start/End Date filters are interpreted as Eastern business days on the
+// backend (same as the main org admin dashboard's date filter), so the
+// displayed "Created At" must also be pinned to Eastern time rather than the
+// viewer's own browser timezone — otherwise leads that are correctly inside
+// the selected range appear to be from the "wrong" day to a viewer outside
+// US Eastern time, making the filter look broken when it isn't.
 function fmtDate(iso) {
   if (!iso) return '—';
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return '—';
-  return d.toLocaleString('en-US', {
-    year: 'numeric', month: 'short', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', hour12: true,
-  });
+  return formatEasternTimeForDisplay(iso) || '—';
 }
 
 const SALE_STATUSES = ['SALE', 'Sale Long Play', 'Immediate Enrollment'];
