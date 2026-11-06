@@ -272,7 +272,8 @@ const Layout = ({ onDashboardRefresh }) => {
       ];
     } else if (user.role === 'multivendor_admin') {
       return [
-        { name: 'Dashboard', href: '/multivendor-dashboard', icon: Database }
+        { name: 'Dashboard', href: '/multivendor-dashboard', icon: Database },
+        { name: 'Payment Status', href: '/multivendor-payment-status', icon: CreditCard }
       ];
     } else if (user.role === 'data_vendor') {
       return [

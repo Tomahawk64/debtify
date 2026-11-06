@@ -363,7 +363,29 @@ const leadSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  
+
+  // Payment tracking for SALE leads (Multi Vendor Payment Status). Set only by
+  // the main org admin / superadmin through PATCH /api/multivendor/payment-status/:id
+  // and shown read-only to Multi Vendor Admins. No defaults on purpose: existing
+  // leads stay untouched and these fields only exist once someone sets them.
+  paymentStatus: {
+    type: String,
+    enum: ['', 'Cleared', 'Pending', 'NSF', 'Cancellation', 'Refunded']
+  },
+  paymentStatusUpdatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  paymentStatusUpdatedAt: {
+    type: Date
+  },
+  paymentType: {
+    type: String,
+    enum: ['', 'Monthly', 'Semi Monthly']
+  },
+  draftDate1: { type: Date },
+  draftDate2: { type: Date },
+
   // Admin processing flag
   adminProcessed: {
     type: Boolean,

@@ -16,6 +16,7 @@ import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import RestrictedAdminDashboard from './pages/RestrictedAdminDashboard';
 import AffiliateDashboard from './pages/AffiliateDashboard';
 import MultiVendorDashboard from './pages/MultiVendorDashboard';
+import MultiVendorPaymentStatus from './pages/MultiVendorPaymentStatus';
 import DataVendorDashboard from './pages/DataVendorDashboard';
 import PaymentStatus from './pages/PaymentStatus';
 import VendorLeadAudit from './pages/VendorLeadAudit';
@@ -115,6 +116,12 @@ function App() {
                 <Route path="multivendor-dashboard" element={
                   <ProtectedRoute roles={['multivendor_admin', 'superadmin']}>
                     <MultiVendorDashboard />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="multivendor-payment-status" element={
+                  <ProtectedRoute roles={['multivendor_admin', 'superadmin']}>
+                    <MultiVendorPaymentStatus />
                   </ProtectedRoute>
                 } />
 

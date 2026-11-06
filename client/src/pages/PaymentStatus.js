@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   CreditCard, Search, RefreshCw, ChevronLeft, ChevronRight,
-  Calendar, User, CheckCircle2, XCircle, Clock, TrendingUp, DollarSign
+  Calendar, User, Users, CheckCircle2, XCircle, Clock, TrendingUp, DollarSign
 } from 'lucide-react';
 import axios from '../utils/axios';
 import toast from 'react-hot-toast';
+import MultiVendorPaymentPanel from '../components/MultiVendorPaymentPanel';
 
 const STATUS_OPTIONS = ['', 'Cleared', 'Pending', 'NSF', 'Cancellation', 'Refunded'];
 
@@ -35,7 +36,7 @@ const STATUS_LABEL = {
   'Refunded':     'Refunded',
 };
 
-export default function PaymentStatus() {
+function DataVendorPaymentPanel() {
   const [vendors, setVendors] = useState([]);
   const [selectedVendorId, setSelectedVendorId] = useState('');
   const [records, setRecords] = useState([]);
@@ -145,20 +146,7 @@ export default function PaymentStatus() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
-            <CreditCard size={22} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Payment Status</h1>
-            <p className="text-slate-400 text-sm">Update NFC / First Payment Complete for SALE leads</p>
-          </div>
-        </div>
-      </div>
-
+    <div>
       {/* Filters card */}
       <div className="bg-slate-800/60 backdrop-blur border border-slate-700/50 rounded-2xl p-5 mb-5 shadow-xl">
         <div className="flex flex-wrap gap-3 items-end">
@@ -501,6 +489,54 @@ export default function PaymentStatus() {
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+const TABS = [
+  { key: 'data',  label: 'Data Vendors',  icon: User },
+  { key: 'multi', label: 'Multi Vendors', icon: Users },
+];
+
+export default function PaymentStatus() {
+  const [tab, setTab] = useState('data');
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+      {/* Header */}
+      <div className="mb-5">
+        <div className="flex items-center gap-3 mb-1">
+          <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
+            <CreditCard size={22} className="text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Payment Status</h1>
+            <p className="text-slate-400 text-sm">Update NFC / First Payment Complete for SALE leads</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Source tabs */}
+      <div className="flex gap-2 mb-5" role="tablist">
+        {TABS.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            role="tab"
+            aria-selected={tab === key}
+            onClick={() => setTab(key)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+              tab === key
+                ? 'bg-indigo-600 border-indigo-500 text-white shadow'
+                : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-500'
+            }`}
+          >
+            <Icon size={14} />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'data' ? <DataVendorPaymentPanel /> : <MultiVendorPaymentPanel />}
     </div>
   );
 }

@@ -1762,6 +1762,14 @@ router.post('/', protect, createLeadValidation, handleValidationErrors, async (r
     delete leadData.entryDate;
     delete leadData.createdAt;
     delete leadData.updatedAt;
+    // Payment tracking is admin-only (PATCH /api/multivendor/payment-status/:id);
+    // never accept it from the create payload, which is spread from req.body.
+    delete leadData.paymentStatus;
+    delete leadData.paymentStatusUpdatedBy;
+    delete leadData.paymentStatusUpdatedAt;
+    delete leadData.paymentType;
+    delete leadData.draftDate1;
+    delete leadData.draftDate2;
 
     const organizationName = await getOrganizationNameById(leadOrganizationId);
     const isGtiOrg = isGtiOrganizationName(organizationName);
