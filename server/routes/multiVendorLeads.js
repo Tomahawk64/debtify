@@ -198,7 +198,7 @@ router.get(
 const SALE_STATUSES    = ['SALE', 'Sale Long Play', 'Immediate Enrollment'];
 const PAYMENT_STATUSES = ['', 'Cleared', 'Pending', 'NSF', 'Cancellation', 'Refunded'];
 const PAYMENT_TYPES    = ['', 'Monthly', 'Semi Monthly'];
-const REVENUE_RATE     = 0.025; // same 2.5% of enrolled debt used for Data Vendors
+const REVENUE_RATE     = 0.03; // Multi Vendor revenue is 3% of enrolled debt (Data Vendors stay at 2.5%)
 const MAIN_ORG_NAME    = (process.env.MAIN_ORG_NAME || 'DEBTIFY').trim().toUpperCase();
 
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
