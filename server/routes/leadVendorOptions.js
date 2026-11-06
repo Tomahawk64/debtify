@@ -5,6 +5,7 @@ const LeadVendorOption = require('../models/LeadVendorOption');
 const Organization = require('../models/Organization');
 const { protect } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
+const { DEFAULT_REVENUE_PERCENTAGE, isValidPercentage } = require('../utils/vendorRevenue');
 
 // ─────────────────────────────────────────────────────────────────
 // Lead Vendor Options — the managed list Agent2 picks a "Lead Vendor"
@@ -39,12 +40,21 @@ async function requireMainOrgAdmin(req, res, next) {
 router.get('/', protect, async (req, res) => {
   try {
     const includeInactive = req.query.all === 'true';
-    if (includeInactive && req.user.role !== 'superadmin' && !(await isMainOrgAdmin(req.user))) {
+    const isPrivileged = req.user.role === 'superadmin' || (await isMainOrgAdmin(req.user));
+    if (includeInactive && !isPrivileged) {
       return res.status(403).json({ success: false, message: 'Not authorized to view retired options' });
     }
     const filter = includeInactive ? {} : { isActive: true };
-    const options = await LeadVendorOption.find(filter).sort({ name: 1 }).lean();
-    res.json({ success: true, data: options });
+    // Revenue percentages are commercial data: only the main org admin /
+    // superadmin ever receive them (this list is readable by every logged-in user).
+    const query = LeadVendorOption.find(filter).sort({ name: 1 });
+    if (!isPrivileged) query.select('-revenuePercentage');
+    const options = await query.lean();
+    res.json({
+      success: true,
+      data: options,
+      ...(isPrivileged ? { defaultRevenuePercentage: DEFAULT_REVENUE_PERCENTAGE } : {})
+    });
   } catch (err) {
     console.error('Error fetching lead vendor options:', err);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -82,7 +92,7 @@ router.post(
 );
 
 // ─────────────────────────────────────────────────────────────────
-// PATCH /api/lead-vendor-options/:id — rename and/or toggle active
+// PATCH /api/lead-vendor-options/:id — rename, toggle active, and/or set revenue %
 // ─────────────────────────────────────────────────────────────────
 router.patch(
   '/:id',
@@ -90,7 +100,17 @@ router.patch(
   requireMainOrgAdmin,
   [
     body('name').optional().trim().isLength({ min: 1, max: 100 }).withMessage('Name must be between 1 and 100 characters'),
-    body('isActive').optional().isBoolean().withMessage('isActive must be a boolean')
+    body('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
+    // number 0-100, or null/'' to go back to the default percentage
+    body('revenuePercentage')
+      .optional({ nullable: true, checkFalsy: false })
+      .custom((v) => {
+        if (v === null || v === '') return true;
+        if (typeof v !== 'number' && typeof v !== 'string') throw new Error('revenuePercentage must be a number');
+        const n = Number(v);
+        if (!isValidPercentage(n)) throw new Error('revenuePercentage must be between 0 and 100');
+        return true;
+      })
   ],
   handleValidationErrors,
   async (req, res) => {
@@ -112,6 +132,11 @@ router.patch(
       }
       if (req.body.isActive !== undefined) {
         option.isActive = req.body.isActive;
+      }
+      if (req.body.revenuePercentage !== undefined) {
+        const v = req.body.revenuePercentage;
+        // null/'' clears the custom rate so the vendor falls back to the default
+        option.revenuePercentage = (v === null || v === '') ? undefined : Math.round(Number(v) * 100) / 100;
       }
       await option.save();
       res.json({ success: true, message: 'Lead vendor option updated', data: option });

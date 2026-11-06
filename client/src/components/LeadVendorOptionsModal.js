@@ -13,13 +13,18 @@ const LeadVendorOptionsModal = ({ isOpen, onClose, onChanged }) => {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState('');
+  const [editingPct, setEditingPct] = useState('');
+  const [defaultPct, setDefaultPct] = useState(3);
   const [savingId, setSavingId] = useState(null);
 
   const fetchOptions = async () => {
     setLoading(true);
     try {
       const res = await axios.get('/api/lead-vendor-options?all=true');
-      if (res.data?.success) setOptions(res.data.data || []);
+      if (res.data?.success) {
+        setOptions(res.data.data || []);
+        if (typeof res.data.defaultRevenuePercentage === 'number') setDefaultPct(res.data.defaultRevenuePercentage);
+      }
     } catch {
       toast.error('Failed to load lead vendor options');
     } finally {
@@ -33,6 +38,7 @@ const LeadVendorOptionsModal = ({ isOpen, onClose, onChanged }) => {
       setNewName('');
       setEditingId(null);
       setEditingName('');
+      setEditingPct('');
     }
   }, [isOpen]);
 
@@ -58,22 +64,32 @@ const LeadVendorOptionsModal = ({ isOpen, onClose, onChanged }) => {
   const startEdit = (opt) => {
     setEditingId(opt._id);
     setEditingName(opt.name);
+    setEditingPct(opt.revenuePercentage === undefined || opt.revenuePercentage === null ? '' : String(opt.revenuePercentage));
   };
 
   const saveEdit = async (id) => {
     const name = editingName.trim();
     if (!name) { toast.error('Name cannot be empty'); return; }
+
+    // blank = use the default percentage
+    const pctText = editingPct.trim();
+    const revenuePercentage = pctText === '' ? null : Number(pctText);
+    if (revenuePercentage !== null && (!Number.isFinite(revenuePercentage) || revenuePercentage < 0 || revenuePercentage > 100)) {
+      toast.error('Revenue % must be a number between 0 and 100');
+      return;
+    }
+
     setSavingId(id);
     try {
-      const res = await axios.patch(`/api/lead-vendor-options/${id}`, { name });
+      const res = await axios.patch(`/api/lead-vendor-options/${id}`, { name, revenuePercentage });
       if (res.data?.success) {
-        toast.success('Renamed');
+        toast.success('Saved');
         setEditingId(null);
         await fetchOptions();
         onChanged?.();
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to rename');
+      toast.error(err.response?.data?.message || 'Failed to save');
     } finally {
       setSavingId(null);
     }
@@ -108,7 +124,7 @@ const LeadVendorOptionsModal = ({ isOpen, onClose, onChanged }) => {
             </div>
             <div>
               <h2 className="text-lg font-bold text-gray-900">Manage Lead Vendors</h2>
-              <p className="text-xs text-gray-500">Controls the options Agent2 can pick when adding a lead</p>
+              <p className="text-xs text-gray-500">Options Agent2 can pick when adding a lead, and each vendor&apos;s revenue %</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors">
@@ -150,18 +166,42 @@ const LeadVendorOptionsModal = ({ isOpen, onClose, onChanged }) => {
                 <div key={opt._id}
                   className={`flex items-center justify-between gap-3 p-3 rounded-xl border ${opt.isActive ? 'border-gray-200 bg-white' : 'border-gray-100 bg-gray-50'}`}>
                   {editingId === opt._id ? (
-                    <input
-                      type="text"
-                      value={editingName}
-                      onChange={e => setEditingName(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') saveEdit(opt._id); }}
-                      autoFocus
-                      className="flex-1 px-2.5 py-1.5 border-2 border-cyan-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
-                    />
+                    <div className="flex flex-1 items-center gap-2 min-w-0">
+                      <input
+                        type="text"
+                        value={editingName}
+                        onChange={e => setEditingName(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') saveEdit(opt._id); }}
+                        autoFocus
+                        className="flex-1 min-w-0 px-2.5 py-1.5 border-2 border-cyan-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                      />
+                      <div className="flex items-center gap-1 shrink-0" title={`Revenue % of enrolled debt. Leave blank for the default (${defaultPct}%).`}>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.01"
+                          value={editingPct}
+                          onChange={e => setEditingPct(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter') saveEdit(opt._id); }}
+                          placeholder={String(defaultPct)}
+                          aria-label="Revenue percentage"
+                          className="w-20 px-2 py-1.5 border-2 border-cyan-300 rounded-lg text-sm font-medium text-right focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                        />
+                        <span className="text-sm font-semibold text-gray-500">%</span>
+                      </div>
+                    </div>
                   ) : (
-                    <span className={`text-sm font-semibold ${opt.isActive ? 'text-gray-800' : 'text-gray-400 line-through'}`}>
-                      {opt.name}
-                    </span>
+                    <div className="flex flex-col min-w-0">
+                      <span className={`text-sm font-semibold ${opt.isActive ? 'text-gray-800' : 'text-gray-400 line-through'}`}>
+                        {opt.name}
+                      </span>
+                      <span className={`text-xs ${opt.revenuePercentage === undefined || opt.revenuePercentage === null ? 'text-gray-400' : 'text-emerald-600 font-semibold'}`}>
+                        Revenue {opt.revenuePercentage === undefined || opt.revenuePercentage === null
+                          ? `${defaultPct}% (default)`
+                          : `${opt.revenuePercentage}%`}
+                      </span>
+                    </div>
                   )}
 
                   <div className="flex items-center gap-1.5 shrink-0">

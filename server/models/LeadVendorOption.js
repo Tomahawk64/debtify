@@ -17,6 +17,14 @@ const leadVendorOptionSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  // Revenue % (of enrolled debt) shown for this vendor's SALE leads in Multi
+  // Vendor Payment Status. Set by the main org admin; when unset the default in
+  // utils/vendorRevenue.js applies. Deliberately NOT returned to non-admin users.
+  revenuePercentage: {
+    type: Number,
+    min: [0, 'Revenue percentage cannot be negative'],
+    max: [100, 'Revenue percentage cannot exceed 100']
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

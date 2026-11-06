@@ -18,6 +18,7 @@ const { protect, authorize } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 const { formatEasternTime } = require('../utils/timeFilters');
 const { escapeRegex } = require('../utils/regexUtils');
+const { DEFAULT_REVENUE_PERCENTAGE, getRevenuePercentages } = require('../utils/vendorRevenue');
 
 const router = express.Router();
 
@@ -198,7 +199,6 @@ router.get(
 const SALE_STATUSES    = ['SALE', 'Sale Long Play', 'Immediate Enrollment'];
 const PAYMENT_STATUSES = ['', 'Cleared', 'Pending', 'NSF', 'Cancellation', 'Refunded'];
 const PAYMENT_TYPES    = ['', 'Monthly', 'Semi Monthly'];
-const REVENUE_RATE     = 0.03; // Multi Vendor revenue is 3% of enrolled debt (Data Vendors stay at 2.5%)
 const MAIN_ORG_NAME    = (process.env.MAIN_ORG_NAME || 'DEBTIFY').trim().toUpperCase();
 
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
@@ -278,7 +278,7 @@ const buildPaymentFilter = (q, vendorMatch, dateMode) => {
   return filter;
 };
 
-const listPaymentSales = async (req, res, { vendorMatch, dateMode, includeEmail }) => {
+const listPaymentSales = async (req, res, { vendorMatch, dateMode, includeEmail, includeRate }) => {
   const page  = Math.max(1, parseInt(req.query.page) || 1);
   const limit = Math.min(500, parseInt(req.query.limit) || 50);
   const filter = buildPaymentFilter(req.query, vendorMatch, dateMode);
@@ -290,28 +290,52 @@ const listPaymentSales = async (req, res, { vendorMatch, dateMode, includeEmail 
     ...(includeEmail ? { email: 1 } : {}),
   };
 
-  const [total, leads, breakdownAgg] = await Promise.all([
+  const [total, leads, groupAgg, percentages] = await Promise.all([
     Lead.countDocuments(filter),
     Lead.find(filter, projection).sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+    // grouped by payment status AND lead vendor, because each vendor has its own revenue %
     Lead.aggregate([
       { $match: filter },
-      { $group: { _id: { $ifNull: ['$paymentStatus', ''] }, count: { $sum: 1 }, enrolledDebt: { $sum: enrolledDebtExpr } } },
+      { $group: {
+        _id: { status: { $ifNull: ['$paymentStatus', ''] }, vendor: '$leadVendor' },
+        count: { $sum: 1 },
+        enrolledDebt: { $sum: enrolledDebtExpr },
+      } },
     ]),
+    getRevenuePercentages(),
   ]);
+
+  const percentageOf = (vendor) => (percentages.has(vendor) ? percentages.get(vendor) : DEFAULT_REVENUE_PERCENTAGE);
 
   const data = leads.map(({ conversionValue, totalDebtAmount, ...rest }) => {
     const enrolledDebt = enrolledDebtOf({ conversionValue, totalDebtAmount });
-    return { ...rest, enrolledDebt, revenue: round2(enrolledDebt * REVENUE_RATE) };
+    const pct = percentageOf(rest.leadVendor);
+    return {
+      ...rest,
+      enrolledDebt,
+      revenue: round2((enrolledDebt * pct) / 100),
+      ...(includeRate ? { revenuePercentage: pct } : {}),
+    };
   });
 
-  const statusBreakdown = {};
+  const breakdown = {};
   let totalEnrolledDebt = 0;
-  for (const g of breakdownAgg) {
-    const enrolledDebt = round2(g.enrolledDebt);
-    totalEnrolledDebt += enrolledDebt;
-    statusBreakdown[g._id || ''] = { count: g.count, enrolledDebt, revenue: round2(enrolledDebt * REVENUE_RATE) };
+  let totalRevenue = 0;
+  for (const g of groupAgg) {
+    const status = g._id.status || '';
+    const enrolled = Number(g.enrolledDebt) || 0;
+    const revenue = (enrolled * percentageOf(g._id.vendor)) / 100;
+    if (!breakdown[status]) breakdown[status] = { count: 0, enrolledDebt: 0, revenue: 0 };
+    breakdown[status].count += g.count;
+    breakdown[status].enrolledDebt += enrolled;
+    breakdown[status].revenue += revenue;
+    totalEnrolledDebt += enrolled;
+    totalRevenue += revenue;
   }
-  totalEnrolledDebt = round2(totalEnrolledDebt);
+  const statusBreakdown = {};
+  for (const [status, b] of Object.entries(breakdown)) {
+    statusBreakdown[status] = { count: b.count, enrolledDebt: round2(b.enrolledDebt), revenue: round2(b.revenue) };
+  }
 
   res.json({
     success: true,
@@ -319,8 +343,8 @@ const listPaymentSales = async (req, res, { vendorMatch, dateMode, includeEmail 
     total,
     page,
     limit,
-    totalEnrolledDebt,
-    totalRevenue: round2(totalEnrolledDebt * REVENUE_RATE),
+    totalEnrolledDebt: round2(totalEnrolledDebt),
+    totalRevenue: round2(totalRevenue),
     statusBreakdown,
   });
 };
@@ -361,7 +385,7 @@ router.get(
   async (req, res) => {
     try {
       const vendorMatch = req.query.vendor ? req.query.vendor : { $nin: [null, ''] };
-      await listPaymentSales(req, res, { vendorMatch, dateMode: 'created', includeEmail: true });
+      await listPaymentSales(req, res, { vendorMatch, dateMode: 'created', includeEmail: true, includeRate: true });
     } catch (err) {
       console.error('[MultiVendor] admin payment status list error:', err);
       res.status(500).json({ success: false, message: 'Server error' });
