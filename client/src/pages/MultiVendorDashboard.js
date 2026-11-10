@@ -163,9 +163,9 @@ const MultiVendorDashboard = () => {
   return (
     <div className="min-h-screen" style={{ background: '#f1f5f9' }}>
       {/* Hero Header */}
-      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)' }}>
-        <div className="absolute -top-16 -right-16 rounded-full opacity-10" style={{ width: 260, height: 260, background: '#06b6d4' }} />
-        <div className="absolute -bottom-20 -left-10 rounded-full opacity-5" style={{ width: 200, height: 200, background: '#06b6d4' }} />
+      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #102828 0%, #204038 60%, #102828 100%)' }}>
+        <div className="absolute -top-16 -right-16 rounded-full opacity-10" style={{ width: 260, height: 260, background: '#3f9580' }} />
+        <div className="absolute -bottom-20 -left-10 rounded-full opacity-5" style={{ width: 200, height: 200, background: '#3f9580' }} />
 
         <div className="relative px-6 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -203,7 +203,7 @@ const MultiVendorDashboard = () => {
                 onClick={handleExport}
                 disabled={exporting || loading}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold disabled:opacity-50 transition-colors"
-                style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)', color: '#0f172a' }}
+                style={{ background: 'linear-gradient(135deg, #3f9580, #307868)', color: '#102828' }}
               >
                 <Download size={15} />
                 {exporting ? 'Exporting…' : 'Export CSV'}
@@ -216,7 +216,7 @@ const MultiVendorDashboard = () => {
       <div className="px-6 py-6 space-y-5">
         {/* Stat Cards */}
         <div className="grid grid-cols-2 gap-4 max-w-md">
-          <StatCard icon={Users} label="Total Leads" value={pagination.total.toLocaleString()} sub="matching your vendors" accent="#6366f1" />
+          <StatCard icon={Users} label="Total Leads" value={pagination.total.toLocaleString()} sub="matching your vendors" accent="#307868" />
           <StatCard icon={CheckCircle2} label="Sales" value={stats.saleCount.toLocaleString()} sub={`of ${leads.length} on this page`} accent="#10b981" />
         </div>
 
@@ -259,7 +259,7 @@ const MultiVendorDashboard = () => {
             <div className="flex gap-2 pb-0.5">
               <button onClick={handleApplyFilters}
                 className="px-5 py-2 rounded-lg text-sm font-bold text-white transition-colors"
-                style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}>
+                style={{ background: 'linear-gradient(135deg, #3f9580, #307868)' }}>
                 Apply
               </button>
               <button onClick={handleClearFilters}
@@ -283,7 +283,7 @@ const MultiVendorDashboard = () => {
 
           {loading ? (
             <div className="flex flex-col items-center justify-center h-56 gap-3">
-              <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: '#06b6d4 transparent #06b6d4 #06b6d4' }} />
+              <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: '#3f9580 transparent #3f9580 #3f9580' }} />
               <p className="text-sm text-slate-400 font-medium">Loading leads…</p>
             </div>
           ) : leads.length === 0 ? (
@@ -300,7 +300,7 @@ const MultiVendorDashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr style={{ background: '#0f172a' }}>
+                  <tr style={{ background: '#102828' }}>
                     {['#', 'Created At', 'Customer Name', 'Phone', 'Lead Vendor', 'Status'].map((h, i) => (
                       <th key={h}
                         className={`px-4 py-3 text-xs font-bold uppercase tracking-wider whitespace-nowrap ${i === 0 ? 'text-center w-10' : i === 3 ? 'text-right' : 'text-left'}`}
@@ -315,13 +315,13 @@ const MultiVendorDashboard = () => {
                     const isEven = idx % 2 === 0;
                     const rowNum = ((pagination.page - 1) * pagination.limit) + idx + 1;
                     return (
-                      <tr key={lead._id || idx} style={{ background: isEven ? '#ffffff' : '#f8fafc' }} className="hover:bg-cyan-50 transition-colors">
+                      <tr key={lead._id || idx} style={{ background: isEven ? '#ffffff' : '#f8fafc' }} className="hover:bg-primary-50 transition-colors">
                         <td className="px-4 py-3 text-center text-xs text-slate-300 font-mono">{rowNum}</td>
                         <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">{fmtDate(lead.createdAt)}</td>
                         <td className="px-4 py-3 whitespace-nowrap"><span className="font-semibold text-slate-800">{lead.name || '—'}</span></td>
                         <td className="px-4 py-3 text-right whitespace-nowrap"><span className="font-mono text-slate-600 text-xs">{lead.phone || '—'}</span></td>
                         <td className="px-4 py-3 whitespace-nowrap">
-                          <span className="inline-block px-2 py-0.5 rounded-md text-xs font-bold bg-cyan-50 text-cyan-700">{lead.leadVendor || '—'}</span>
+                          <span className="inline-block px-2 py-0.5 rounded-md text-xs font-bold bg-primary-50 text-primary-700">{lead.leadVendor || '—'}</span>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">{statusPill(lead.leadProgressStatus || lead.status)}</td>
                       </tr>
@@ -354,7 +354,7 @@ const MultiVendorDashboard = () => {
                   <button key={p} onClick={() => handlePageChange(p)} disabled={loading}
                     className="w-9 h-9 rounded-lg text-sm font-semibold transition-colors"
                     style={p === pagination.page
-                      ? { background: '#06b6d4', color: 'white', border: '1px solid #06b6d4' }
+                      ? { background: '#3f9580', color: 'white', border: '1px solid #3f9580' }
                       : { background: 'white', color: '#64748b', border: '1px solid #e2e8f0' }}>
                     {p}
                   </button>

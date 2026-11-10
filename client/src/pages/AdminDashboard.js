@@ -1086,17 +1086,17 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-4 px-3">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50/60 via-white/50 to-primary-50/60 py-4 px-3">
       <div className="w-full space-y-3">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 backdrop-blur-sm bg-opacity-95">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+              <div className="p-2 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg shadow-lg">
                 <BarChart3 className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent tracking-tight">
                   Admin Dashboard
                 </h1>
                 <p className="text-gray-600 text-xs">
@@ -1131,7 +1131,7 @@ const AdminDashboard = () => {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group text-sm"
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group text-sm"
               >
                 <RefreshCw className={`h-4 w-4 mr-1.5 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180'} transition-transform duration-500`} />
                 {refreshing ? 'Refreshing...' : 'Refresh'}
@@ -1382,7 +1382,7 @@ const AdminDashboard = () => {
 
         {/* Lead Management Toggle */}
         <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden backdrop-blur-sm bg-opacity-95">
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
+          <div className="bg-gradient-to-r from-primary-500 to-primary-700 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
@@ -1473,7 +1473,7 @@ const AdminDashboard = () => {
                 onClick={() => handleDateFilterChange('all')}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
                   dateFilter.filterType === 'all' 
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105' 
+                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md scale-105' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                 }`}
               >
@@ -1483,7 +1483,7 @@ const AdminDashboard = () => {
                 onClick={() => handleDateFilterChange('today')}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
                   dateFilter.filterType === 'today' 
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105' 
+                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md scale-105' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                 }`}
               >
@@ -1493,7 +1493,7 @@ const AdminDashboard = () => {
                 onClick={() => handleDateFilterChange('week')}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
                   dateFilter.filterType === 'week' 
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105' 
+                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md scale-105' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                 }`}
               >
@@ -1503,7 +1503,7 @@ const AdminDashboard = () => {
                 onClick={() => handleDateFilterChange('month')}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
                   dateFilter.filterType === 'month' 
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105' 
+                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md scale-105' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                 }`}
               >
@@ -1545,7 +1545,7 @@ const AdminDashboard = () => {
                   }}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
                     qualificationFilter === 'all' 
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105' 
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md scale-105' 
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                   }`}
                 >
@@ -1607,7 +1607,7 @@ const AdminDashboard = () => {
                   }}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
                     progressFilter === 'all'
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105'
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md scale-105'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                   }`}
                 >
@@ -1656,7 +1656,7 @@ const AdminDashboard = () => {
                   }}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
                     duplicateFilter === 'all' 
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105' 
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md scale-105' 
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                   }`}
                 >
@@ -1705,7 +1705,7 @@ const AdminDashboard = () => {
                   }}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${
                     organizationFilter === 'all' 
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105' 
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md scale-105' 
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                   }`}
                 >
@@ -1782,7 +1782,7 @@ const AdminDashboard = () => {
                 </button>
                 <button
                   onClick={() => setShowShareModal(true)}
-                  className="px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-1.5"
+                  className="px-4 py-1.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-xs font-semibold rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-1.5"
                 >
                   <Users size={14} />
                   <span>Share Data</span>
@@ -1867,7 +1867,7 @@ const AdminDashboard = () => {
                       {/* Lead Info - 2 columns */}
                       <div className="col-span-2">
                         <div className="flex items-center space-x-2">
-                          <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow group-hover:scale-110 transition-transform duration-200">
+                          <div className="h-8 w-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center shadow group-hover:scale-110 transition-transform duration-200">
                             <span className="text-white font-bold text-xs">
                               {lead.name ? lead.name.charAt(0).toUpperCase() : 'L'}
                             </span>
@@ -2003,7 +2003,7 @@ const AdminDashboard = () => {
                         <div className="flex flex-col space-y-1">
                           <button
                             onClick={() => openViewModal(lead)}
-                            className="w-full text-blue-600 hover:text-white bg-blue-50 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 px-2 py-1 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1"
+                            className="w-full text-blue-600 hover:text-white bg-blue-50 hover:bg-gradient-to-r hover:from-primary-600 hover:to-primary-700 px-2 py-1 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1"
                           >
                             {isMainOrgAdmin ? (
                               <>
@@ -2075,7 +2075,7 @@ const AdminDashboard = () => {
             </div>
 
             <div className="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+              <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4">
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-xl font-semibold text-white">
@@ -2759,7 +2759,7 @@ const AdminDashboard = () => {
             className="w-full flex items-center justify-between px-5 py-4 bg-gradient-to-r from-indigo-50 to-white hover:from-indigo-100 transition-colors duration-200 border-b border-gray-100"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style={{ background: 'linear-gradient(135deg,#307868,#3f9580)' }}>
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>

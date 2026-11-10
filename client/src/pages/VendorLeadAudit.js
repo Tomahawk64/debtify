@@ -137,7 +137,7 @@ const VendorLeadAudit = () => {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-xl p-5 sm:p-6 flex items-center justify-between flex-wrap gap-3">
+      <div className="bg-gradient-to-r from-primary-950 via-primary-900 to-primary-950 rounded-2xl shadow-xl p-5 sm:p-6 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl shadow-lg">
             <ShieldAlert size={20} className="text-white" />

@@ -204,7 +204,7 @@ const SuperUserManagement = () => {
       <div className="p-5 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-white">
         <div className="flex flex-wrap justify-between items-start gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style={{ background: 'linear-gradient(135deg,#307868,#3f9580)' }}>
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -224,7 +224,7 @@ const SuperUserManagement = () => {
             <button
               onClick={() => setIsCreateModalOpen(true)}
               className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white rounded-lg transition-all active:scale-95 shadow-md"
-              style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}
+              style={{ background: 'linear-gradient(135deg,#307868,#3f9580)' }}
             >
               <UserPlus className="w-4 h-4" />
               Create User

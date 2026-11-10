@@ -40,7 +40,7 @@ const formatUtcDate = (d) => {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 };
 
-const inputCls = 'border border-slate-200 text-sm rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-400';
+const inputCls = 'border border-slate-200 text-sm rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-400';
 const labelCls = 'text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1';
 
 const MultiVendorPaymentStatus = () => {
@@ -110,8 +110,8 @@ const MultiVendorPaymentStatus = () => {
   return (
     <div className="min-h-screen" style={{ background: '#f1f5f9' }}>
       {/* Hero Header */}
-      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)' }}>
-        <div className="absolute -top-16 -right-16 rounded-full opacity-10" style={{ width: 260, height: 260, background: '#06b6d4' }} />
+      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #102828 0%, #204038 60%, #102828 100%)' }}>
+        <div className="absolute -top-16 -right-16 rounded-full opacity-10" style={{ width: 260, height: 260, background: '#3f9580' }} />
         <div className="relative px-6 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="rounded-xl p-2 flex-shrink-0" style={{ background: 'rgba(6,182,212,0.12)', border: '1px solid rgba(6,182,212,0.25)' }}>
@@ -186,7 +186,7 @@ const MultiVendorPaymentStatus = () => {
                 />
                 <button onClick={applySearch}
                   className="px-5 py-2 rounded-lg text-sm font-bold text-white transition-colors"
-                  style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}>
+                  style={{ background: 'linear-gradient(135deg, #3f9580, #307868)' }}>
                   Go
                 </button>
               </div>
@@ -262,7 +262,7 @@ const MultiVendorPaymentStatus = () => {
         <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-56 gap-3">
-              <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: '#06b6d4 transparent #06b6d4 #06b6d4' }} />
+              <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: '#3f9580 transparent #3f9580 #3f9580' }} />
               <p className="text-sm text-slate-400 font-medium">Loading…</p>
             </div>
           ) : records.length === 0 ? (
@@ -277,7 +277,7 @@ const MultiVendorPaymentStatus = () => {
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm border-collapse">
                 <thead>
-                  <tr style={{ background: '#0f172a' }}>
+                  <tr style={{ background: '#102828' }}>
                     {['Lead', 'Phone', 'Enrolled Debt', 'Revenue', 'Lead Vendor', 'Created At', 'Payment Status', 'Payment Type', 'Draft Date 1', 'Draft Date 2'].map((h) => (
                       <th key={h} className={th} style={{ color: '#94a3b8' }}>{h}</th>
                     ))}
@@ -285,7 +285,7 @@ const MultiVendorPaymentStatus = () => {
                 </thead>
                 <tbody>
                   {records.map((rec, idx) => (
-                    <tr key={rec._id} style={{ background: idx % 2 === 0 ? '#ffffff' : '#f8fafc' }} className="hover:bg-cyan-50 transition-colors">
+                    <tr key={rec._id} style={{ background: idx % 2 === 0 ? '#ffffff' : '#f8fafc' }} className="hover:bg-primary-50 transition-colors">
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="font-semibold text-slate-800">{rec.name || '—'}</div>
                         {rec.leadId && <div className="text-[10px] text-slate-400 font-mono">{rec.leadId}</div>}
@@ -302,7 +302,7 @@ const MultiVendorPaymentStatus = () => {
                           : <span className="text-slate-300">—</span>}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-bold bg-cyan-50 text-cyan-700">{rec.leadVendor || '—'}</span>
+                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-bold bg-primary-50 text-primary-700">{rec.leadVendor || '—'}</span>
                       </td>
                       <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">
                         {rec.createdAt ? formatEasternTimeForDisplay(rec.createdAt, { includeTime: false }) : '—'}

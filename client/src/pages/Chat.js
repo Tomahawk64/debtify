@@ -80,7 +80,7 @@ function Avatar({ name, online, size = 36 }) {
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <div style={{
         width: size, height: size, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #3f9580 0%, #286055 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         color: '#fff', fontWeight: 700, fontSize: Math.round(size * 0.36),
         flexShrink: 0,
@@ -89,7 +89,7 @@ function Avatar({ name, online, size = 36 }) {
         <span style={{
           position: 'absolute', bottom: 1, right: 1,
           width: 9, height: 9, borderRadius: '50%',
-          background: '#22c55e', border: '2px solid #1e293b',
+          background: '#22c55e', border: '2px solid #17342f',
         }} />
       )}
     </div>
@@ -154,7 +154,7 @@ function NewPrivateModal({ onClose, onCreated }) {
       onClick={onClose}
     >
       <div
-        className="bg-slate-800 rounded-xl w-full max-w-md p-6 shadow-2xl"
+        className="bg-primary-900 rounded-xl w-full max-w-md p-6 shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -166,7 +166,7 @@ function NewPrivateModal({ onClose, onCreated }) {
         <div className="relative mb-4">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
-            className="w-full bg-slate-700 text-white rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-primary-800 text-white rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Search users…"
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -187,7 +187,7 @@ function NewPrivateModal({ onClose, onCreated }) {
                 key={uid}
                 onClick={() => handleCreate(uid)}
                 disabled={creating === uid}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-700 text-left disabled:opacity-50"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary-800 text-left disabled:opacity-50"
               >
                 <Avatar name={u.displayName || u.username} size={32} />
                 <div>
@@ -260,7 +260,7 @@ function NewGroupModal({ onClose, onCreated }) {
       onClick={onClose}
     >
       <div
-        className="bg-slate-800 rounded-xl w-full max-w-md p-6 shadow-2xl"
+        className="bg-primary-900 rounded-xl w-full max-w-md p-6 shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -270,7 +270,7 @@ function NewGroupModal({ onClose, onCreated }) {
           </button>
         </div>
         <input
-          className="w-full bg-slate-700 text-white rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 mb-3"
+          className="w-full bg-primary-800 text-white rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 mb-3"
           placeholder="Group name…"
           value={name}
           onChange={e => setName(e.target.value)}
@@ -279,7 +279,7 @@ function NewGroupModal({ onClose, onCreated }) {
         <div className="relative mb-3">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
-            className="w-full bg-slate-700 text-white rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-primary-800 text-white rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Add members…"
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -307,7 +307,7 @@ function NewGroupModal({ onClose, onCreated }) {
               <button
                 key={id}
                 onClick={() => toggleUser(u)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${isSel ? 'bg-indigo-700' : 'hover:bg-slate-700'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${isSel ? 'bg-indigo-700' : 'hover:bg-primary-800'}`}
               >
                 <Avatar name={u.name} size={28} />
                 <span className="text-white text-sm">{u.name}</span>
@@ -648,7 +648,7 @@ export default function Chat() {
   // ── Guard ─────────────────────────────────────────────────────────────────
   if (!hasChatToken) {
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-900">
+      <div className="flex items-center justify-center h-screen bg-primary-950">
         <div className="text-center">
           <AlertCircle size={48} className="text-amber-400 mx-auto mb-4" />
           <p className="text-white text-lg font-semibold mb-2">Chat session expired</p>
@@ -676,18 +676,18 @@ export default function Chat() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-screen bg-slate-900 text-white overflow-hidden">
+    <div className="flex h-screen bg-primary-950 text-white overflow-hidden">
 
       {/* ── Sidebar ── */}
       <div
         className={`
-          flex flex-col bg-slate-800 border-r border-slate-700 flex-shrink-0 transition-all duration-200
+          flex flex-col bg-primary-900 border-r border-primary-800 flex-shrink-0 transition-all duration-200
           ${sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}
           md:w-72 md:overflow-visible
         `}
       >
         {/* Header */}
-        <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+        <div className="p-4 border-b border-primary-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MessageSquare size={20} className="text-indigo-400" />
             <span className="font-semibold text-sm">Messages</span>
@@ -704,14 +704,14 @@ export default function Chat() {
           <div className="flex gap-1">
             <button
               onClick={() => setNewPrivateOpen(true)}
-              className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-white"
+              className="p-1.5 rounded hover:bg-primary-800 text-slate-400 hover:text-white"
               title="New message"
             >
               <Plus size={16} />
             </button>
             <button
               onClick={() => setNewGroupOpen(true)}
-              className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-white"
+              className="p-1.5 rounded hover:bg-primary-800 text-slate-400 hover:text-white"
               title="New group"
             >
               <Users size={16} />
@@ -720,11 +720,11 @@ export default function Chat() {
         </div>
 
         {/* Search */}
-        <div className="px-3 py-2 border-b border-slate-700/50">
+        <div className="px-3 py-2 border-b border-primary-800/50">
           <div className="relative">
             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
-              className="w-full bg-slate-700/50 text-sm text-white rounded-lg pl-8 pr-7 py-1.5 outline-none focus:bg-slate-700"
+              className="w-full bg-primary-800/50 text-sm text-white rounded-lg pl-8 pr-7 py-1.5 outline-none focus:bg-primary-800"
               placeholder="Search conversations…"
               value={convSearch}
               onChange={e => setConvSearch(e.target.value)}
@@ -766,7 +766,7 @@ export default function Chat() {
               <button
                 key={conv._id}
                 onClick={() => handleSelect(conv)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-700/50 transition-colors ${isActive ? 'bg-slate-700' : ''}`}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-primary-800/50 transition-colors ${isActive ? 'bg-primary-800' : ''}`}
               >
                 <div className="relative flex-shrink-0">
                   <Avatar name={label} size={40} online={isOnline} />
@@ -813,10 +813,10 @@ export default function Chat() {
         ) : (
           <>
             {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700 bg-slate-800 flex-shrink-0">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-primary-800 bg-primary-900 flex-shrink-0">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="md:hidden p-1.5 rounded hover:bg-slate-700 text-slate-400"
+                className="md:hidden p-1.5 rounded hover:bg-primary-800 text-slate-400"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -832,7 +832,7 @@ export default function Chat() {
               {pinned.length > 0 && (
                 <button
                   onClick={() => setPinnedOpen(v => !v)}
-                  className={`p-1.5 rounded hover:bg-slate-700 flex items-center gap-1 transition-colors ${pinnedOpen ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`}
+                  className={`p-1.5 rounded hover:bg-primary-800 flex items-center gap-1 transition-colors ${pinnedOpen ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`}
                   title="Pinned messages"
                 >
                   <Pin size={16} />
@@ -843,7 +843,7 @@ export default function Chat() {
 
             {/* Pinned panel */}
             {pinnedOpen && pinned.length > 0 && (
-              <div className="bg-slate-800/80 border-b border-slate-700 px-4 py-2 flex-shrink-0">
+              <div className="bg-primary-900/80 border-b border-primary-800 px-4 py-2 flex-shrink-0">
                 <p className="text-xs text-amber-400 font-semibold mb-1">📌 Pinned Messages</p>
                 <div className="space-y-1 max-h-32 overflow-y-auto">
                   {pinned.map(msg => (
@@ -861,9 +861,9 @@ export default function Chat() {
                 if (item.type === 'separator') {
                   return (
                     <div key={item.key} className="flex items-center gap-3 my-4">
-                      <div className="flex-1 h-px bg-slate-700" />
+                      <div className="flex-1 h-px bg-primary-800" />
                       <span className="text-slate-500 text-xs px-2">{item.label}</span>
-                      <div className="flex-1 h-px bg-slate-700" />
+                      <div className="flex-1 h-px bg-primary-800" />
                     </div>
                   );
                 }
@@ -893,7 +893,7 @@ export default function Chat() {
                           ? 'bg-indigo-900/60 border border-indigo-500/40 text-indigo-200'
                           : isMe
                             ? 'bg-indigo-600 text-white rounded-br-sm'
-                            : 'bg-slate-700 text-slate-100 rounded-bl-sm'}
+                            : 'bg-primary-800 text-slate-100 rounded-bl-sm'}
                         ${wasPinned ? 'ring-1 ring-amber-400/40' : ''}
                       `}>
                         {msg.mediaUrl && (
@@ -964,7 +964,7 @@ export default function Chat() {
               {/* Upload progress */}
               {uploadPct !== null && (
                 <div className="flex items-center gap-2 text-xs text-slate-400 py-1">
-                  <div className="flex-1 bg-slate-700 rounded-full h-1.5">
+                  <div className="flex-1 bg-primary-800 rounded-full h-1.5">
                     <div
                       className="bg-indigo-500 h-1.5 rounded-full transition-all"
                       style={{ width: `${uploadPct}%` }}
@@ -978,11 +978,11 @@ export default function Chat() {
             </div>
 
             {/* Input */}
-            <div className="px-4 py-3 border-t border-slate-700 bg-slate-800 flex-shrink-0">
+            <div className="px-4 py-3 border-t border-primary-800 bg-primary-900 flex-shrink-0">
               <div className="flex items-end gap-2">
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 flex-shrink-0"
+                  className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-primary-800 flex-shrink-0"
                   title="Attach file"
                 >
                   <Paperclip size={18} />
@@ -997,7 +997,7 @@ export default function Chat() {
                   }}
                 />
                 <textarea
-                  className="flex-1 bg-slate-700 text-white text-sm rounded-xl px-4 py-2.5 outline-none resize-none focus:ring-2 focus:ring-indigo-500 max-h-32"
+                  className="flex-1 bg-primary-800 text-white text-sm rounded-xl px-4 py-2.5 outline-none resize-none focus:ring-2 focus:ring-indigo-500 max-h-32"
                   placeholder="Message…"
                   rows={1}
                   value={input}
@@ -1070,8 +1070,8 @@ function ThreadPanel({ thread, myGlobalId, onClose, onReply }) {
   }
 
   return (
-    <div className="w-80 flex flex-col bg-slate-800 border-l border-slate-700 flex-shrink-0">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
+    <div className="w-80 flex flex-col bg-primary-900 border-l border-primary-800 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-primary-800">
         <span className="font-semibold text-sm">Thread</span>
         <button onClick={onClose} className="text-slate-400 hover:text-white">
           <X size={18} />
@@ -1079,7 +1079,7 @@ function ThreadPanel({ thread, myGlobalId, onClose, onReply }) {
       </div>
 
       {/* Root message */}
-      <div className="px-4 py-3 bg-slate-700/30 border-b border-slate-700">
+      <div className="px-4 py-3 bg-primary-800/30 border-b border-primary-800">
         <p className="text-xs text-slate-400 mb-1">
           {thread.msg.sender?.displayName || thread.msg.sender?.username}
         </p>
@@ -1096,7 +1096,7 @@ function ThreadPanel({ thread, myGlobalId, onClose, onReply }) {
           return (
             <div key={r._id} className={`flex gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
               <Avatar name={r.sender?.displayName || '?'} size={24} />
-              <div className={`max-w-[80%] px-3 py-1.5 rounded-xl text-xs ${isMe ? 'bg-indigo-600 text-white' : 'bg-slate-700 text-slate-200'}`}>
+              <div className={`max-w-[80%] px-3 py-1.5 rounded-xl text-xs ${isMe ? 'bg-indigo-600 text-white' : 'bg-primary-800 text-slate-200'}`}>
                 {r.text}
               </div>
             </div>
@@ -1105,9 +1105,9 @@ function ThreadPanel({ thread, myGlobalId, onClose, onReply }) {
       </div>
 
       {/* Reply input */}
-      <div className="px-3 py-2 border-t border-slate-700 flex gap-2">
+      <div className="px-3 py-2 border-t border-primary-800 flex gap-2">
         <input
-          className="flex-1 bg-slate-700 text-white text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-indigo-500"
+          className="flex-1 bg-primary-800 text-white text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-indigo-500"
           placeholder="Reply…"
           value={replyText}
           onChange={e => setReplyText(e.target.value)}

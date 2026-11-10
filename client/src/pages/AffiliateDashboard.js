@@ -202,7 +202,7 @@ const AffiliateDashboard = () => {
       <div
         className="relative overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)',
+          background: 'linear-gradient(135deg, #102828 0%, #204038 60%, #102828 100%)',
         }}
       >
         {/* Decorative circles */}
@@ -271,7 +271,7 @@ const AffiliateDashboard = () => {
               onClick={handleExport}
               disabled={exporting || loading}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold disabled:opacity-50 transition-colors"
-              style={{ background: 'linear-gradient(135deg, #EAB308, #ca8a04)', color: '#0f172a' }}
+              style={{ background: 'linear-gradient(135deg, #EAB308, #ca8a04)', color: '#102828' }}
             >
               <Download size={15} />
               {exporting ? 'Exporting…' : 'Export CSV'}
@@ -290,7 +290,7 @@ const AffiliateDashboard = () => {
             label="Total Leads"
             value={pagination.total.toLocaleString()}
             sub="matching campaign"
-            accent="#6366f1"
+            accent="#307868"
           />
           <StatCard
             icon={DollarSign}
@@ -334,7 +334,7 @@ const AffiliateDashboard = () => {
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
                 className="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:border-transparent"
-                style={{ '--tw-ring-color': '#6366f1' }}
+                style={{ '--tw-ring-color': '#307868' }}
               />
             </div>
             <div>
@@ -364,7 +364,7 @@ const AffiliateDashboard = () => {
               <button
                 onClick={handleApplyFilters}
                 className="px-5 py-2 rounded-lg text-sm font-bold text-white transition-colors"
-                style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
+                style={{ background: 'linear-gradient(135deg, #307868, #286055)' }}
               >
                 Apply
               </button>
@@ -387,7 +387,7 @@ const AffiliateDashboard = () => {
                 {pagination.total.toLocaleString()} Lead{pagination.total !== 1 ? 's' : ''}
               </span>
               {(filterRef.current.startDate || filterRef.current.endDate) && (
-                <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: '#ede9fe', color: '#7c3aed' }}>
+                <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: '#dcf0e9', color: '#286055' }}>
                   Date filtered
                 </span>
               )}
@@ -408,7 +408,7 @@ const AffiliateDashboard = () => {
             <div className="flex flex-col items-center justify-center h-56 gap-3">
               <div
                 className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
-                style={{ borderColor: '#6366f1 transparent #6366f1 #6366f1' }}
+                style={{ borderColor: '#307868 transparent #307868 #307868' }}
               />
               <p className="text-sm text-slate-400 font-medium">Loading leads…</p>
             </div>
@@ -428,7 +428,7 @@ const AffiliateDashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr style={{ background: '#0f172a' }}>
+                  <tr style={{ background: '#102828' }}>
                     {['#', 'Lead Created At', 'Customer Name', 'Primary Phone #', 'Total Debt', 'Draft Date', 'Credit Score', 'Status', 'Agent 1', 'Agent 2'].map((h, i) => (
                       <th
                         key={h}
@@ -521,7 +521,7 @@ const AffiliateDashboard = () => {
                     disabled={loading}
                     className="w-9 h-9 rounded-lg text-sm font-semibold transition-colors"
                     style={p === pagination.page
-                      ? { background: '#6366f1', color: 'white', border: '1px solid #6366f1' }
+                      ? { background: '#307868', color: 'white', border: '1px solid #307868' }
                       : { background: 'white', color: '#64748b', border: '1px solid #e2e8f0' }}
                   >
                     {p}

@@ -81,7 +81,7 @@ const DISP_META = {
   'DNC':    { label: 'Do Not Call',            color: 'bg-red-200 text-red-900 ring-red-300' },
   'DNCL':   { label: 'DNC Hopper Match',       color: 'bg-red-300 text-red-900 ring-red-400' },
   'HU':     { label: 'Hangup',                 color: 'bg-gray-100 text-gray-800 ring-gray-200' },
-  'LB':     { label: 'Language Barrier',       color: 'bg-cyan-100 text-cyan-800 ring-cyan-200' },
+  'LB':     { label: 'Language Barrier',       color: 'bg-primary-100 text-primary-800 ring-primary-200' },
   'N':      { label: 'No Answer',              color: 'bg-yellow-100 text-yellow-800 ring-yellow-200' },
   'NA':     { label: 'No Answer AutoDial',     color: 'bg-amber-100 text-amber-900 ring-amber-200' },
   'ND':     { label: 'No Debt',                color: 'bg-lime-100 text-lime-800 ring-lime-200' },
@@ -448,7 +448,7 @@ const DataVendorDashboard = () => {
   // SHARED HEADER
   // ─────────────────────────────────────────────────────────────
   const Header = () => (
-    <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-xl p-5 sm:p-6">
+    <div className="bg-gradient-to-r from-primary-950 via-primary-900 to-primary-950 rounded-2xl shadow-xl p-5 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <img src="/debtify-logo.svg" alt="Debtify" className="h-12 w-auto object-contain" loading="eager" />
@@ -533,7 +533,7 @@ const DataVendorDashboard = () => {
   // ─────────────────────────────────────────────────────────────
   if (view === 'lists') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-white/60 via-primary-50/40 to-primary-100/50">
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-6 space-y-5">
           <Header />
 
@@ -642,7 +642,7 @@ const DataVendorDashboard = () => {
                     {showDailyBreakdown && (
                       <div className="overflow-x-auto rounded-xl border border-gray-100">
                         <table className="min-w-full">
-                          <thead className="bg-slate-900">
+                          <thead className="bg-primary-950">
                             <tr>
                               <th className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date</th>
                               <th className="px-4 py-2.5 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sales</th>
@@ -867,7 +867,7 @@ const DataVendorDashboard = () => {
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-white/60 via-primary-50/40 to-primary-100/50">
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-6 space-y-5">
           <Header />
 
@@ -1030,7 +1030,7 @@ const DataVendorDashboard = () => {
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
                   <thead>
-                    <tr className="bg-slate-900">
+                    <tr className="bg-primary-950">
                       <th className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Lead</th>
                       <th className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Phone</th>
                       <th className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Enrolled Debt</th>
@@ -1131,7 +1131,7 @@ const DataVendorDashboard = () => {
   // ─────────────────────────────────────────────────────────────
   if (view === 'runs') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-white/60 via-primary-50/40 to-primary-100/50">
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-6 space-y-5">
           <Header />
 
@@ -1147,7 +1147,7 @@ const DataVendorDashboard = () => {
               <div className="overflow-x-auto">
                 <table className="min-w-full">
                   <thead>
-                    <tr className="bg-slate-900">
+                    <tr className="bg-primary-950">
                       <th className="px-4 py-3 text-left text-xs font-bold text-yellow-400 uppercase tracking-wider whitespace-nowrap">Run #</th>
                       <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider whitespace-nowrap">Date</th>
                       <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider whitespace-nowrap">Label</th>
@@ -1247,7 +1247,7 @@ const DataVendorDashboard = () => {
   const displayedStatuses = showAllStatuses ? dispKeys : dispKeys.slice(0, 8);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-white/60 via-primary-50/40 to-primary-100/50">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-6 space-y-5">
         <Header />
 
@@ -1331,7 +1331,7 @@ const DataVendorDashboard = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full">
-                <thead className="bg-slate-900 sticky top-0">
+                <thead className="bg-primary-950 sticky top-0">
                   <tr>
                     {ALL_COLUMNS.map(col => (
                       <th key={col.key} className="px-3 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">

@@ -109,7 +109,7 @@ const AdminUploadShareModal = ({ isOpen, onClose }) => {
       {/* Modal */}
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
+        <div className="flex items-center justify-between p-5 border-b border-gray-200 bg-gradient-to-r from-primary-600 to-primary-700">
           <div className="flex items-center gap-2 text-white">
             <Upload size={20} />
             <h3 className="text-lg font-bold">Share Data with Restricted Admin</h3>
@@ -191,7 +191,7 @@ const AdminUploadShareModal = ({ isOpen, onClose }) => {
           <button
             onClick={handleUpload}
             disabled={uploading || !selectedAdmin || !file}
-            className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
+            className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
           >
             {uploading ? (
               <>

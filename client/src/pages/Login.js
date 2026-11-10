@@ -125,6 +125,7 @@ const Login = () => {
           className="relative h-48 flex-shrink-0 bg-cover"
           style={{ backgroundImage: "url('/loginpage-sm.jpg')", backgroundPosition: '75% center' }}
         >
+          <div className="absolute inset-0 bg-cover pointer-events-none" style={{ backgroundImage: "url('/loginpage-sm.jpg')", backgroundPosition: '75% center', filter: 'hue-rotate(-100deg) saturate(0.9)' }} aria-hidden="true" />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-black/20" />
           <div className="relative flex items-center gap-2.5 p-6">
             <img src="/favicon.svg" alt="Debtify" className="h-8 w-8 drop-shadow" />
@@ -142,6 +143,7 @@ const Login = () => {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/loginpage.jpg')" }}
         />
+        <div className="absolute inset-0 bg-cover bg-center pointer-events-none" style={{ backgroundImage: "url('/loginpage.jpg')", filter: 'hue-rotate(-100deg) saturate(0.9)' }} aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-transparent" />
 
         {/* ambient brand glow blobs */}

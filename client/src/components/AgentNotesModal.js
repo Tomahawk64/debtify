@@ -180,7 +180,7 @@ const AgentNotesPad = ({ show, onClose, initialPos = { x: 600, y: 80 } }) => {
       <div
         onMouseDown={handleDragStart}
         className="flex items-center justify-between px-3 py-2 text-white text-sm font-bold select-none cursor-move flex-shrink-0"
-        style={{ background: 'linear-gradient(135deg,#6366f1,#4f46e5)' }}
+        style={{ background: 'linear-gradient(135deg,#307868,#286055)' }}
       >
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

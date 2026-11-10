@@ -303,11 +303,11 @@ const RestrictedAdminDashboard = () => {
   if (loading) return <LoadingSpinner message="Loading dashboard..." />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-white/60 via-primary-50/40 to-primary-100/50">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-6 space-y-5">
 
         {/* ── Branded Header ──────────────────────────────────────── */}
-        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-xl p-5 sm:p-6">
+        <div className="bg-gradient-to-r from-primary-950 via-primary-900 to-primary-950 rounded-2xl shadow-xl p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <img
@@ -468,7 +468,7 @@ const RestrictedAdminDashboard = () => {
                     onClick={() => handlePreset(p.key)}
                     className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${
                       activePreset === p.key
-                        ? 'bg-slate-900 text-yellow-400 shadow-md'
+                        ? 'bg-primary-950 text-yellow-400 shadow-md'
                         : 'text-slate-500 hover:text-slate-700 hover:bg-white'
                     }`}
                   >
@@ -511,7 +511,7 @@ const RestrictedAdminDashboard = () => {
               </div>
               <button
                 onClick={handleApplyCustom}
-                className="px-4 py-2 text-xs font-bold bg-slate-900 text-yellow-400 rounded-xl hover:bg-slate-800 transition-colors shadow-sm"
+                className="px-4 py-2 text-xs font-bold bg-primary-950 text-yellow-400 rounded-xl hover:bg-primary-900 transition-colors shadow-sm"
               >
                 Apply
               </button>
@@ -552,7 +552,7 @@ const RestrictedAdminDashboard = () => {
                           ? 'bg-emerald-600 text-white shadow-md'
                           : s.key === 'NQ'
                             ? 'bg-red-600 text-white shadow-md'
-                            : 'bg-slate-900 text-yellow-400 shadow-md'
+                            : 'bg-primary-950 text-yellow-400 shadow-md'
                         : `${s.color} hover:bg-white`
                     }`}
                   >
@@ -610,7 +610,7 @@ const RestrictedAdminDashboard = () => {
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
-                <tr className="bg-gradient-to-r from-slate-800 to-slate-900">
+                <tr className="bg-gradient-to-r from-primary-900 to-primary-950">
                   <th className="px-3 py-3.5 text-left text-[11px] font-bold text-slate-300 uppercase tracking-wider whitespace-nowrap">
                     #
                   </th>

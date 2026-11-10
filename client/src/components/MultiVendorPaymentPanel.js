@@ -39,8 +39,8 @@ const formatUtcDate = (d) => {
 };
 
 const LIMIT = 50;
-const selectCls = 'bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-const cellSelectCls = 'bg-slate-700 border border-slate-600 text-white text-xs rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer disabled:opacity-50';
+const selectCls = 'bg-primary-800 border border-primary-700 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+const cellSelectCls = 'bg-primary-800 border border-primary-700 text-white text-xs rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer disabled:opacity-50';
 
 // Controlled date cell: only saves when the value actually changed, and reverts on failure.
 function DraftDateInput({ value, disabled, onCommit }) {
@@ -57,7 +57,7 @@ function DraftDateInput({ value, disabled, onCommit }) {
         const ok = await onCommit(v);
         if (!ok) setV(value);
       }}
-      className="bg-slate-700 border border-slate-600 text-white text-xs rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+      className="bg-primary-800 border border-primary-700 text-white text-xs rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
     />
   );
 }
@@ -153,14 +153,14 @@ export default function MultiVendorPaymentPanel() {
   return (
     <div>
       {/* Filters card */}
-      <div className="bg-slate-800/60 backdrop-blur border border-slate-700/50 rounded-2xl p-5 mb-5 shadow-xl">
+      <div className="bg-primary-900/60 backdrop-blur border border-primary-800/50 rounded-2xl p-5 mb-5 shadow-xl">
         <div className="flex flex-wrap gap-3 items-end">
           <div className="flex flex-col gap-1 min-w-[220px]">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
               <Users size={11} /> Lead Vendor
             </label>
             {vendorLoading ? (
-              <div className="h-9 bg-slate-700/50 rounded-lg animate-pulse" />
+              <div className="h-9 bg-primary-800/50 rounded-lg animate-pulse" />
             ) : (
               <select value={selectedVendor} onChange={(e) => { setSelectedVendor(e.target.value); setPage(1); }} className={selectCls}>
                 <option value="">All Lead Vendors</option>
@@ -205,7 +205,7 @@ export default function MultiVendorPaymentPanel() {
                 placeholder="Name, phone, lead ID, vendor, status…"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="flex-1 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="flex-1 bg-primary-800 border border-primary-700 text-white text-sm rounded-lg px-3 py-2 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-colors">
                 Go
@@ -214,11 +214,11 @@ export default function MultiVendorPaymentPanel() {
           </form>
 
           <button onClick={clearFilters}
-            className="px-4 py-2 text-sm text-slate-400 hover:text-white border border-slate-600 hover:border-slate-500 rounded-lg transition-colors self-end">
+            className="px-4 py-2 text-sm text-slate-400 hover:text-white border border-primary-700 hover:border-slate-500 rounded-lg transition-colors self-end">
             Clear
           </button>
           <button onClick={fetchRecords} disabled={loading} title="Refresh"
-            className="px-3 py-2 text-slate-400 hover:text-white border border-slate-600 hover:border-slate-500 rounded-lg transition-colors self-end disabled:opacity-50">
+            className="px-3 py-2 text-slate-400 hover:text-white border border-primary-700 hover:border-slate-500 rounded-lg transition-colors self-end disabled:opacity-50">
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
@@ -227,7 +227,7 @@ export default function MultiVendorPaymentPanel() {
       {/* Summary cards */}
       {!loading && total > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-          <div className="bg-slate-800/60 backdrop-blur border border-slate-700/50 rounded-xl p-4 flex items-center gap-4 shadow">
+          <div className="bg-primary-900/60 backdrop-blur border border-primary-800/50 rounded-xl p-4 flex items-center gap-4 shadow">
             <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow">
               <TrendingUp size={18} className="text-white" />
             </div>
@@ -237,7 +237,7 @@ export default function MultiVendorPaymentPanel() {
               <p className="text-xs text-slate-500">{total} SALE records</p>
             </div>
           </div>
-          <div className="bg-slate-800/60 backdrop-blur border border-emerald-700/40 rounded-xl p-4 flex items-center gap-4 shadow">
+          <div className="bg-primary-900/60 backdrop-blur border border-emerald-700/40 rounded-xl p-4 flex items-center gap-4 shadow">
             <div className="p-2.5 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg shadow">
               <CreditCard size={18} className="text-white" />
             </div>
@@ -260,12 +260,12 @@ export default function MultiVendorPaymentPanel() {
         {totalPages > 1 && (
           <div className="flex items-center gap-2">
             <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1 || loading}
-              className="p-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 disabled:opacity-40 transition-colors">
+              className="p-1.5 rounded-lg bg-primary-800 hover:bg-primary-700 text-slate-300 disabled:opacity-40 transition-colors">
               <ChevronLeft size={16} />
             </button>
             <span className="text-slate-400 text-sm">{page} / {totalPages}</span>
             <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages || loading}
-              className="p-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 disabled:opacity-40 transition-colors">
+              className="p-1.5 rounded-lg bg-primary-800 hover:bg-primary-700 text-slate-300 disabled:opacity-40 transition-colors">
               <ChevronRight size={16} />
             </button>
           </div>
@@ -273,7 +273,7 @@ export default function MultiVendorPaymentPanel() {
       </div>
 
       {/* Table */}
-      <div className="bg-slate-800/60 backdrop-blur border border-slate-700/50 rounded-2xl shadow-xl overflow-hidden">
+      <div className="bg-primary-900/60 backdrop-blur border border-primary-800/50 rounded-2xl shadow-xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <RefreshCw size={28} className="animate-spin text-indigo-400" />
@@ -287,7 +287,7 @@ export default function MultiVendorPaymentPanel() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-700">
+                <tr className="border-b border-primary-800">
                   <th className={th}>Lead</th>
                   <th className={th}>Phone</th>
                   <th className={th}>Enrolled Debt</th>
@@ -300,11 +300,11 @@ export default function MultiVendorPaymentPanel() {
                   <th className={th}>Draft Date 2</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/50">
+              <tbody className="divide-y divide-primary-800/50">
                 {records.map((rec) => {
                   const busy = updatingId === rec._id;
                   return (
-                    <tr key={rec._id} className="hover:bg-slate-700/30 transition-colors">
+                    <tr key={rec._id} className="hover:bg-primary-800/30 transition-colors">
                       <td className="px-4 py-3">
                         <div className="font-medium text-white">{rec.name || '—'}</div>
                         {rec.email && <div className="text-xs text-slate-500 truncate max-w-[160px]">{rec.email}</div>}
@@ -325,7 +325,7 @@ export default function MultiVendorPaymentPanel() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-bold bg-primary-500/10 text-primary-300 border border-primary-500/20">
                           {rec.leadVendor || '—'}
                         </span>
                       </td>
@@ -400,12 +400,12 @@ export default function MultiVendorPaymentPanel() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-3 mt-5">
           <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1 || loading}
-            className="flex items-center gap-1.5 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg disabled:opacity-40 transition-colors text-sm">
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary-800 hover:bg-primary-700 text-slate-300 rounded-lg disabled:opacity-40 transition-colors text-sm">
             <ChevronLeft size={15} /> Prev
           </button>
           <span className="text-slate-400 text-sm">Page {page} of {totalPages}</span>
           <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages || loading}
-            className="flex items-center gap-1.5 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg disabled:opacity-40 transition-colors text-sm">
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary-800 hover:bg-primary-700 text-slate-300 rounded-lg disabled:opacity-40 transition-colors text-sm">
             Next <ChevronRight size={15} />
           </button>
         </div>

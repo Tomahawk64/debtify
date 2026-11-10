@@ -2441,7 +2441,7 @@ const Agent1Dashboard = () => {
 
             <div className="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <form onSubmit={handleAssignmentSubmit}>
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-xl font-semibold text-white">Assign Lead</h3>
@@ -2563,7 +2563,7 @@ const Agent1Dashboard = () => {
             {/* Card */}
             <div className="relative bg-white rounded-2xl shadow-2xl border border-indigo-200 w-full max-w-sm mx-4 overflow-hidden">
               {/* Header */}
-              <div className="px-5 py-4 text-white" style={{ background: 'linear-gradient(135deg,#6366f1,#4f46e5)' }}>
+              <div className="px-5 py-4 text-white" style={{ background: 'linear-gradient(135deg,#307868,#286055)' }}>
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2622,7 +2622,7 @@ const Agent1Dashboard = () => {
                     handleSubmit({ preventDefault: () => {} });
                   }}
                   className="flex-1 py-2.5 text-sm font-bold text-white rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ background: 'linear-gradient(135deg,#6366f1,#4f46e5)' }}
+                  style={{ background: 'linear-gradient(135deg,#307868,#286055)' }}
                 >
                   Confirm &amp; Dispose
                 </button>

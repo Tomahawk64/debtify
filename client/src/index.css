@@ -17,16 +17,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 rounded-full;
+  @apply bg-primary-50 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gradient-to-b from-blue-400 to-indigo-500 rounded-full;
+  @apply bg-gradient-to-b from-primary-300 to-primary-500 rounded-full;
   transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gradient-to-b from-blue-500 to-indigo-600;
+  @apply bg-gradient-to-b from-primary-400 to-primary-600;
 }
 
 /* Custom scrollbar class for specific elements */
@@ -35,20 +35,57 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-gray-50 rounded-xl;
+  @apply bg-primary-50 rounded-xl;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-gradient-to-b from-blue-400 to-indigo-500 rounded-xl shadow-lg;
+  @apply bg-gradient-to-b from-primary-300 to-primary-500 rounded-xl shadow-lg;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  @apply bg-gradient-to-b from-blue-500 to-indigo-600;
+  @apply bg-gradient-to-b from-primary-400 to-primary-600;
 }
 
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Theme tokens - forest / sage green ("Dashboard V22" look)
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --rail-from: #102828;
+  --rail-to: #204038;
+  --rail-active: #b8e8da;
+  --brand-green: #307868;
+}
+
+/* Soft sage-mint page background (also applied behind the app shell) */
+.app-bg {
+  background: linear-gradient(135deg, #f4f7f6 0%, #e3ece9 55%, #d6e4e4 100%);
+}
+
+/* Frosted white card with a gentle lift on hover. Uses transform only (no
+   layout properties) so it never triggers reflow on heavy pages. */
+.glass-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 24px -6px rgba(16, 40, 40, 0.10);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 30px -10px rgba(16, 40, 40, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-card,
+  .glass-card:hover {
+    transition: none;
+    transform: none;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -141,7 +178,7 @@ html {
 
 /* Gradient text */
 .gradient-text {
-  @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
 }
 
 /* Glass morphism effect */
@@ -159,13 +196,13 @@ html {
 
 /* Form input focus styles */
 .form-input:focus {
-  @apply ring-2 ring-blue-500 border-blue-500;
+  @apply ring-2 ring-primary-500 border-primary-500;
   transition: all 0.3s ease;
 }
 
 /* Button hover effects */
 .btn-primary {
-  @apply bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-200;
+  @apply bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:ring-4 focus:ring-primary-200;
   transition: all 0.3s ease;
 }
 
@@ -191,7 +228,7 @@ html {
 
 /* Card styles - Enhanced */
 .card {
-  @apply bg-white rounded-2xl shadow-lg border border-gray-100;
+  @apply bg-white rounded-2xl shadow-lg border border-primary-100;
   transition: all 0.3s ease;
 }
 
@@ -258,7 +295,7 @@ html {
 }
 
 .table-row {
-  @apply hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200;
+  @apply hover:bg-gradient-to-r hover:from-primary-50 hover:to-primary-100 transition-all duration-200;
 }
 
 /* Hover scale effect */
@@ -276,11 +313,11 @@ html {
 }
 
 .shadow-glow-blue {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 20px rgba(48, 120, 104, 0.3);
 }
 
 .shadow-glow-purple {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 20px rgba(48, 120, 104, 0.3);
 }
 
 /* Mobile responsive adjustments */
@@ -301,6 +338,6 @@ body {
 
 /* Focus visible for accessibility */
 *:focus-visible {
-  @apply outline-2 outline-offset-2 outline-blue-500;
+  @apply outline-2 outline-offset-2 outline-primary-500;
 }
 

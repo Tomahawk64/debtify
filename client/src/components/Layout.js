@@ -296,12 +296,12 @@ const Layout = ({ onDashboardRefresh }) => {
   const isRestricted = user && ['admin', 'agent2'].includes(user.role) && !user.isMainOrgAdmin;
 
   return (
-    <div className={`flex h-screen bg-gray-100${isRestricted ? ' select-none' : ''}`}>
+    <div className={`flex h-screen app-bg${isRestricted ? ' select-none' : ''}`}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 flex z-40 md:hidden">
           <div 
-            className="fixed inset-0 bg-gray-600 bg-opacity-75"
+            className="fixed inset-0 bg-primary-950 bg-opacity-60"
             onClick={() => setSidebarOpen(false)}
           ></div>
         </div>
@@ -310,32 +310,33 @@ const Layout = ({ onDashboardRefresh }) => {
       {/* Sidebar */}
       <div className={`${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:inset-0`}>
+      } fixed inset-y-0 left-0 z-50 w-64 flex flex-col overflow-hidden text-white shadow-2xl transform transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:inset-0 md:m-3 md:rounded-3xl`}
+        style={{ background: 'linear-gradient(180deg, var(--rail-to) 0%, var(--rail-from) 100%)' }}>
         
         {/* Sidebar header */}
-        <div className="flex items-center justify-between h-16 px-6 bg-primary-600">
-          <h1 className="text-xl font-bold text-white tracking-tight">Debtify</h1>
+        <div className="flex items-center justify-between h-16 px-6 flex-shrink-0">
+          <h1 className="text-xl font-bold text-primary-100 tracking-tight">Debtify</h1>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="text-white md:hidden"
+            className="text-primary-100 md:hidden"
           >
             <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* User info */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-white/10 flex-shrink-0">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center">
-                <span className="text-white font-medium">
+              <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--rail-active)' }}>
+                <span className="font-semibold text-primary-900">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
               </div>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">{user.name}</p>
-              <p className="text-xs text-gray-500 capitalize">
+              <p className="text-sm font-medium text-white">{user.name}</p>
+              <p className="text-xs text-primary-200 capitalize">
                 {user.role === 'agent1' ? 'Lead Generator' : 
                  user.role === 'agent2' ? 'Lead Follower' : 
                  user.role === 'admin' ? 'Administrator' : 
@@ -349,7 +350,7 @@ const Layout = ({ onDashboardRefresh }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="mt-6 px-3">
+        <nav className="mt-6 px-3 flex-1 overflow-y-auto">
           <div className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -361,16 +362,17 @@ const Layout = ({ onDashboardRefresh }) => {
                   to={item.href}
                   className={`${
                     isActive(item.href)
-                      ? 'bg-primary-100 text-primary-900 border-r-2 border-primary-600'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  } group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200`}
+                      ? 'text-primary-950 shadow-md'
+                      : 'text-primary-100/80 hover:bg-white/10 hover:text-white'
+                  } group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors duration-200`}
+                  style={isActive(item.href) ? { backgroundColor: 'var(--rail-active)' } : undefined}
                   onClick={() => setSidebarOpen(false)}
                   onDoubleClick={() => isDashboardItem && handleDashboardDoubleClick(item)}
                   title={isDashboardItem ? 'Double-click to refresh dashboard and scroll to top' : ''}
                 >
                   <Icon
                     className={`${
-                      isActive(item.href) ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'
+                      isActive(item.href) ? 'text-primary-800' : 'text-primary-200/70 group-hover:text-white'
                     } mr-3 h-5 w-5`}
                   />
                   {item.name}
@@ -381,12 +383,12 @@ const Layout = ({ onDashboardRefresh }) => {
         </nav>
 
         {/* Logout button */}
-        <div className="absolute bottom-0 left-0 right-0 p-6">
+        <div className="p-6 flex-shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors duration-200"
+            className="w-full flex items-center px-3 py-2.5 text-sm font-medium text-primary-100/80 rounded-xl hover:bg-white/10 hover:text-white transition-colors duration-200"
           >
-            <LogOut className="mr-3 h-5 w-5 text-gray-400" />
+            <LogOut className="mr-3 h-5 w-5 text-primary-200/70" />
             Logout
           </button>
         </div>
@@ -396,7 +398,7 @@ const Layout = ({ onDashboardRefresh }) => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top navigation */}
         <header
-          className={`shadow-sm border-b${showRedTopbarAlert ? '' : ' bg-white border-gray-200'}`}
+          className={`shadow-sm border-b${showRedTopbarAlert ? '' : ' bg-white/80 border-primary-100'}`}
           style={showRedTopbarAlert ? {
             backgroundColor: ALERT_COLORS[alertColorIdx].bg,
             borderBottomColor: ALERT_COLORS[alertColorIdx].border,
@@ -407,7 +409,7 @@ const Layout = ({ onDashboardRefresh }) => {
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className={`${showRedTopbarAlert ? 'text-red-100 hover:text-white' : 'text-gray-500 hover:text-gray-700'} md:hidden`}
+                className={`${showRedTopbarAlert ? 'text-red-100 hover:text-white' : 'text-gray-500 hover:text-primary-700'} md:hidden`}
               >
                 <Menu className="h-6 w-6" />
               </button>
@@ -469,7 +471,7 @@ const Layout = ({ onDashboardRefresh }) => {
                             <div
                               key={n._id}
                               className={`flex items-start gap-3 px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                                !n.isRead ? 'bg-blue-50' : ''
+                                !n.isRead ? 'bg-primary-50' : ''
                               }`}
                             >
                               <div className="mt-0.5">{getNotifIcon(n.type)}</div>
@@ -519,7 +521,7 @@ const Layout = ({ onDashboardRefresh }) => {
               </button>
 
               {/* User avatar */}
-              <div className="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-primary-100">
                 <span className="text-white text-sm font-medium">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
@@ -529,7 +531,7 @@ const Layout = ({ onDashboardRefresh }) => {
         </header>
 
         {/* Main content area */}
-        <main className="flex-1 overflow-y-auto bg-gray-50">
+        <main className="flex-1 overflow-y-auto">
           <div className="p-6">
             <Outlet />
           </div>

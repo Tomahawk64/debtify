@@ -205,7 +205,7 @@ const BackdatedLeadModal = ({ isOpen, onClose, onCreated }) => {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Name <span className="text-red-500">*</span></label>
             <input type="text" name="name" value={formData.name} onChange={handleChange}
-              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
           </div>
 
           {/* Email / Phone / Alt Phone */}
@@ -213,17 +213,17 @@ const BackdatedLeadModal = ({ isOpen, onClose, onCreated }) => {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
               <input type="email" name="email" value={formData.email} onChange={handleChange}
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone</label>
               <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="10 digits"
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Alternate Phone</label>
               <input type="text" name="alternatePhone" value={formData.alternatePhone} onChange={handleChange} placeholder="10 digits"
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
           </div>
 
@@ -231,7 +231,7 @@ const BackdatedLeadModal = ({ isOpen, onClose, onCreated }) => {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Debt Category</label>
             <select name="debtCategory" value={formData.debtCategory} onChange={handleCategoryChange}
-              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all mb-3">
+              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all mb-3">
               <option value="unsecured">Unsecured</option>
               <option value="secured">Secured</option>
             </select>
@@ -240,7 +240,7 @@ const BackdatedLeadModal = ({ isOpen, onClose, onCreated }) => {
                 <button key={type} type="button" onClick={() => toggleDebtType(type)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg border-2 transition-all ${
                     formData.debtTypes.includes(type)
-                      ? 'bg-blue-600 border-blue-600 text-white'
+                      ? 'bg-primary-600 border-primary-600 text-white'
                       : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300'
                   }`}>
                   {type}
@@ -254,29 +254,29 @@ const BackdatedLeadModal = ({ isOpen, onClose, onCreated }) => {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Total Debt ($)</label>
               <input type="number" name="totalDebtAmount" value={formData.totalDebtAmount} onChange={handleChange}
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5"># Creditors</label>
               <input type="number" name="numberOfCreditors" value={formData.numberOfCreditors} onChange={handleChange}
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Monthly Payment ($)</label>
               <input type="number" name="monthlyDebtPayment" value={formData.monthlyDebtPayment} onChange={handleChange}
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Credit Score</label>
               <input type="number" name="creditScore" value={formData.creditScore} onChange={handleChange}
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Credit Score Range</label>
             <select name="creditScoreRange" value={formData.creditScoreRange} onChange={handleChange}
-              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all">
+              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all">
               <option value="">Select a range…</option>
               {CREDIT_SCORE_RANGES.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
@@ -287,30 +287,30 @@ const BackdatedLeadModal = ({ isOpen, onClose, onCreated }) => {
             <div className="sm:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Address</label>
               <input type="text" name="address" value={formData.address} onChange={handleChange}
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">City</label>
               <input type="text" name="city" value={formData.city} onChange={handleChange}
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">State</label>
               <input type="text" name="state" value={formData.state} onChange={handleChange}
-                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+                className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
             </div>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Zipcode</label>
             <input type="text" name="zipcode" value={formData.zipcode} onChange={handleChange}
-              className="w-full sm:w-1/4 px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+              className="w-full sm:w-1/4 px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
           </div>
 
           {/* Notes */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Notes</label>
             <textarea name="notes" value={formData.notes} onChange={handleChange} rows={3}
-              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm transition-all" />
+              className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm transition-all" />
           </div>
         </div>
 

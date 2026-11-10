@@ -214,7 +214,7 @@ const VicidialCallQueue = ({ onLoadCallData, isFormActive }) => {
       {/* Header — always visible */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary-50 to-primary-100 hover:from-primary-100 hover:to-primary-200 transition-colors"
       >
         <div className="flex items-center space-x-3">
           <div className="relative">
