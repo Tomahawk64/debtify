@@ -3,9 +3,36 @@ const { body } = require('express-validator');
 const router = express.Router();
 const LeadVendorOption = require('../models/LeadVendorOption');
 const Organization = require('../models/Organization');
+const Lead = require('../models/Lead');
+const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
-const { DEFAULT_REVENUE_PERCENTAGE, isValidPercentage } = require('../utils/vendorRevenue');
+const {
+  DEFAULT_REVENUE_PERCENTAGE,
+  CPA_MIN_CALL_SECONDS,
+  isValidPercentage,
+  isValidCpaRate
+} = require('../utils/vendorRevenue');
+
+const PAYMENT_MODELS = ['CPL', 'CPA'];
+
+// Validators shared by create + update. cpaRate: a number >= 0, or null/'' to clear.
+const paymentModelValidator = body('paymentModel')
+  .optional()
+  .custom((v) => {
+    if (!PAYMENT_MODELS.includes(v)) throw new Error('paymentModel must be CPL or CPA');
+    return true;
+  });
+const cpaRateValidator = body('cpaRate')
+  .optional({ nullable: true, checkFalsy: false })
+  .custom((v) => {
+    if (v === null || v === '') return true;
+    if (typeof v !== 'number' && typeof v !== 'string') throw new Error('cpaRate must be a number');
+    if (!isValidCpaRate(Number(v))) throw new Error('cpaRate must be a number between 0 and 1,000,000');
+    return true;
+  });
+
+const round2 = (n) => Math.round(Number(n) * 100) / 100;
 
 // ─────────────────────────────────────────────────────────────────
 // Lead Vendor Options — the managed list Agent2 picks a "Lead Vendor"
@@ -48,12 +75,15 @@ router.get('/', protect, async (req, res) => {
     // Revenue percentages are commercial data: only the main org admin /
     // superadmin ever receive them (this list is readable by every logged-in user).
     const query = LeadVendorOption.find(filter).sort({ name: 1 });
-    if (!isPrivileged) query.select('-revenuePercentage');
+    if (!isPrivileged) query.select('-revenuePercentage -paymentModel -cpaRate');
     const options = await query.lean();
     res.json({
       success: true,
-      data: options,
-      ...(isPrivileged ? { defaultRevenuePercentage: DEFAULT_REVENUE_PERCENTAGE } : {})
+      // entries created before paymentModel existed have no value => CPL
+      data: isPrivileged ? options.map((o) => ({ ...o, paymentModel: o.paymentModel === 'CPA' ? 'CPA' : 'CPL' })) : options,
+      ...(isPrivileged
+        ? { defaultRevenuePercentage: DEFAULT_REVENUE_PERCENTAGE, cpaMinCallSeconds: CPA_MIN_CALL_SECONDS }
+        : {})
     });
   } catch (err) {
     console.error('Error fetching lead vendor options:', err);
@@ -72,17 +102,29 @@ router.post(
     body('name')
       .trim()
       .isLength({ min: 1, max: 100 })
-      .withMessage('Name must be between 1 and 100 characters')
+      .withMessage('Name must be between 1 and 100 characters'),
+    paymentModelValidator,
+    cpaRateValidator
   ],
   handleValidationErrors,
   async (req, res) => {
     try {
       const name = req.body.name.trim();
+      const paymentModel = req.body.paymentModel === 'CPA' ? 'CPA' : 'CPL';
+      const hasRate = req.body.cpaRate !== undefined && req.body.cpaRate !== null && req.body.cpaRate !== '';
+      if (paymentModel === 'CPA' && !hasRate) {
+        return res.status(400).json({ success: false, message: 'A CPA rate is required for CPA lead vendors' });
+      }
       const existing = await LeadVendorOption.findOne({ name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } });
       if (existing) {
         return res.status(400).json({ success: false, message: 'A lead vendor option with this name already exists' });
       }
-      const option = await LeadVendorOption.create({ name, createdBy: req.user._id });
+      const option = await LeadVendorOption.create({
+        name,
+        paymentModel,
+        ...(paymentModel === 'CPA' ? { cpaRate: round2(req.body.cpaRate) } : {}),
+        createdBy: req.user._id
+      });
       res.status(201).json({ success: true, message: 'Lead vendor option created', data: option });
     } catch (err) {
       console.error('Error creating lead vendor option:', err);
@@ -110,7 +152,9 @@ router.patch(
         const n = Number(v);
         if (!isValidPercentage(n)) throw new Error('revenuePercentage must be between 0 and 100');
         return true;
-      })
+      }),
+    paymentModelValidator,
+    cpaRateValidator
   ],
   handleValidationErrors,
   async (req, res) => {
@@ -138,6 +182,18 @@ router.patch(
         // null/'' clears the custom rate so the vendor falls back to the default
         option.revenuePercentage = (v === null || v === '') ? undefined : Math.round(Number(v) * 100) / 100;
       }
+      if (req.body.paymentModel !== undefined) {
+        option.paymentModel = req.body.paymentModel;
+      }
+      if (req.body.cpaRate !== undefined) {
+        const v = req.body.cpaRate;
+        option.cpaRate = (v === null || v === '') ? undefined : round2(v);
+      }
+      // A CPA vendor can't exist without a rate (it would silently pay $0).
+      // The stored rate is kept when switching back to CPL so it isn't lost.
+      if (option.paymentModel === 'CPA' && !isValidCpaRate(option.cpaRate)) {
+        return res.status(400).json({ success: false, message: 'A CPA rate is required for CPA lead vendors' });
+      }
       await option.save();
       res.json({ success: true, message: 'Lead vendor option updated', data: option });
     } catch (err) {
@@ -146,5 +202,44 @@ router.patch(
     }
   }
 );
+
+// ─────────────────────────────────────────────────────────────────
+// DELETE /api/lead-vendor-options/:id — permanently remove an option
+// Refused while any lead is tagged with the name or any Multi Vendor Admin
+// still has it in scope: deleting would drop the vendor's payout settings
+// (CPL % / CPA rate) and silently change what historic sales are worth.
+// Those vendors should be retired instead.
+// ─────────────────────────────────────────────────────────────────
+router.delete('/:id', protect, requireMainOrgAdmin, async (req, res) => {
+  try {
+    if (!/^[0-9a-fA-F]{24}$/.test(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid lead vendor option id' });
+    }
+    const option = await LeadVendorOption.findById(req.params.id);
+    if (!option) {
+      return res.status(404).json({ success: false, message: 'Lead vendor option not found' });
+    }
+
+    const [leadCount, accountCount] = await Promise.all([
+      Lead.countDocuments({ leadVendor: option.name }),
+      User.countDocuments({ subLeadVendors: option.name })
+    ]);
+    if (leadCount > 0 || accountCount > 0) {
+      const parts = [];
+      if (leadCount > 0) parts.push(`${leadCount} lead${leadCount === 1 ? '' : 's'}`);
+      if (accountCount > 0) parts.push(`${accountCount} Multi Vendor account${accountCount === 1 ? '' : 's'}`);
+      return res.status(409).json({
+        success: false,
+        message: `"${option.name}" is still used by ${parts.join(' and ')}, so it can't be deleted. Retire it instead.`
+      });
+    }
+
+    await option.deleteOne();
+    res.json({ success: true, message: 'Lead vendor option deleted' });
+  } catch (err) {
+    console.error('Error deleting lead vendor option:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
 
 module.exports = router;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   CreditCard, Search, RefreshCw, ChevronLeft, ChevronRight,
-  Calendar, Users, CheckCircle2, XCircle, Clock, TrendingUp
+  Calendar, Users, CheckCircle2, XCircle, Clock, TrendingUp, PhoneCall
 } from 'lucide-react';
 import axios from '../utils/axios';
 import toast from 'react-hot-toast';
@@ -9,6 +9,10 @@ import { formatEasternTimeForDisplay } from '../utils/dateUtils';
 
 // Admin (main org) editor for Multi Vendor SALE-lead payment status. Mirrors the
 // Data Vendor panel in PaymentStatus.js; vendors are identified by Lead Vendor name.
+// Two views, by how the vendor is paid (set in Manage Lead Vendors):
+//   CPL - % of enrolled debt, with payment status / type / draft dates (the original view).
+//   CPA - a fixed rate per sale whose call ran past the limit; the admin types in the
+//         call duration here and the revenue follows.
 
 const STATUS_OPTIONS = ['', 'Cleared', 'Pending', 'NSF', 'Cancellation', 'Refunded'];
 
@@ -62,8 +66,47 @@ function DraftDateInput({ value, disabled, onCommit }) {
   );
 }
 
+// Call length in whole seconds. Saves on blur / Enter only when the value changed;
+// empty clears it. Reverts to the stored value if the save fails.
+function CallDurationInput({ value, disabled, onCommit }) {
+  const [v, setV] = useState(value);
+  useEffect(() => { setV(value); }, [value]);
+  const commit = async () => {
+    if (v === value) return;
+    const ok = await onCommit(v);
+    if (!ok) setV(value);
+  };
+  return (
+    <div className="flex items-center gap-1.5">
+      <input
+        type="number"
+        min="0"
+        max="86400"
+        step="1"
+        inputMode="numeric"
+        value={v}
+        disabled={disabled}
+        placeholder="sec"
+        aria-label="Call duration in seconds"
+        onChange={(e) => setV(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+        className="w-24 bg-primary-800 border border-primary-700 text-white text-xs rounded-lg px-2 py-1 text-right focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 placeholder-slate-500"
+      />
+      <span className="text-[10px] text-slate-500">sec</span>
+    </div>
+  );
+}
+
+const MODEL_TABS = [
+  { key: 'CPL', label: 'CPL Vendors' },
+  { key: 'CPA', label: 'CPA Vendors' },
+];
+
 export default function MultiVendorPaymentPanel() {
+  const [model, setModel] = useState('CPL');
   const [vendors, setVendors] = useState([]);
+  const [vendorModels, setVendorModels] = useState({});
   const [vendorLoading, setVendorLoading] = useState(true);
   const [selectedVendor, setSelectedVendor] = useState('');
 
@@ -72,6 +115,8 @@ export default function MultiVendorPaymentPanel() {
   const [page, setPage] = useState(1);
   const [totalEnrolledDebt, setTotalEnrolledDebt] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
+  const [qualifiedCount, setQualifiedCount] = useState(0);
+  const [minSeconds, setMinSeconds] = useState(180);
 
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -85,21 +130,22 @@ export default function MultiVendorPaymentPanel() {
 
   useEffect(() => {
     axios.get('/api/multivendor/payment-status/admin/vendors')
-      .then((res) => setVendors(res.data?.data || []))
+      .then((res) => { setVendors(res.data?.data || []); setVendorModels(res.data?.vendorModels || {}); })
       .catch(() => toast.error('Failed to load lead vendors'))
       .finally(() => setVendorLoading(false));
   }, []);
 
-  const fetchRecords = useCallback(async () => {
+  // silent = refresh in place (no spinner) after an inline edit, so the row being edited isn't unmounted
+  const loadRecords = useCallback(async (silent = false) => {
     const myReq = ++reqId.current;
-    setLoading(true);
+    if (!silent) setLoading(true);
     try {
-      const params = { page, limit: LIMIT };
+      const params = { page, limit: LIMIT, model };
       if (selectedVendor)             params.vendor = selectedVendor;
       if (search)                     params.search = search;
       if (startDate)                  params.startDate = startDate;
       if (endDate)                    params.endDate = endDate;
-      if (paymentStatusFilter !== '') params.paymentStatusFilter = paymentStatusFilter;
+      if (model === 'CPL' && paymentStatusFilter !== '') params.paymentStatusFilter = paymentStatusFilter;
 
       const res = await axios.get('/api/multivendor/payment-status/admin/sales', { params });
       if (myReq !== reqId.current) return; // a newer request superseded this one
@@ -107,16 +153,26 @@ export default function MultiVendorPaymentPanel() {
       setTotal(res.data.total || 0);
       setTotalEnrolledDebt(res.data.totalEnrolledDebt || 0);
       setTotalRevenue(res.data.totalRevenue || 0);
+      setQualifiedCount(res.data.qualifiedCount || 0);
+      if (typeof res.data.cpaMinCallSeconds === 'number') setMinSeconds(res.data.cpaMinCallSeconds);
     } catch (err) {
       if (myReq !== reqId.current) return;
-      setRecords([]); setTotal(0); setTotalEnrolledDebt(0); setTotalRevenue(0);
+      setRecords([]); setTotal(0); setTotalEnrolledDebt(0); setTotalRevenue(0); setQualifiedCount(0);
       toast.error(err.response?.data?.message || 'Failed to load SALE records');
     } finally {
       if (myReq === reqId.current) setLoading(false);
     }
-  }, [selectedVendor, search, startDate, endDate, paymentStatusFilter, page]);
+  }, [selectedVendor, search, startDate, endDate, paymentStatusFilter, page, model]);
 
-  useEffect(() => { fetchRecords(); }, [fetchRecords]);
+  useEffect(() => { loadRecords(); }, [loadRecords]);
+
+  const switchModel = (next) => {
+    if (next === model) return;
+    setModel(next);
+    // vendor / payment-status filters belong to one view only
+    setSelectedVendor(''); setPaymentStatusFilter('');
+    setPage(1);
+  };
 
   // Returns true on success so callers (date inputs) can revert on failure.
   const handleFieldChange = async (record, field, value) => {
@@ -134,6 +190,18 @@ export default function MultiVendorPaymentPanel() {
     }
   };
 
+  // CPA: save the call length, then re-pull the list so revenue and the totals are the server's numbers.
+  const handleDurationCommit = async (record, text) => {
+    const t = String(text).trim();
+    if (t !== '' && !/^\d+$/.test(t)) {
+      toast.error('Enter the call duration as whole seconds');
+      return false;
+    }
+    const ok = await handleFieldChange(record, 'callDuration', t === '' ? null : Number(t));
+    if (ok) loadRecords(true);
+    return ok;
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     setSearch(searchInput.trim());
@@ -147,11 +215,39 @@ export default function MultiVendorPaymentPanel() {
     setPage(1);
   };
 
+  const modelVendors = vendors.filter((v) => (vendorModels[v] === 'CPA' ? 'CPA' : 'CPL') === model);
+  const isCpa = model === 'CPA';
+
   const totalPages = Math.ceil(total / LIMIT);
   const th = 'px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider';
 
   return (
     <div>
+      {/* Payment model: how the vendor is paid (CPL % of debt, or CPA fixed rate per qualifying call) */}
+      <div className="flex gap-2 mb-4" role="tablist" aria-label="Vendor payment type">
+        {MODEL_TABS.map(({ key, label }) => (
+          <button
+            key={key}
+            role="tab"
+            aria-selected={model === key}
+            onClick={() => switchModel(key)}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+              model === key
+                ? 'bg-indigo-600/80 border-indigo-500 text-white'
+                : 'bg-primary-900/60 border-primary-800/50 text-slate-400 hover:text-white hover:border-slate-500'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {isCpa && (
+        <p className="text-xs text-slate-400 mb-4">
+          CPA vendors earn their fixed rate for each SALE lead whose call lasted more than {minSeconds} seconds.
+          Enter the call duration for each lead below; revenue updates automatically.
+        </p>
+      )}
+
       {/* Filters card */}
       <div className="bg-primary-900/60 backdrop-blur border border-primary-800/50 rounded-2xl p-5 mb-5 shadow-xl">
         <div className="flex flex-wrap gap-3 items-end">
@@ -164,7 +260,7 @@ export default function MultiVendorPaymentPanel() {
             ) : (
               <select value={selectedVendor} onChange={(e) => { setSelectedVendor(e.target.value); setPage(1); }} className={selectCls}>
                 <option value="">All Lead Vendors</option>
-                {vendors.map((v) => <option key={v} value={v}>{v}</option>)}
+                {modelVendors.map((v) => <option key={v} value={v}>{v}</option>)}
               </select>
             )}
           </div>
@@ -180,20 +276,22 @@ export default function MultiVendorPaymentPanel() {
             <input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setPage(1); }} className={selectCls} />
           </div>
 
-          <div className="flex flex-col gap-1 min-w-[160px]">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-              <CreditCard size={11} /> Payment Status
-            </label>
-            <select value={paymentStatusFilter} onChange={(e) => { setPaymentStatusFilter(e.target.value); setPage(1); }} className={selectCls}>
-              <option value="">All Statuses</option>
-              <option value="not_set">Not Set</option>
-              <option value="Cleared">Cleared</option>
-              <option value="Pending">Pending</option>
-              <option value="NSF">NSF</option>
-              <option value="Cancellation">Cancellation</option>
-              <option value="Refunded">Refunded</option>
-            </select>
-          </div>
+          {!isCpa && (
+            <div className="flex flex-col gap-1 min-w-[160px]">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <CreditCard size={11} /> Payment Status
+              </label>
+              <select value={paymentStatusFilter} onChange={(e) => { setPaymentStatusFilter(e.target.value); setPage(1); }} className={selectCls}>
+                <option value="">All Statuses</option>
+                <option value="not_set">Not Set</option>
+                <option value="Cleared">Cleared</option>
+                <option value="Pending">Pending</option>
+                <option value="NSF">NSF</option>
+                <option value="Cancellation">Cancellation</option>
+                <option value="Refunded">Refunded</option>
+              </select>
+            </div>
+          )}
 
           <form onSubmit={handleSearch} className="flex flex-col gap-1 flex-1 min-w-[200px]">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
@@ -202,7 +300,7 @@ export default function MultiVendorPaymentPanel() {
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Name, phone, lead ID, vendor, status…"
+                placeholder={isCpa ? 'Name, phone, lead ID, vendor…' : 'Name, phone, lead ID, vendor, status…'}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="flex-1 bg-primary-800 border border-primary-700 text-white text-sm rounded-lg px-3 py-2 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -217,7 +315,7 @@ export default function MultiVendorPaymentPanel() {
             className="px-4 py-2 text-sm text-slate-400 hover:text-white border border-primary-700 hover:border-slate-500 rounded-lg transition-colors self-end">
             Clear
           </button>
-          <button onClick={fetchRecords} disabled={loading} title="Refresh"
+          <button onClick={() => loadRecords()} disabled={loading} title="Refresh"
             className="px-3 py-2 text-slate-400 hover:text-white border border-primary-700 hover:border-slate-500 rounded-lg transition-colors self-end disabled:opacity-50">
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -239,12 +337,16 @@ export default function MultiVendorPaymentPanel() {
           </div>
           <div className="bg-primary-900/60 backdrop-blur border border-emerald-700/40 rounded-xl p-4 flex items-center gap-4 shadow">
             <div className="p-2.5 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg shadow">
-              <CreditCard size={18} className="text-white" />
+              {isCpa ? <PhoneCall size={18} className="text-white" /> : <CreditCard size={18} className="text-white" />}
             </div>
             <div>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Revenue</p>
               <p className="text-xl font-bold text-emerald-400">{money(totalRevenue)}</p>
-              <p className="text-xs text-slate-500">Across all matching records</p>
+              <p className="text-xs text-slate-500">
+                {isCpa
+                  ? `${qualifiedCount} call${qualifiedCount === 1 ? '' : 's'} over ${minSeconds}s`
+                  : 'Across all matching records'}
+              </p>
             </div>
           </div>
         </div>
@@ -281,7 +383,73 @@ export default function MultiVendorPaymentPanel() {
         ) : records.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <CreditCard size={40} className="text-slate-600" />
-            <p className="text-slate-500 text-sm">No SALE records found</p>
+            <p className="text-slate-500 text-sm">
+              {isCpa && modelVendors.length === 0 ? 'No CPA lead vendors have SALE leads yet' : 'No SALE records found'}
+            </p>
+          </div>
+        ) : isCpa ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-primary-800">
+                  <th className={th}>Lead</th>
+                  <th className={th}>Phone</th>
+                  <th className={th}>Lead ID</th>
+                  <th className={th}>Enrolled Debt</th>
+                  <th className={th}>Created At</th>
+                  <th className={th}>Lead Vendor</th>
+                  <th className={th}>Call Duration</th>
+                  <th className={th}>Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-primary-800/50">
+                {records.map((rec) => {
+                  const busy = updatingId === rec._id;
+                  const hasDuration = rec.callDuration !== null && rec.callDuration !== undefined;
+                  return (
+                    <tr key={rec._id} className="hover:bg-primary-800/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-white">{rec.name || '—'}</div>
+                        {rec.email && <div className="text-xs text-slate-500 truncate max-w-[160px]">{rec.email}</div>}
+                      </td>
+                      <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{rec.phone || '—'}</td>
+                      <td className="px-4 py-3 text-slate-400 text-xs font-mono whitespace-nowrap">{rec.leadId || '—'}</td>
+                      <td className="px-4 py-3">
+                        {rec.enrolledDebt > 0
+                          ? <span className="text-emerald-400 font-semibold">${Number(rec.enrolledDebt).toLocaleString()}</span>
+                          : <span className="text-slate-500">—</span>}
+                      </td>
+                      <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">
+                        {rec.createdAt ? formatEasternTimeForDisplay(rec.createdAt, { includeTime: false }) : '—'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-block px-2 py-0.5 rounded-md text-xs font-bold bg-primary-500/10 text-primary-300 border border-primary-500/20">
+                          {rec.leadVendor || '—'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <CallDurationInput
+                          value={hasDuration ? String(rec.callDuration) : ''}
+                          disabled={busy}
+                          onCommit={(v) => handleDurationCommit(rec, v)}
+                        />
+                        <div className="text-[10px] text-slate-500 mt-0.5 whitespace-nowrap">
+                          {!hasDuration ? 'Not entered' : rec.callDuration > minSeconds ? 'Over limit — paid' : `Needs over ${minSeconds}s`}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        {rec.revenue > 0
+                          ? <span className="text-violet-400 font-semibold">{money(rec.revenue)}</span>
+                          : <span className="text-slate-500">—</span>}
+                        {rec.cpaRate !== undefined && (
+                          <div className="text-[10px] text-slate-500 whitespace-nowrap">rate {money(rec.cpaRate)}</div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         ) : (
           <div className="overflow-x-auto">

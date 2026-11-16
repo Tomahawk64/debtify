@@ -18,7 +18,7 @@ const { protect, authorize } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 const { formatEasternTime } = require('../utils/timeFilters');
 const { escapeRegex } = require('../utils/regexUtils');
-const { DEFAULT_REVENUE_PERCENTAGE, getRevenuePercentages } = require('../utils/vendorRevenue');
+const { DEFAULT_REVENUE_PERCENTAGE, CPA_MIN_CALL_SECONDS, getVendorPayoutConfigs } = require('../utils/vendorRevenue');
 
 const router = express.Router();
 
@@ -78,7 +78,12 @@ const dateQueryValidation = [
 router.get('/sub-vendors', protect, authorize('multivendor_admin', 'superadmin'), async (req, res) => {
   try {
     const vendors = await resolveAllowedVendors(req.user, null);
-    res.json({ success: true, data: vendors });
+    // Which payout model (CPL / CPA) each vendor uses, so the Payment Status page
+    // knows which view(s) to offer. The rate itself is never exposed here.
+    const configs = await getVendorPayoutConfigs();
+    const vendorModels = {};
+    for (const v of vendors) vendorModels[v] = configs.has(v) ? configs.get(v).model : 'CPL';
+    res.json({ success: true, data: vendors, vendorModels });
   } catch (err) {
     console.error('[MultiVendor] sub-vendors fetch error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -244,13 +249,17 @@ const paymentListValidation = [
     .optional()
     .isIn(['', 'not_set', ...PAYMENT_STATUSES.filter(Boolean)])
     .withMessage('Invalid paymentStatusFilter'),
+  query('model').optional().isIn(['CPL', 'CPA']).withMessage('model must be CPL or CPA'),
 ];
 
-const buildPaymentFilter = (q, vendorMatch, dateMode) => {
+const buildPaymentFilter = (q, vendorMatch, dateMode, model = 'CPL') => {
   const filter = { leadProgressStatus: { $in: SALE_STATUSES }, leadVendor: vendorMatch };
   const and = [];
 
-  if (q.paymentStatusFilter === 'not_set') {
+  // CPA views don't show payment status, so it is neither filterable nor searchable there.
+  if (model === 'CPA') {
+    // (no payment status condition)
+  } else if (q.paymentStatusFilter === 'not_set') {
     and.push({ $or: [{ paymentStatus: '' }, { paymentStatus: null }] }); // null also matches "field missing"
   } else if (q.paymentStatusFilter) {
     filter.paymentStatus = q.paymentStatusFilter;
@@ -271,17 +280,96 @@ const buildPaymentFilter = (q, vendorMatch, dateMode) => {
 
   if (q.search) {
     const re = { $regex: escapeRegex(q.search), $options: 'i' };
-    and.push({ $or: [{ name: re }, { phone: re }, { leadId: re }, { leadVendor: re }, { paymentStatus: re }] });
+    and.push({
+      $or: [{ name: re }, { phone: re }, { leadId: re }, { leadVendor: re }, ...(model === 'CPA' ? [] : [{ paymentStatus: re }])]
+    });
   }
 
   if (and.length) filter.$and = and;
   return filter;
 };
 
+// Lists the SALE leads of one payout model.
+//   CPL — enrolled debt × the vendor's revenue %, with payment status / type / draft dates.
+//   CPA — the vendor's fixed rate for each lead whose (admin-entered) call lasted
+//         more than CPA_MIN_CALL_SECONDS, otherwise $0. No payment-status fields.
+// `model` comes from ?model= and defaults to CPL, so older clients keep working.
 const listPaymentSales = async (req, res, { vendorMatch, dateMode, includeEmail, includeRate }) => {
+  const model = req.query.model === 'CPA' ? 'CPA' : 'CPL';
   const page  = Math.max(1, parseInt(req.query.page) || 1);
   const limit = Math.min(500, parseInt(req.query.limit) || 50);
-  const filter = buildPaymentFilter(req.query, vendorMatch, dateMode);
+
+  const configs = await getVendorPayoutConfigs();
+  const cpaNames = [];
+  for (const [name, c] of configs) if (c.model === 'CPA') cpaNames.push(name);
+
+  // Keep only vendors on this payout model. Vendor names with no option (renamed /
+  // removed) count as CPL, matching how they were always treated before.
+  const filter = buildPaymentFilter(req.query, vendorMatch, dateMode, model);
+  filter.$and = [
+    ...(filter.$and || []),
+    { leadVendor: model === 'CPA' ? { $in: cpaNames } : { $nin: cpaNames } },
+  ];
+
+  const cfgOf = (vendor) => configs.get(vendor) || { model: 'CPL', percentage: DEFAULT_REVENUE_PERCENTAGE, cpaRate: 0 };
+  const percentageOf = (vendor) => cfgOf(vendor).percentage;
+
+  if (model === 'CPA') {
+    const projection = {
+      name: 1, phone: 1, leadId: 1, leadVendor: 1, createdAt: 1,
+      conversionValue: 1, totalDebtAmount: 1,
+      callDuration: 1, // select:false in the schema — requested explicitly
+      ...(includeEmail ? { email: 1 } : {}),
+    };
+    const qualifies = (d) => Number.isFinite(Number(d)) && d !== null && Number(d) > CPA_MIN_CALL_SECONDS;
+
+    const [total, leads, groupAgg] = await Promise.all([
+      Lead.countDocuments(filter),
+      Lead.find(filter, projection).sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+      Lead.aggregate([
+        { $match: filter },
+        { $group: {
+          _id: '$leadVendor',
+          count: { $sum: 1 },
+          enrolledDebt: { $sum: enrolledDebtExpr },
+          qualified: { $sum: { $cond: [{ $gt: [{ $ifNull: ['$callDuration', 0] }, CPA_MIN_CALL_SECONDS] }, 1, 0] } },
+        } },
+      ]),
+    ]);
+
+    const data = leads.map(({ conversionValue, totalDebtAmount, callDuration, ...rest }) => {
+      const rate = cfgOf(rest.leadVendor).cpaRate;
+      return {
+        ...rest,
+        enrolledDebt: enrolledDebtOf({ conversionValue, totalDebtAmount }),
+        revenue: qualifies(callDuration) ? round2(rate) : 0,
+        // call length / rate are for the main org admin's editor only
+        ...(includeRate ? { callDuration: callDuration === undefined || callDuration === null ? null : callDuration, cpaRate: rate } : {}),
+      };
+    });
+
+    let totalEnrolledDebt = 0;
+    let totalRevenue = 0;
+    let qualifiedCount = 0;
+    for (const g of groupAgg) {
+      totalEnrolledDebt += Number(g.enrolledDebt) || 0;
+      totalRevenue += (Number(g.qualified) || 0) * cfgOf(g._id).cpaRate;
+      qualifiedCount += Number(g.qualified) || 0;
+    }
+
+    return res.json({
+      success: true,
+      model,
+      data,
+      total,
+      page,
+      limit,
+      totalEnrolledDebt: round2(totalEnrolledDebt),
+      totalRevenue: round2(totalRevenue),
+      statusBreakdown: {},
+      ...(includeRate ? { qualifiedCount, cpaMinCallSeconds: CPA_MIN_CALL_SECONDS } : {}),
+    });
+  }
 
   const projection = {
     name: 1, phone: 1, leadId: 1, leadVendor: 1, createdAt: 1, leadProgressStatus: 1,
@@ -290,7 +378,7 @@ const listPaymentSales = async (req, res, { vendorMatch, dateMode, includeEmail,
     ...(includeEmail ? { email: 1 } : {}),
   };
 
-  const [total, leads, groupAgg, percentages] = await Promise.all([
+  const [total, leads, groupAgg] = await Promise.all([
     Lead.countDocuments(filter),
     Lead.find(filter, projection).sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit).lean(),
     // grouped by payment status AND lead vendor, because each vendor has its own revenue %
@@ -302,10 +390,7 @@ const listPaymentSales = async (req, res, { vendorMatch, dateMode, includeEmail,
         enrolledDebt: { $sum: enrolledDebtExpr },
       } },
     ]),
-    getRevenuePercentages(),
   ]);
-
-  const percentageOf = (vendor) => (percentages.has(vendor) ? percentages.get(vendor) : DEFAULT_REVENUE_PERCENTAGE);
 
   const data = leads.map(({ conversionValue, totalDebtAmount, ...rest }) => {
     const enrolledDebt = enrolledDebtOf({ conversionValue, totalDebtAmount });
@@ -339,6 +424,7 @@ const listPaymentSales = async (req, res, { vendorMatch, dateMode, includeEmail,
 
   res.json({
     success: true,
+    model,
     data,
     total,
     page,
@@ -367,7 +453,9 @@ router.get(
           totalEnrolledDebt: 0, totalRevenue: 0, statusBreakdown: {},
         });
       }
-      await listPaymentSales(req, res, { vendorMatch: { $in: allowedVendors }, dateMode: 'draft', includeEmail: false });
+      // CPA rows have no draft dates, so their date filter runs on the created date.
+      const dateMode = req.query.model === 'CPA' ? 'created' : 'draft';
+      await listPaymentSales(req, res, { vendorMatch: { $in: allowedVendors }, dateMode, includeEmail: false });
     } catch (err) {
       console.error('[MultiVendor] payment status list error:', err);
       res.status(500).json({ success: false, message: 'Server error' });
@@ -400,7 +488,11 @@ router.get('/payment-status/admin/vendors', protect, requirePaymentAdmin, async 
       leadProgressStatus: { $in: SALE_STATUSES },
       leadVendor: { $nin: [null, ''] },
     });
-    res.json({ success: true, data: names.filter(Boolean).sort((a, b) => a.localeCompare(b)) });
+    const sorted = names.filter(Boolean).sort((a, b) => a.localeCompare(b));
+    const configs = await getVendorPayoutConfigs();
+    const vendorModels = {};
+    for (const v of sorted) vendorModels[v] = configs.has(v) ? configs.get(v).model : 'CPL';
+    res.json({ success: true, data: sorted, vendorModels });
   } catch (err) {
     console.error('[MultiVendor] payment vendors error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
@@ -446,17 +538,43 @@ router.patch('/payment-status/:id', protect, requirePaymentAdmin, async (req, re
         set[field] = parsed;
       }
     }
-    if (Object.keys(set).length === 0) {
+    // Call length (seconds) for CPA vendors' leads; null / '' clears it.
+    let clearCallDuration = false;
+    const touchesPayment = Object.keys(set).length > 0; // status / type / draft dates
+    if (body.callDuration !== undefined) {
+      const v = body.callDuration;
+      if (v === null || v === '') {
+        clearCallDuration = true;
+      } else {
+        const n = typeof v === 'number' ? v : (typeof v === 'string' && /^\d+$/.test(v.trim()) ? Number(v.trim()) : NaN);
+        if (!Number.isInteger(n) || n < 0 || n > 86400) {
+          return res.status(400).json({ success: false, message: 'Call duration must be a whole number of seconds between 0 and 86400' });
+        }
+        set.callDuration = n;
+      }
+    }
+    if (Object.keys(set).length === 0 && !clearCallDuration) {
       return res.status(400).json({ success: false, message: 'No payment fields provided' });
     }
 
     // Only a vendor-tagged SALE lead can carry payment data; timestamps:false so
     // payment bookkeeping never alters the lead's own "last updated" metadata.
+    // Entering a call duration alone is not a payment-status change, so it does not
+    // stamp "status updated by/at".
+    const update = {
+      $set: {
+        ...set,
+        ...(touchesPayment ? { paymentStatusUpdatedBy: req.user._id, paymentStatusUpdatedAt: new Date() } : {}),
+      },
+    };
+    if (clearCallDuration) update.$unset = { callDuration: '' };
+    if (Object.keys(update.$set).length === 0) delete update.$set;
+
     const lead = await Lead.findOneAndUpdate(
       { _id: req.params.id, leadProgressStatus: { $in: SALE_STATUSES }, leadVendor: { $nin: [null, ''] } },
-      { $set: { ...set, paymentStatusUpdatedBy: req.user._id, paymentStatusUpdatedAt: new Date() } },
+      update,
       { new: true, runValidators: true, timestamps: false }
-    ).select('paymentStatus paymentType draftDate1 draftDate2 paymentStatusUpdatedAt').lean();
+    ).select('paymentStatus paymentType draftDate1 draftDate2 paymentStatusUpdatedAt callDuration').lean();
 
     if (!lead) {
       return res.status(404).json({ success: false, message: 'SALE lead not found' });

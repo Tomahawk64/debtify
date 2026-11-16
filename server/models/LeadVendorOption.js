@@ -25,6 +25,22 @@ const leadVendorOptionSchema = new mongoose.Schema({
     min: [0, 'Revenue percentage cannot be negative'],
     max: [100, 'Revenue percentage cannot exceed 100']
   },
+  // How this vendor is paid in Payment Status:
+  //   CPL — cost per lead: revenue = revenuePercentage % of enrolled debt.
+  //   CPA — cost per acquisition: a fixed cpaRate ($) per SALE lead whose call
+  //         lasted more than CPA_MIN_CALL_SECONDS (see utils/vendorRevenue.js).
+  // Entries created before this field existed have no value and behave as CPL.
+  // Like revenuePercentage, never returned to non-admin users.
+  paymentModel: {
+    type: String,
+    enum: ['CPL', 'CPA'],
+    default: 'CPL'
+  },
+  cpaRate: {
+    type: Number,
+    min: [0, 'CPA rate cannot be negative'],
+    max: [1000000, 'CPA rate is too large']
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

@@ -385,6 +385,16 @@ const leadSchema = new mongoose.Schema({
   },
   draftDate1: { type: Date },
   draftDate2: { type: Date },
+  // Call length in seconds, typed in manually by the main org admin on the
+  // Payment Status page. Decides whether a lead from a CPA lead vendor earns
+  // the vendor's fixed rate. select:false keeps it out of every other lead
+  // response (agents, exports, ...); payment routes request it explicitly.
+  callDuration: {
+    type: Number,
+    min: 0,
+    max: 86400,
+    select: false
+  },
 
   // Admin processing flag
   adminProcessed: {
